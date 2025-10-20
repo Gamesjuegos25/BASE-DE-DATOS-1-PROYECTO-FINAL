@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Consultas - Constructora</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-building"></i>
+                <h1>Sistema Constructora</h1>
+            </div>
+            <nav class="nav">
+                <div class="nav-toggle" id="navToggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h3><i class="fas fa-search"></i> Consultas</h3>
+        </div>
+        <ul class="sidebar-menu">
+            <li>
+                <a href="#dashboard" class="menu-item active" data-section="dashboard">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="#obras" class="menu-item" data-section="obras">
+                    <i class="fas fa-building"></i>
+                    <span>Obras</span>
+                </a>
+            </li>
+            <li>
+                <a href="#empleados" class="menu-item" data-section="empleados">
+                    <i class="fas fa-users"></i>
+                    <span>Empleados</span>
+                </a>
+            </li>
+            <li>
+                <a href="#materiales" class="menu-item" data-section="materiales">
+                    <i class="fas fa-boxes"></i>
+                    <span>Materiales</span>
+                </a>
+            </li>
+            <li>
+                <a href="#proveedores" class="menu-item" data-section="proveedores">
+                    <i class="fas fa-truck"></i>
+                    <span>Proveedores</span>
+                </a>
+            </li>
+            <li>
+                <a href="#inventario" class="menu-item" data-section="inventario">
+                    <i class="fas fa-warehouse"></i>
+                    <span>Inventario</span>
+                </a>
+            </li>
+            <li>
+                <a href="#proyectos" class="menu-item" data-section="proyectos">
+                    <i class="fas fa-tasks"></i>
+                    <span>Proyectos</span>
+                </a>
+            </li>
+            <li>
+                <a href="#reportes" class="menu-item" data-section="reportes">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Reportes</span>
+                </a>
+            </li>
+            <li>
+                <a href="#vehiculos" class="menu-item" data-section="vehiculos">
+                    <i class="fas fa-car"></i>
+                    <span>Vehículos</span>
+                </a>
+            </li>
+            <li>
+                <a href="#equipos" class="menu-item" data-section="equipos">
+                    <i class="fas fa-tools"></i>
+                    <span>Equipos</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <main class="main-content" id="mainContent">
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="content-section active">
+            <div class="section-header">
+                <h2><i class="fas fa-chart-pie"></i> Dashboard General</h2>
+                <p>Resumen general del sistema de la constructora</p>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="totalObras">0</h3>
+                        <p>Obras Activas</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="totalEmpleados">0</h3>
+                        <p>Empleados</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-boxes"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="totalMateriales">0</h3>
+                        <p>Tipos de Material</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-truck"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="totalProveedores">0</h3>
+                        <p>Proveedores</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-cards">
+                <div class="dashboard-card">
+                    <h3>Obras Recientes</h3>
+                    <div id="obrasRecientes" class="recent-items">
+                        <!-- Se llena dinámicamente -->
+                    </div>
+                </div>
+                <div class="dashboard-card">
+                    <h3>Actividad Reciente</h3>
+                    <div id="actividadReciente" class="recent-items">
+                        <!-- Se llena dinámicamente -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Obras Section -->
+        <section id="obras" class="content-section">
+            <div class="section-header">
+                <h2><i class="fas fa-building"></i> Consulta de Obras</h2>
+                <div class="section-controls">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchObras" placeholder="Buscar obras...">
+                    </div>
+                    <select id="filterEstadoObra">
+                        <option value="">Todos los estados</option>
+                        <option value="En Proceso">En Proceso</option>
+                        <option value="Completada">Completada</option>
+                        <option value="Suspendida">Suspendida</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <table class="data-table" id="tablaObras">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Ubicación</th>
+                            <th>Tipo</th>
+                            <th>Estado</th>
+                            <th>Cliente</th>
+                            <th>Presupuesto</th>
+                            <th>Avance</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Se llena dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Empleados Section -->
+        <section id="empleados" class="content-section">
+            <div class="section-header">
+                <h2><i class="fas fa-users"></i> Consulta de Empleados</h2>
+                <div class="section-controls">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchEmpleados" placeholder="Buscar empleados...">
+                    </div>
+                    <select id="filterTipoEmpleado">
+                        <option value="">Todos los tipos</option>
+                        <option value="Ingeniero">Ingeniero</option>
+                        <option value="Arquitecto">Arquitecto</option>
+                        <option value="Albañil">Albañil</option>
+                        <option value="Administrativo">Administrativo</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <table class="data-table" id="tablaEmpleados">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Tipo</th>
+                            <th>Salario Fijo</th>
+                            <th>Estado</th>
+                            <th>Proyectos Asignados</th>
+                            <th>Último Pago</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Se llena dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Materiales Section -->
+        <section id="materiales" class="content-section">
+            <div class="section-header">
+                <h2><i class="fas fa-boxes"></i> Consulta de Materiales</h2>
+                <div class="section-controls">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchMateriales" placeholder="Buscar materiales...">
+                    </div>
+                    <select id="filterTipoMaterial">
+                        <option value="">Todos los tipos</option>
+                        <option value="Cemento">Cemento</option>
+                        <option value="Acero">Acero</option>
+                        <option value="Ladrillo">Ladrillo</option>
+                        <option value="Herramientas">Herramientas</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <table class="data-table" id="tablaMateriales">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Unidad</th>
+                            <th>Precio Unitario</th>
+                            <th>Tipo</th>
+                            <th>Estado</th>
+                            <th>Proveedor</th>
+                            <th>Stock Total</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Se llena dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Proveedores Section -->
+        <section id="proveedores" class="content-section">
+            <div class="section-header">
+                <h2><i class="fas fa-truck"></i> Consulta de Proveedores</h2>
+                <div class="section-controls">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchProveedores" placeholder="Buscar proveedores...">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <table class="data-table" id="tablaProveedores">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Contacto</th>
+                            <th>Materiales Suministrados</th>
+                            <th>Total Facturas</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Se llena dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Inventario Section -->
+        <section id="inventario" class="content-section">
+            <div class="section-header">
+                <h2><i class="fas fa-warehouse"></i> Consulta de Inventario</h2>
+                <div class="section-controls">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInventario" placeholder="Buscar en inventario...">
+                    </div>
+                    <select id="filterBodega">
+                        <option value="">Todas las bodegas</option>
+                        <!-- Se llena dinámicamente -->
+                    </select>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <table class="data-table" id="tablaInventario">
+                    <thead>
+                        <tr>
+                            <th>Bodega</th>
+                            <th>Obra</th>
+                            <th>Material</th>
+                            <th>Cantidad Disponible</th>
+                            <th>Unidad</th>
+                            <th>Valor Total</th>
+                            <th>Responsable</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Se llena dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Proyectos Section -->
+        <section id="proyectos" class="content-section">
+            <div class="section-header">
+                <h2><i class="fas fa-tasks"></i> Consulta de Proyectos</h2>
+                <div class="section-controls">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchProyectos" placeholder="Buscar proyectos...">
+                    </div>
+                    <select id="filterEstadoProyecto">
+                        <option value="">Todos los estados</option>
+                        <option value="Planificación">Planificación</option>
+                        <option value="En Proceso">En Proceso</option>
+                        <option value="Completado">Completado</option>
+                        <option value="Suspendido">Suspendido</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <table class="data-table" id="tablaProyectos">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Obra</th>
+                            <th>Fecha Inicio</th>
+                            <th>Fecha Fin</th>
+                            <th>Estado</th>
+                            <th>Avance</th>
+                            <th>Actividades</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Se llena dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Reportes Section -->
+        <section id="reportes" class="content-section">
+            <div class="section-header">
+                <h2><i class="fas fa-chart-bar"></i> Reportes y Análisis</h2>
+                <div class="section-controls">
+                    <select id="filterTipoReporte">
+                        <option value="semanal">Reportes Semanales</option>
+                        <option value="gastos">Gastos por Obra</option>
+                        <option value="materiales">Uso de Materiales</option>
+                        <option value="pagos">Pagos a Empleados</option>
+                    </select>
+                    <select id="filterObraReporte">
+                        <option value="">Todas las obras</option>
+                        <!-- Se llena dinámicamente -->
+                    </select>
+                </div>
+            </div>
+            
+            <div class="reports-container">
+                <div class="report-summary">
+                    <div class="summary-card">
+                        <h3>Gastos Totales</h3>
+                        <p id="gastosTotales">Q. 0.00</p>
+                    </div>
+                    <div class="summary-card">
+                        <h3>Materiales Consumidos</h3>
+                        <p id="materialesConsumidos">0</p>
+                    </div>
+                    <div class="summary-card">
+                        <h3>Pagos Realizados</h3>
+                        <p id="pagosRealizados">Q. 0.00</p>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <table class="data-table" id="tablaReportes">
+                        <thead id="reportesHeader">
+                            <!-- Se llena dinámicamente según el tipo de reporte -->
+                        </thead>
+                        <tbody>
+                            <!-- Se llena dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Vehículos Section -->
+        <section id="vehiculos" class="content-section">
+            <div class="section-header">
+                <h2><i class="fas fa-car"></i> Consulta de Vehículos</h2>
+                <div class="section-controls">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchVehiculos" placeholder="Buscar vehículos...">
+                    </div>
+                    <select id="filterTipoVehiculo">
+                        <option value="">Todos los tipos</option>
+                        <option value="Camión">Camión</option>
+                        <option value="Pickup">Pickup</option>
+                        <option value="Maquinaria">Maquinaria</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <table class="data-table" id="tablaVehiculos">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Placa</th>
+                            <th>Tipo</th>
+                            <th>Estado</th>
+                            <th>Obra Asignada</th>
+                            <th>Ubicación Actual</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Se llena dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Equipos Section -->
+        <section id="equipos" class="content-section">
+            <div class="section-header">
+                <h2><i class="fas fa-tools"></i> Consulta de Equipos</h2>
+                <div class="section-controls">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchEquipos" placeholder="Buscar equipos...">
+                    </div>
+                    <select id="filterTipoEquipo">
+                        <option value="">Todos los tipos</option>
+                        <option value="Herramientas">Herramientas</option>
+                        <option value="Maquinaria">Maquinaria</option>
+                        <option value="Medición">Medición</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <table class="data-table" id="tablaEquipos">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Tipo</th>
+                            <th>Estado</th>
+                            <th>Empleado Asignado</th>
+                            <th>Fecha Asignación</th>
+                            <th>Fecha Fin</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Se llena dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal para detalles -->
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Detalles</h3>
+                <span class="close" id="closeModal">&times;</span>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Contenido dinámico -->
+            </div>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="conexion_database.js"></script>
+    <script src="script.js"></script>
+    <script>
+        // Detectar automáticamente si hay backend disponible
+        document.addEventListener('DOMContentLoaded', function() {
+            // Intentar conectar con el backend
+            fetch('http://localhost:3000/api/dashboard/estadisticas')
+                .then(response => {
+                    if (response.ok) {
+                        console.log('✅ Backend detectado - Usando base de datos real');
+                        inicializarSistemaConDB();
+                    } else {
+                        throw new Error('Backend no disponible');
+                    }
+                })
+                .catch(error => {
+                    console.log('⚠️ Backend no disponible - Usando datos simulados');
+                    console.log('💡 Para usar base de datos real, ejecuta: iniciar_sistema.bat');
+                    inicializarSistema();
+                });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Vehículos - Sistema Constructora{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="header-section">
+        <h1>🚛 Gestión de Vehículos</h1>
+        <a href="{{ url_for('crear_vehiculo') }}" class="btn-primary">
+            ➕ Nuevo Vehículo
+        </a>
+    </div>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    {% if vehiculos %}
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Placa</th>
+                        <th>Tipo</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for vehiculo in vehiculos %}
+                    <tr>
+                        <td>{{ vehiculo.id or vehiculo.vehiculo_id or 'N/A' }}</td>
+                        <td><strong>{{ vehiculo.placa or 'Sin placa' }}</strong></td>
+                        <td>{{ vehiculo.tipo or 'No especificado' }}</td>
+                        <td>
+                            <span class="badge badge-success">{{ vehiculo.estado or 'Disponible' }}</span>
+                        </td>
+                        <td>
+                            <button class="btn-sm btn-secondary">👁️ Ver</button>
+                            <button class="btn-sm btn-primary">✏️ Editar</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">🚛</div>
+            <h3>No hay vehículos registrados</h3>
+            <p>Comienza agregando el primer vehículo de la flota.</p>
+            <a href="{{ url_for('crear_vehiculo') }}" class="btn-primary">
+                ➕ Agregar Primer Vehículo
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

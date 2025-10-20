@@ -1,0 +1,359 @@
+{% extends "base.html" %}
+
+{% block title %}Reportes Académicos - Sistema Constructora{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="header-section">
+        <h1>📊 Reportes Académicos</h1>
+        <p>Principales salidas requeridas por el proyecto académico</p>
+    </div>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    <!-- REPORTE 1: Control de gastos por obra y área -->
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">💰 1. Control de Gastos por Obra y Área</h2>
+        </div>
+        <div class="card-body">
+            <div class="report-stats">
+                <div class="stat-card">
+                    <h3>Q{{ "{:,.2f}".format(reportes.gastos_totales) if reportes.gastos_totales else '0.00' }}</h3>
+                    <p>Gastos Totales</p>
+                </div>
+                <div class="stat-card">
+                    <h3>{{ reportes.obras_con_gastos or 0 }}</h3>
+                    <p>Obras con Gastos</p>
+                </div>
+                <div class="stat-card">
+                    <h3>{{ reportes.areas_activas or 0 }}</h3>
+                    <p>Áreas Activas</p>
+                </div>
+            </div>
+            
+            {% if reportes.gastos_por_obra %}
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Obra</th>
+                            <th>Área</th>
+                            <th>Tipo de Gasto</th>
+                            <th>Monto (Q)</th>
+                            <th>Fecha</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for gasto in reportes.gastos_por_obra %}
+                        <tr>
+                            <td>{{ gasto.obra or 'N/A' }}</td>
+                            <td>{{ gasto.area or 'General' }}</td>
+                            <td>{{ gasto.tipo_gasto or 'Varios' }}</td>
+                            <td>Q{{ "{:,.2f}".format(gasto.monto) if gasto.monto else '0.00' }}</td>
+                            <td>{{ gasto.fecha or 'N/A' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <p>No hay gastos registrados por obra y área</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- REPORTE 2: Control de materiales por área -->
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">🧱 2. Control de Materiales por Área</h2>
+        </div>
+        <div class="card-body">
+            <div class="report-stats">
+                <div class="stat-card">
+                    <h3>{{ reportes.materiales_asignados or 0 }}</h3>
+                    <p>Materiales Asignados</p>
+                </div>
+                <div class="stat-card">
+                    <h3>{{ reportes.areas_con_materiales or 0 }}</h3>
+                    <p>Áreas con Materiales</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Q{{ "{:,.2f}".format(reportes.valor_materiales) if reportes.valor_materiales else '0.00' }}</h3>
+                    <p>Valor en Materiales</p>
+                </div>
+            </div>
+            
+            {% if reportes.materiales_por_area %}
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Área</th>
+                            <th>Material</th>
+                            <th>Cantidad</th>
+                            <th>Unidad</th>
+                            <th>Valor Total</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for material in reportes.materiales_por_area %}
+                        <tr>
+                            <td>{{ material.area or 'Sin área' }}</td>
+                            <td>{{ material.material or 'N/A' }}</td>
+                            <td>{{ material.cantidad or 0 }}</td>
+                            <td>{{ material.unidad or 'N/A' }}</td>
+                            <td>Q{{ "{:,.2f}".format(material.valor_total) if material.valor_total else '0.00' }}</td>
+                            <td>
+                                <span class="badge badge-success">{{ material.estado or 'Disponible' }}</span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <p>No hay materiales asignados por área</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- REPORTE 3: Asignaciones de proyectos -->
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">📋 3. Asignaciones de Proyectos</h2>
+        </div>
+        <div class="card-body">
+            <div class="report-stats">
+                <div class="stat-card">
+                    <h3>{{ reportes.proyectos_activos or 0 }}</h3>
+                    <p>Proyectos Activos</p>
+                </div>
+                <div class="stat-card">
+                    <h3>{{ reportes.ingenieros_asignados or 0 }}</h3>
+                    <p>Ingenieros Asignados</p>
+                </div>
+                <div class="stat-card">
+                    <h3>{{ reportes.arquitectos_asignados or 0 }}</h3>
+                    <p>Arquitectos Asignados</p>
+                </div>
+            </div>
+            
+            {% if reportes.asignaciones_proyectos %}
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Proyecto</th>
+                            <th>Responsable</th>
+                            <th>Cargo</th>
+                            <th>Fecha Asignación</th>
+                            <th>Estado</th>
+                            <th>Progreso</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for asignacion in reportes.asignaciones_proyectos %}
+                        <tr>
+                            <td>{{ asignacion.proyecto or 'N/A' }}</td>
+                            <td>{{ asignacion.responsable or 'Sin asignar' }}</td>
+                            <td>
+                                <span class="badge badge-info">{{ asignacion.cargo or 'N/A' }}</span>
+                            </td>
+                            <td>{{ asignacion.fecha_asignacion or 'N/A' }}</td>
+                            <td>
+                                <span class="badge badge-primary">{{ asignacion.estado or 'Planeación' }}</span>
+                            </td>
+                            <td>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: {{ asignacion.progreso or 0 }}%"></div>
+                                    <span class="progress-text">{{ asignacion.progreso or 0 }}%</span>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <p>No hay asignaciones de proyectos registradas</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- REPORTE 4: Control de actividades del personal -->
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">👷‍♂️ 4. Control de Actividades del Personal</h2>
+        </div>
+        <div class="card-body">
+            <div class="report-stats">
+                <div class="stat-card">
+                    <h3>{{ reportes.empleados_activos or 0 }}</h3>
+                    <p>Empleados Activos</p>
+                </div>
+                <div class="stat-card">
+                    <h3>{{ reportes.actividades_diarias or 0 }}</h3>
+                    <p>Actividades Hoy</p>
+                </div>
+                <div class="stat-card">
+                    <h3>{{ reportes.areas_ocupadas or 0 }}</h3>
+                    <p>Áreas Ocupadas</p>
+                </div>
+            </div>
+            
+            {% if reportes.actividades_personal %}
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Empleado</th>
+                            <th>Área Asignada</th>
+                            <th>Actividad</th>
+                            <th>Horario</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for actividad in reportes.actividades_personal %}
+                        <tr>
+                            <td>{{ actividad.empleado or 'N/A' }}</td>
+                            <td>{{ actividad.area or 'Sin área' }}</td>
+                            <td>{{ actividad.actividad or 'Sin actividad' }}</td>
+                            <td>{{ actividad.horario or 'N/A' }}</td>
+                            <td>
+                                <span class="badge badge-success">{{ actividad.estado or 'Activo' }}</span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <p>No hay actividades del personal registradas</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- REPORTE 5: Actualización automática de precios -->
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">💱 5. Actualización Automática de Precios</h2>
+        </div>
+        <div class="card-body">
+            <div class="report-stats">
+                <div class="stat-card">
+                    <h3>{{ reportes.precios_actualizados or 0 }}</h3>
+                    <p>Precios Actualizados Hoy</p>
+                </div>
+                <div class="stat-card">
+                    <h3>{{ reportes.variacion_promedio or 0 }}%</h3>
+                    <p>Variación Promedio</p>
+                </div>
+                <div class="stat-card">
+                    <h3>{{ reportes.materiales_con_precio or 0 }}</h3>
+                    <p>Materiales con Precio</p>
+                </div>
+            </div>
+            
+            {% if reportes.historial_precios %}
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Material</th>
+                            <th>Precio Anterior</th>
+                            <th>Precio Actual</th>
+                            <th>Variación</th>
+                            <th>Fecha Actualización</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for precio in reportes.historial_precios %}
+                        <tr>
+                            <td>{{ precio.material or 'N/A' }}</td>
+                            <td>Q{{ "{:,.2f}".format(precio.precio_anterior) if precio.precio_anterior else '0.00' }}</td>
+                            <td>Q{{ "{:,.2f}".format(precio.precio_actual) if precio.precio_actual else '0.00' }}</td>
+                            <td>
+                                {% if precio.variacion %}
+                                    {% if precio.variacion > 0 %}
+                                        <span class="badge badge-danger">+{{ precio.variacion }}%</span>
+                                    {% else %}
+                                        <span class="badge badge-success">{{ precio.variacion }}%</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="badge badge-secondary">0%</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ precio.fecha_actualizacion or 'N/A' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <p>No hay historial de actualización de precios</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.report-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.progress-bar {
+    position: relative;
+    width: 100%;
+    height: 20px;
+    background-color: #e9ecef;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #28a745, #20c997);
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 12px;
+    font-weight: bold;
+    color: #333;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px;
+    color: #6c757d;
+}
+</style>
+{% endblock %}

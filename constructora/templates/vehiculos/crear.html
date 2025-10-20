@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Nuevo Vehículo - Sistema Constructora{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="header-section">
+        <h1>🚛 Nuevo Vehículo</h1>
+        <a href="{{ url_for('listar_vehiculos') }}" class="btn-secondary">
+            ⬅️ Volver a Vehículos
+        </a>
+    </div>
+    
+    <div class="form-container">
+        <form method="POST" class="form-modern">
+            <div class="form-section">
+                <h3>🚗 Información del Vehículo</h3>
+                
+                <div class="form-group">
+                    <label for="placa">Placa *</label>
+                    <input type="text" id="placa" name="placa" required 
+                           placeholder="Ej: P123ABC" value="{{ request.form.placa if request.form else '' }}">
+                </div>
+                
+                <div class="form-group">
+                    <label for="tipo">Tipo de Vehículo</label>
+                    <select id="tipo" name="tipo">
+                        <option value="">Seleccionar tipo...</option>
+                        <option value="Camión">🚛 Camión</option>
+                        <option value="Volqueta">🚚 Volqueta</option>
+                        <option value="Pickup">🛻 Pickup</option>
+                        <option value="Mezcladora">🚛 Mezcladora</option>
+                        <option value="Grúa">🏗️ Grúa</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="estado">Estado</label>
+                    <select id="estado" name="estado">
+                        <option value="Disponible">✅ Disponible</option>
+                        <option value="En Uso">🔄 En Uso</option>
+                        <option value="Mantenimiento">🔧 En Mantenimiento</option>
+                        <option value="Fuera de Servicio">❌ Fuera de Servicio</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">✅ Crear Vehículo</button>
+                <a href="{{ url_for('listar_vehiculos') }}" class="btn-secondary">❌ Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

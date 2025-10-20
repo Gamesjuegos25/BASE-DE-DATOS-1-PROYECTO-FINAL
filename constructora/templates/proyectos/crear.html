@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Nuevo Proyecto - Sistema Constructora{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="header-section">
+        <h1>📋 Nuevo Proyecto</h1>
+        <a href="{{ url_for('listar_proyectos') }}" class="btn-secondary">
+            ⬅️ Volver a Proyectos
+        </a>
+    </div>
+    
+    <div class="form-container">
+        <form method="POST" class="form-modern">
+            <div class="form-section">
+                <h3>📝 Información del Proyecto</h3>
+                
+                <div class="form-group">
+                    <label for="nombre">Nombre del Proyecto *</label>
+                    <input type="text" id="nombre" name="nombre" required 
+                           placeholder="Ej: Construcción Complejo Residencial Torre Norte" 
+                           value="{{ request.form.nombre if request.form else '' }}">
+                </div>
+                
+                <div class="form-group">
+                    <label for="fecha_inicio">Fecha de Inicio</label>
+                    <input type="date" id="fecha_inicio" name="fecha_inicio" 
+                           value="{{ request.form.fecha_inicio if request.form else '' }}">
+                </div>
+                
+                <div class="form-group">
+                    <label for="fecha_fin">Fecha Estimada de Finalización</label>
+                    <input type="date" id="fecha_fin" name="fecha_fin" 
+                           value="{{ request.form.fecha_fin if request.form else '' }}">
+                </div>
+                
+                <div class="form-group">
+                    <label for="estado">Estado del Proyecto</label>
+                    <select id="estado" name="estado">
+                        <option value="Planeación">📝 Planeación</option>
+                        <option value="En Progreso">🔄 En Progreso</option>
+                        <option value="Pausado">⏸️ Pausado</option>
+                        <option value="Completado">✅ Completado</option>
+                        <option value="Cancelado">❌ Cancelado</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">✅ Crear Proyecto</button>
+                <a href="{{ url_for('listar_proyectos') }}" class="btn-secondary">❌ Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

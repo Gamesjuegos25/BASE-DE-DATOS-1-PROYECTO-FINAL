@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block title %}Nuevo Material - Sistema Constructora{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="header-section">
+        <h1>🧱 Nuevo Material</h1>
+        <a href="{{ url_for('listar_materiales') }}" class="btn-secondary">
+            ⬅️ Volver a Materiales
+        </a>
+    </div>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    <div class="form-container">
+        <form method="POST" class="form-modern">
+            <div class="form-section">
+                <h3>📦 Información del Material</h3>
+                
+                <div class="form-group">
+                    <label for="nombre">Nombre del Material *</label>
+                    <input type="text" 
+                           id="nombre" 
+                           name="nombre" 
+                           required 
+                           placeholder="Ej: Cemento Portland"
+                           value="{{ request.form.nombre if request.form else '' }}">
+                </div>
+                
+                <div class="form-group">
+                    <label for="unidad">Unidad de Medida *</label>
+                    <select id="unidad" name="unidad" required>
+                        <option value="">Seleccionar unidad...</option>
+                        <option value="Bolsa" {{ 'selected' if request.form and request.form.unidad == 'Bolsa' else '' }}>📦 Bolsa</option>
+                        <option value="Metro Cúbico" {{ 'selected' if request.form and request.form.unidad == 'Metro Cúbico' else '' }}>📏 Metro Cúbico (m³)</option>
+                        <option value="Metro Cuadrado" {{ 'selected' if request.form and request.form.unidad == 'Metro Cuadrado' else '' }}>📐 Metro Cuadrado (m²)</option>
+                        <option value="Metro Lineal" {{ 'selected' if request.form and request.form.unidad == 'Metro Lineal' else '' }}>📏 Metro Lineal (m)</option>
+                        <option value="Kilogramo" {{ 'selected' if request.form and request.form.unidad == 'Kilogramo' else '' }}>⚖️ Kilogramo (kg)</option>
+                        <option value="Quintal" {{ 'selected' if request.form and request.form.unidad == 'Quintal' else '' }}>⚖️ Quintal (qq)</option>
+                        <option value="Tonelada" {{ 'selected' if request.form and request.form.unidad == 'Tonelada' else '' }}>⚖️ Tonelada (ton)</option>
+                        <option value="Litro" {{ 'selected' if request.form and request.form.unidad == 'Litro' else '' }}>🥤 Litro (L)</option>
+                        <option value="Galón" {{ 'selected' if request.form and request.form.unidad == 'Galón' else '' }}>🪣 Galón</option>
+                        <option value="Pieza" {{ 'selected' if request.form and request.form.unidad == 'Pieza' else '' }}>🔧 Pieza/Unidad</option>
+                        <option value="Docena" {{ 'selected' if request.form and request.form.unidad == 'Docena' else '' }}>📦 Docena</option>
+                        <option value="Ciento" {{ 'selected' if request.form and request.form.unidad == 'Ciento' else '' }}>💯 Ciento</option>
+                        <option value="Millar" {{ 'selected' if request.form and request.form.unidad == 'Millar' else '' }}>📦 Millar</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="precio">Precio Unitario (Q)</label>
+                    <input type="number" 
+                           id="precio" 
+                           name="precio" 
+                           step="0.01" 
+                           min="0"
+                           placeholder="Ej: 125.50"
+                           value="{{ request.form.precio if request.form else '' }}">
+                    <small class="form-help">Precio por unidad de medida</small>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h3>📋 Información Adicional (Opcional)</h3>
+                
+                <div class="form-group">
+                    <label for="categoria">Categoría</label>
+                    <select id="categoria" name="categoria">
+                        <option value="">Seleccionar categoría...</option>
+                        <option value="Cemento y Aglomerantes" {{ 'selected' if request.form and request.form.categoria == 'Cemento y Aglomerantes' else '' }}>🏗️ Cemento y Aglomerantes</option>
+                        <option value="Agregados" {{ 'selected' if request.form and request.form.categoria == 'Agregados' else '' }}>🪨 Agregados (Arena, Grava)</option>
+                        <option value="Hierro y Acero" {{ 'selected' if request.form and request.form.categoria == 'Hierro y Acero' else '' }}>🔩 Hierro y Acero</option>
+                        <option value="Madera" {{ 'selected' if request.form and request.form.categoria == 'Madera' else '' }}>🌳 Madera</option>
+                        <option value="Ladrillos y Blocks" {{ 'selected' if request.form and request.form.categoria == 'Ladrillos y Blocks' else '' }}>🧱 Ladrillos y Blocks</option>
+                        <option value="Tuberías y Accesorios" {{ 'selected' if request.form and request.form.categoria == 'Tuberías y Accesorios' else '' }}>🔧 Tuberías y Accesorios</option>
+                        <option value="Electricidad" {{ 'selected' if request.form and request.form.categoria == 'Electricidad' else '' }}>⚡ Materiales Eléctricos</option>
+                        <option value="Pintura y Acabados" {{ 'selected' if request.form and request.form.categoria == 'Pintura y Acabados' else '' }}>🎨 Pintura y Acabados</option>
+                        <option value="Herramientas" {{ 'selected' if request.form and request.form.categoria == 'Herramientas' else '' }}>🔨 Herramientas</option>
+                        <option value="Otros" {{ 'selected' if request.form and request.form.categoria == 'Otros' else '' }}>📦 Otros</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="proveedor">Proveedor Principal</label>
+                    <input type="text" 
+                           id="proveedor" 
+                           name="proveedor" 
+                           placeholder="Ej: Distribuidora Central"
+                           value="{{ request.form.proveedor if request.form else '' }}">
+                </div>
+                
+                <div class="form-group">
+                    <label for="stock_minimo">Stock Mínimo</label>
+                    <input type="number" 
+                           id="stock_minimo" 
+                           name="stock_minimo" 
+                           min="0"
+                           placeholder="Ej: 10"
+                           value="{{ request.form.stock_minimo if request.form else '' }}">
+                    <small class="form-help">Cantidad mínima en inventario</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="descripcion">Descripción/Especificaciones</label>
+                    <textarea id="descripcion" 
+                              name="descripcion" 
+                              rows="3"
+                              placeholder="Características técnicas, especificaciones, notas...">{{ request.form.descripcion if request.form else '' }}</textarea>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">
+                    ✅ Crear Material
+                </button>
+                <a href="{{ url_for('listar_materiales') }}" class="btn-secondary">
+                    ❌ Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// Validación del formulario
+document.querySelector('form').addEventListener('submit', function(e) {
+    const nombre = document.getElementById('nombre').value.trim();
+    const unidad = document.getElementById('unidad').value;
+    
+    if (!nombre) {
+        alert('El nombre del material es obligatorio');
+        e.preventDefault();
+        return false;
+    }
+    
+    if (!unidad) {
+        alert('La unidad de medida es obligatoria');
+        e.preventDefault();
+        return false;
+    }
+    
+    return true;
+});
+</script>
+{% endblock %}

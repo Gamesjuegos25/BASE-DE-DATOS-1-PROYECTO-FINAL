@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Materiales - Sistema Constructora{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="header-section">
+        <h1>🧱 Gestión de Materiales</h1>
+        <a href="{{ url_for('crear_material') }}" class="btn-primary">
+            ➕ Nuevo Material
+        </a>
+    </div>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    <div class="stats-cards">
+        <div class="stat-card">
+            <h3>{{ materiales|length }}</h3>
+            <p>Total Materiales</p>
+        </div>
+        <div class="stat-card">
+            <h3>{{ materiales|selectattr('precio')|list|length }}</h3>
+            <p>Con Precio</p>
+        </div>
+        <div class="stat-card">
+            <h3>{{ materiales|selectattr('unidad')|list|length }}</h3>
+            <p>Con Unidad</p>
+        </div>
+        <div class="stat-card">
+            <h3>{{ materiales|length }}</h3>
+            <p>Disponibles</p>
+        </div>
+    </div>
+    
+    {% if materiales %}
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Material</th>
+                        <th>Unidad</th>
+                        <th>Precio Unitario</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for material in materiales %}
+                    <tr>
+                        <td>{{ material.id or material.material_id or 'N/A' }}</td>
+                        <td>
+                            <strong>{{ material.nombre or 'Sin nombre' }}</strong>
+                        </td>
+                        <td>
+                            {% if material.unidad %}
+                                <span class="badge badge-info">{{ material.unidad }}</span>
+                            {% else %}
+                                <span class="text-muted">Sin unidad</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if material.precio %}
+                                Q{{ "{:,.2f}".format(material.precio) }}
+                            {% else %}
+                                <span class="text-muted">No definido</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge badge-success">Disponible</span>
+                        </td>
+                        <td>
+                            <button class="btn-sm btn-secondary" onclick="verMaterial('{{ material.id or material.material_id }}')">
+                                👁️ Ver
+                            </button>
+                            <button class="btn-sm btn-primary" onclick="editarMaterial('{{ material.id or material.material_id }}')">
+                                ✏️ Editar
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">🧱</div>
+            <h3>No hay materiales registrados</h3>
+            <p>Comienza agregando el primer material para tus obras.</p>
+            <a href="{{ url_for('crear_material') }}" class="btn-primary">
+                ➕ Agregar Primer Material
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+function verMaterial(id) {
+    alert('Función ver material #' + id + ' (por implementar)');
+}
+
+function editarMaterial(id) {
+    alert('Función editar material #' + id + ' (por implementar)');
+}
+</script>
+{% endblock %}

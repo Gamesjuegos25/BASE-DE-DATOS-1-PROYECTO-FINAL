@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Sistema ERP Constructora{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div>
+                    <h1><i class="fas fa-building"></i> ERP Constructora</h1>
+                    <div class="header-subtitle">Sistema Integral de Gestión</div>
+                </div>
+                <div class="header-actions">
+                    <div class="user-menu">
+                        <div class="user-avatar">A</div>
+                        <span>Administrador</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h3 class="sidebar-title">Módulos del Sistema</h3>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <!-- Dashboard -->
+                <div class="nav-item">
+                    <a href="{{ url_for('dashboard') }}" class="nav-link {% if request.endpoint == 'dashboard' %}active{% endif %}">
+                        <i class="nav-icon fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </div>
+                
+                <!-- MÓDULO OBRAS Y PROYECTOS -->
+                <div class="nav-section">
+                    <div class="nav-title">📋 Obras & Proyectos</div>
+                    <div class="nav-item">
+                        <a href="{{ url_for('listar_obras') }}" class="nav-link {% if request.endpoint in ['listar_obras', 'crear_obra'] %}active{% endif %}">
+                            <i class="nav-icon fas fa-building"></i>
+                            <span>Obras</span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="{{ url_for('listar_proyectos') }}" class="nav-link {% if request.endpoint in ['listar_proyectos', 'crear_proyecto'] %}active{% endif %}">
+                            <i class="nav-icon fas fa-project-diagram"></i>
+                            <span>Proyectos</span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="{{ url_for('listar_actividades') }}" class="nav-link {% if request.endpoint in ['listar_actividades', 'crear_actividad'] %}active{% endif %}">
+                            <i class="nav-icon fas fa-tasks"></i>
+                            <span>Actividades</span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="{{ url_for('listar_areas') }}" class="nav-link {% if request.endpoint in ['listar_areas', 'crear_area'] %}active{% endif %}">
+                            <i class="nav-icon fas fa-layer-group"></i>
+                            <span>Áreas</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- MÓDULO RECURSOS HUMANOS -->
+                <div class="nav-section">
+                    <div class="nav-title">👥 Recursos Humanos</div>
+                    <div class="nav-item">
+                        <a href="{{ url_for('listar_empleados') }}" class="nav-link {% if request.endpoint in ['listar_empleados', 'crear_empleado'] %}active{% endif %}">
+                            <i class="nav-icon fas fa-users"></i>
+                            <span>Empleados</span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="{{ url_for('listar_contratos') }}" class="nav-link {% if request.endpoint in ['listar_contratos', 'crear_contrato'] %}active{% endif %}">
+                            <i class="nav-icon fas fa-file-contract"></i>
+                            <span>Contratos</span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="{{ url_for('listar_trabajos') }}" class="nav-link {% if request.endpoint in ['listar_trabajos', 'crear_trabajo'] %}active{% endif %}">
+                            <i class="nav-icon fas fa-hammer"></i>
+                            <span>Trabajos</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- MÓDULO RECURSOS Y MATERIALES -->
+                <div class="nav-section">
+                    <div class="nav-title">📦 Recursos & Materiales</div>
+                    <div class="nav-item">
+                        <a href="{{ url_for('listar_materiales') }}" class="nav-link {% if request.endpoint in ['listar_materiales', 'crear_material'] %}active{% endif %}">
+                            <i class="nav-icon fas fa-boxes"></i>
+                            <span>Materiales</span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="{{ url_for('listar_proveedores') }}" class="nav-link {% if request.endpoint in ['listar_proveedores', 'crear_proveedor'] %}active{% endif %}">
+                            <i class="nav-icon fas fa-truck"></i>
+                            <span>Proveedores</span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="{{ url_for('bodegas_index') }}" class="nav-link {% if request.endpoint == 'bodegas_index' %}active{% endif %}">
+                            <i class="nav-icon fas fa-warehouse"></i>
+                            <span>Bodegas</span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="{{ url_for('listar_requisiciones') }}" class="nav-link {% if request.endpoint == 'listar_requisiciones' %}active{% endif %}">
+                            <i class="nav-icon fas fa-clipboard-list"></i>
+                            <span>Requisiciones</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- MÓDULO EQUIPOS Y VEHÍCULOS -->
+                <div class="nav-section">
+                    <div class="nav-title">🚛 Equipos & Vehículos</div>
+                    <div class="nav-item">
+                        <a href="{{ url_for('listar_vehiculos') }}" class="nav-link {% if request.endpoint in ['listar_vehiculos', 'crear_vehiculo'] %}active{% endif %}">
+                            <i class="nav-icon fas fa-car"></i>
+                            <span>Vehículos</span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="{{ url_for('listar_equipos') }}" class="nav-link {% if request.endpoint in ['listar_equipos', 'crear_equipo'] %}active{% endif %}">
+                            <i class="nav-icon fas fa-tools"></i>
+                            <span>Equipos</span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="{{ url_for('listar_movimientos') }}" class="nav-link {% if request.endpoint == 'listar_movimientos' %}active{% endif %}">
+                            <i class="nav-icon fas fa-exchange-alt"></i>
+                            <span>Movimientos</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- MÓDULO CONTROL Y SEGUIMIENTO -->
+                <div class="nav-section">
+                    <div class="nav-title">📊 Control & Seguimiento</div>
+                    <div class="nav-item">
+                        <a href="{{ url_for('listar_bitacoras') }}" class="nav-link {% if request.endpoint in ['listar_bitacoras', 'crear_bitacora'] %}active{% endif %}">
+                            <i class="nav-icon fas fa-book"></i>
+                            <span>Bitácoras</span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="{{ url_for('listar_incidentes') }}" class="nav-link {% if request.endpoint in ['listar_incidentes', 'crear_incidente'] %}active{% endif %}">
+                            <i class="nav-icon fas fa-exclamation-triangle"></i>
+                            <span>Incidentes</span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="{{ url_for('listar_avances') }}" class="nav-link {% if request.endpoint in ['listar_avances', 'crear_avance'] %}active{% endif %}">
+                            <i class="nav-icon fas fa-chart-line"></i>
+                            <span>Avances</span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="{{ url_for('listar_presupuestos') }}" class="nav-link {% if request.endpoint in ['listar_presupuestos', 'crear_presupuesto'] %}active{% endif %}">
+                            <i class="nav-icon fas fa-dollar-sign"></i>
+                            <span>Presupuestos</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- MÓDULO ADMINISTRACIÓN -->
+                <div class="nav-section">
+                    <div class="nav-title">⚙️ Administración</div>
+                    <div class="nav-item">
+                        <a href="{{ url_for('listar_usuarios') }}" class="nav-link {% if request.endpoint == 'listar_usuarios' %}active{% endif %}">
+                            <i class="nav-icon fas fa-user-cog"></i>
+                            <span>Usuarios</span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="{{ url_for('listar_auditorias') }}" class="nav-link {% if request.endpoint == 'listar_auditorias' %}active{% endif %}">
+                            <i class="nav-icon fas fa-shield-alt"></i>
+                            <span>Auditorías</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- MÓDULO REPORTES -->
+                <div class="nav-section">
+                    <div class="nav-title">📈 Reportes</div>
+                    <div class="nav-item">
+                        <a href="{{ url_for('reportes_academicos') }}" class="nav-link {% if request.endpoint == 'reportes_academicos' %}active{% endif %}">
+                            <i class="nav-icon fas fa-graduation-cap"></i>
+                            <span>Académicos</span>
+                        </a>
+                    </div>
+                    <div class="nav-item">
+                        <a href="{{ url_for('reportes_sistema_completo') }}" class="nav-link {% if request.endpoint == 'reportes_sistema_completo' %}active{% endif %}">
+                            <i class="nav-icon fas fa-chart-bar"></i>
+                            <span>Sistema Completo</span>
+                        </a>
+                    </div>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-wrapper">
+                <!-- Flash Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }} fade-in">
+                                <i class="alert-icon fas fa-{{ 'check-circle' if category == 'success' else 'exclamation-triangle' if category == 'error' or category == 'danger' else 'info-circle' }}"></i>
+                                <div>{{ message }}</div>
+                                <button class="modal-close" onclick="this.parentElement.remove()">×</button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+                
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Auto cerrar alertas después de 5 segundos
+        setTimeout(function() {
+            document.querySelectorAll('.alert').forEach(function(alert) {
+                alert.style.opacity = '0';
+                alert.style.transform = 'translateY(-10px)';
+                setTimeout(() => alert.remove(), 300);
+            });
+        }, 5000);
+
+        // Funcionalidad de toggle para el menú móvil
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.createElement('button');
+            menuToggle.innerHTML = '<i class="fas fa-bars"></i>';
+            menuToggle.className = 'menu-toggle';
+            menuToggle.style.cssText = `
+                display: none;
+                position: fixed;
+                top: 20px;
+                left: 20px;
+                z-index: 1001;
+                background: var(--primary-color);
+                color: white;
+                border: none;
+                padding: 10px;
+                border-radius: 5px;
+                cursor: pointer;
+            `;
+            
+            // Mostrar solo en móviles
+            const mediaQuery = window.matchMedia('(max-width: 768px)');
+            function handleMobileMenu(e) {
+                if (e.matches) {
+                    menuToggle.style.display = 'block';
+                    document.body.appendChild(menuToggle);
+                } else {
+                    if (document.body.contains(menuToggle)) {
+                        document.body.removeChild(menuToggle);
+                    }
+                }
+            }
+            
+            mediaQuery.addEventListener('change', handleMobileMenu);
+            handleMobileMenu(mediaQuery);
+            
+            menuToggle.addEventListener('click', function() {
+                const sidebar = document.querySelector('.sidebar');
+                sidebar.classList.toggle('active');
+            });
+        });
+    </script>
+</body>
+</html>

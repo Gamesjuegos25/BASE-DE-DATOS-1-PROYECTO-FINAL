@@ -1,0 +1,275 @@
+{% extends "base.html" %}
+
+{% block title %}Nueva Obra - Sistema Constructora{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Nueva Obra</h1>
+    <p>Crear un nuevo proyecto de construcción</p>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h2 class="card-title">Información de la Obra</h2>
+    </div>
+    
+    <form method="POST" action="{{ url_for('crear_obra') }}">
+        <div class="form-row">
+            <div class="form-group">
+                <label for="nombre" class="form-label">Nombre de la Obra *</label>
+                <input type="text" id="nombre" name="nombre" class="form-control" required 
+                       placeholder="Ej: Edificio Residencial Norte">
+            </div>
+        </div>
+        
+        <!-- Sección de Cliente (Obligatorio) -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3 class="card-title">Información del Cliente *</h3>
+                <p style="margin: 0; color: #6c757d; font-size: 14px;">Selecciona un cliente existente o crea uno nuevo</p>
+            </div>
+            
+            <div class="client-section">
+                <div class="form-group">
+                    <label class="form-label">Tipo de Cliente</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="tipo_cliente" value="existente" checked>
+                            <span>Cliente Existente</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="tipo_cliente" value="nuevo">
+                            <span>Nuevo Cliente</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Cliente Existente -->
+                <div id="cliente-existente" class="client-option">
+                    <div class="form-group">
+                        <label for="cliente_id" class="form-label">Seleccionar Cliente *</label>
+                        <select id="cliente_id" name="cliente_id" class="form-control" required>
+                            <option value="">Seleccionar cliente...</option>
+                            {% for cliente in clientes %}
+                            <option value="{{ cliente.id }}">{{ cliente.nombre }} - {{ cliente.documento or 'Sin documento' }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Nuevo Cliente -->
+                <div id="cliente-nuevo" class="client-option" style="display: none;">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="nuevo_cliente_nombre" class="form-label">Nombre Completo *</label>
+                            <input type="text" id="nuevo_cliente_nombre" name="nuevo_cliente_nombre" class="form-control" 
+                                   placeholder="Nombre completo del cliente">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="nuevo_cliente_documento" class="form-label">Documento</label>
+                            <input type="text" id="nuevo_cliente_documento" name="nuevo_cliente_documento" class="form-control" 
+                                   placeholder="CC, NIT, etc.">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="nuevo_cliente_telefono" class="form-label">Teléfono</label>
+                            <input type="tel" id="nuevo_cliente_telefono" name="nuevo_cliente_telefono" class="form-control" 
+                                   placeholder="Número de contacto">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="nuevo_cliente_email" class="form-label">Email</label>
+                            <input type="email" id="nuevo_cliente_email" name="nuevo_cliente_email" class="form-control" 
+                                   placeholder="correo@ejemplo.com">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="nuevo_cliente_direccion" class="form-label">Dirección</label>
+                        <input type="text" id="nuevo_cliente_direccion" name="nuevo_cliente_direccion" class="form-control" 
+                               placeholder="Dirección completa">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="descripcion" class="form-label">Descripción</label>
+            <textarea id="descripcion" name="descripcion" class="form-control" rows="4" 
+                      placeholder="Descripción detallada del proyecto"></textarea>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label for="fecha_inicio" class="form-label">Fecha de Inicio</label>
+                <input type="date" id="fecha_inicio" name="fecha_inicio" class="form-control">
+            </div>
+            
+            <div class="form-group">
+                <label for="fecha_fin" class="form-label">Fecha de Finalización</label>
+                <input type="date" id="fecha_fin" name="fecha_fin" class="form-control">
+            </div>
+        </div>
+        
+        <div class="form-row">
+            <div class="form-group">
+                <label for="valor" class="form-label">Valor del Proyecto (COP)</label>
+                <input type="number" id="valor" name="valor" class="form-control" min="0" step="1000" 
+                       placeholder="0">
+            </div>
+            
+            <div class="form-group">
+                <label for="estado" class="form-label">Estado</label>
+                <select id="estado" name="estado" class="form-control">
+                    <option value="">Seleccionar estado</option>
+                    <option value="Planeación">Planeación</option>
+                    <option value="En Progreso">En Progreso</option>
+                    <option value="Pausado">Pausado</option>
+                    <option value="Completado">Completado</option>
+                    <option value="Cancelado">Cancelado</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="ubicacion" class="form-label">Ubicación</label>
+            <input type="text" id="ubicacion" name="ubicacion" class="form-control" 
+                   placeholder="Dirección o ubicación del proyecto">
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i>
+                Crear Obra
+            </button>
+            
+            <a href="{{ url_for('listar_obras') }}" class="btn btn-secondary">
+                <i class="fas fa-times"></i>
+                Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+
+<style>
+.page-header {
+    margin-bottom: 30px;
+}
+
+.page-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 8px;
+}
+
+.page-header p {
+    color: #6c757d;
+    font-size: 16px;
+}
+
+.form-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #e9ecef;
+}
+
+.form-actions .btn {
+    padding: 12px 24px;
+}
+
+/* Estilos para la sección de cliente */
+.client-section {
+    padding: 20px;
+}
+
+.radio-group {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.radio-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.radio-option input[type="radio"] {
+    margin: 0;
+}
+
+.client-option {
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    padding: 20px;
+    background-color: #f8f9fa;
+}
+
+@media (max-width: 768px) {
+    .form-actions {
+        flex-direction: column;
+    }
+    
+    .form-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .radio-group {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+</style>
+
+<script>
+// Manejar cambio entre cliente existente y nuevo
+document.addEventListener('DOMContentLoaded', function() {
+    const radioButtons = document.querySelectorAll('input[name="tipo_cliente"]');
+    const clienteExistente = document.getElementById('cliente-existente');
+    const clienteNuevo = document.getElementById('cliente-nuevo');
+    const selectCliente = document.getElementById('cliente_id');
+    const camposNuevoCliente = document.querySelectorAll('#cliente-nuevo input');
+    
+    function toggleClienteSection() {
+        const tipoSeleccionado = document.querySelector('input[name="tipo_cliente"]:checked').value;
+        
+        if (tipoSeleccionado === 'existente') {
+            clienteExistente.style.display = 'block';
+            clienteNuevo.style.display = 'none';
+            selectCliente.required = true;
+            
+            // Quitar required de campos de nuevo cliente
+            camposNuevoCliente.forEach(campo => {
+                if (campo.id === 'nuevo_cliente_nombre') {
+                    campo.required = false;
+                }
+            });
+        } else {
+            clienteExistente.style.display = 'none';
+            clienteNuevo.style.display = 'block';
+            selectCliente.required = false;
+            selectCliente.value = '';
+            
+            // Hacer required el nombre del nuevo cliente
+            document.getElementById('nuevo_cliente_nombre').required = true;
+        }
+    }
+    
+    radioButtons.forEach(radio => {
+        radio.addEventListener('change', toggleClienteSection);
+    });
+    
+    // Inicializar el estado
+    toggleClienteSection();
+});
+</script>
+{% endblock %}

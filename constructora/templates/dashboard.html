@@ -1,0 +1,346 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Sistema ERP Constructora{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">📊 Dashboard Ejecutivo</h1>
+    <p class="page-subtitle">Panel de control integral del sistema de gestión</p>
+</div>
+
+<!-- Estadísticas principales -->
+<div class="dashboard-grid">
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-title">Total de Obras</div>
+            <div class="stat-icon primary">
+                <i class="fas fa-building"></i>
+            </div>
+        </div>
+        <div class="stat-value">{{ stats.total_obras or 0 }}</div>
+        <div class="stat-change positive">
+            <i class="fas fa-arrow-up"></i>
+            <span>+12% este mes</span>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-title">Obras Activas</div>
+            <div class="stat-icon success">
+                <i class="fas fa-play-circle"></i>
+            </div>
+        </div>
+        <div class="stat-value">{{ stats.obras_activas or 0 }}</div>
+        <div class="stat-change positive">
+            <i class="fas fa-arrow-up"></i>
+            <span>+8% este mes</span>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-title">Total Empleados</div>
+            <div class="stat-icon info">
+                <i class="fas fa-users"></i>
+            </div>
+        </div>
+        <div class="stat-value">{{ stats.total_empleados or 0 }}</div>
+        <div class="stat-change positive">
+            <i class="fas fa-arrow-up"></i>
+            <span>+5% este mes</span>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-title">Proveedores</div>
+            <div class="stat-icon warning">
+                <i class="fas fa-truck"></i>
+            </div>
+        </div>
+        <div class="stat-value">{{ stats.total_proveedores or 0 }}</div>
+        <div class="stat-change negative">
+            <i class="fas fa-arrow-down"></i>
+            <span>-2% este mes</span>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-title">Materiales</div>
+            <div class="stat-icon primary">
+                <i class="fas fa-boxes"></i>
+            </div>
+        </div>
+        <div class="stat-value">{{ stats.total_materiales or 0 }}</div>
+        <div class="stat-change positive">
+            <i class="fas fa-arrow-up"></i>
+            <span>+15% este mes</span>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-title">Vehículos</div>
+            <div class="stat-icon danger">
+                <i class="fas fa-car"></i>
+            </div>
+        </div>
+        <div class="stat-value">{{ stats.total_vehiculos or 0 }}</div>
+        <div class="stat-change positive">
+            <i class="fas fa-arrow-up"></i>
+            <span>+3% este mes</span>
+        </div>
+    </div>
+</div>
+
+<!-- Módulos del Sistema -->
+<div class="modules-grid">
+    <!-- Gestión de Obras -->
+    <div class="module-card">
+        <div class="module-header">
+            <div class="module-icon">
+                <i class="fas fa-building"></i>
+            </div>
+            <h3 class="module-title">Gestión de Obras</h3>
+            <p class="module-description">Administra y supervisa todas las obras en construcción</p>
+        </div>
+        <div class="module-content">
+            <div class="module-stats">
+                <div class="module-stat">
+                    <div class="module-stat-value">{{ stats.total_obras or 0 }}</div>
+                    <div class="module-stat-label">Obras Totales</div>
+                </div>
+                <div class="module-stat">
+                    <div class="module-stat-value">{{ stats.obras_activas or 0 }}</div>
+                    <div class="module-stat-label">En Progreso</div>
+                </div>
+            </div>
+            <div class="module-actions">
+                <a href="{{ url_for('crear_obra') }}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-plus"></i> Nueva Obra
+                </a>
+                <a href="{{ url_for('listar_obras') }}" class="btn btn-secondary btn-sm">
+                    <i class="fas fa-list"></i> Ver Todas
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recursos Humanos -->
+    <div class="module-card">
+        <div class="module-header">
+            <div class="module-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <h3 class="module-title">Recursos Humanos</h3>
+            <p class="module-description">Gestiona empleados, contratos y nómina</p>
+        </div>
+        <div class="module-content">
+            <div class="module-stats">
+                <div class="module-stat">
+                    <div class="module-stat-value">{{ stats.total_empleados or 0 }}</div>
+                    <div class="module-stat-label">Empleados</div>
+                </div>
+                <div class="module-stat">
+                    <div class="module-stat-value">0</div>
+                    <div class="module-stat-label">Contratos</div>
+                </div>
+            </div>
+            <div class="module-actions">
+                <a href="{{ url_for('crear_empleado') }}" class="btn btn-success btn-sm">
+                    <i class="fas fa-user-plus"></i> Nuevo
+                </a>
+                <a href="{{ url_for('listar_empleados') }}" class="btn btn-secondary btn-sm">
+                    <i class="fas fa-list"></i> Listar
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Materiales y Proveedores -->
+    <div class="module-card">
+        <div class="module-header">
+            <div class="module-icon">
+                <i class="fas fa-boxes"></i>
+            </div>
+            <h3 class="module-title">Materiales & Proveedores</h3>
+            <p class="module-description">Control de inventario y gestión de proveedores</p>
+        </div>
+        <div class="module-content">
+            <div class="module-stats">
+                <div class="module-stat">
+                    <div class="module-stat-value">{{ stats.total_materiales or 0 }}</div>
+                    <div class="module-stat-label">Materiales</div>
+                </div>
+                <div class="module-stat">
+                    <div class="module-stat-value">{{ stats.total_proveedores or 0 }}</div>
+                    <div class="module-stat-label">Proveedores</div>
+                </div>
+            </div>
+            <div class="module-actions">
+                <a href="{{ url_for('crear_material') }}" class="btn btn-warning btn-sm">
+                    <i class="fas fa-plus"></i> Material
+                </a>
+                <a href="{{ url_for('listar_materiales') }}" class="btn btn-secondary btn-sm">
+                    <i class="fas fa-list"></i> Ver Todo
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Equipos y Vehículos -->
+    <div class="module-card">
+        <div class="module-header">
+            <div class="module-icon">
+                <i class="fas fa-tools"></i>
+            </div>
+            <h3 class="module-title">Equipos & Vehículos</h3>
+            <p class="module-description">Administra maquinaria y vehículos de la empresa</p>
+        </div>
+        <div class="module-content">
+            <div class="module-stats">
+                <div class="module-stat">
+                    <div class="module-stat-value">{{ stats.total_equipos or 0 }}</div>
+                    <div class="module-stat-label">Equipos</div>
+                </div>
+                <div class="module-stat">
+                    <div class="module-stat-value">{{ stats.total_vehiculos or 0 }}</div>
+                    <div class="module-stat-label">Vehículos</div>
+                </div>
+            </div>
+            <div class="module-actions">
+                <a href="{{ url_for('crear_equipo') }}" class="btn btn-info btn-sm">
+                    <i class="fas fa-plus"></i> Equipo
+                </a>
+                <a href="{{ url_for('listar_equipos') }}" class="btn btn-secondary btn-sm">
+                    <i class="fas fa-list"></i> Ver Todo
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bodegas e Inventarios -->
+    <div class="module-card">
+        <div class="module-header">
+            <div class="module-icon">
+                <i class="fas fa-warehouse"></i>
+            </div>
+            <h3 class="module-title">Bodegas & Inventarios</h3>
+            <p class="module-description">Control de almacenes y stock de materiales</p>
+        </div>
+        <div class="module-content">
+            <div class="module-stats">
+                <div class="module-stat">
+                    <div class="module-stat-value">0</div>
+                    <div class="module-stat-label">Bodegas</div>
+                </div>
+                <div class="module-stat">
+                    <div class="module-stat-value">0</div>
+                    <div class="module-stat-label">Items Stock</div>
+                </div>
+            </div>
+            <div class="module-actions">
+                <a href="{{ url_for('bodegas_index') }}" class="btn btn-primary btn-sm">
+                    <i class="fas fa-warehouse"></i> Gestionar
+                </a>
+                <a href="{{ url_for('listar_proyectos') }}" class="btn btn-secondary btn-sm">
+                    <i class="fas fa-project-diagram"></i> Proyectos
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reportes y Análisis -->
+    <div class="module-card">
+        <div class="module-header">
+            <div class="module-icon">
+                <i class="fas fa-chart-bar"></i>
+            </div>
+            <h3 class="module-title">Reportes & Análisis</h3>
+            <p class="module-description">Informes detallados y análisis de rendimiento</p>
+        </div>
+        <div class="module-content">
+            <div class="module-stats">
+                <div class="module-stat">
+                    <div class="module-stat-value">12</div>
+                    <div class="module-stat-label">Reportes</div>
+                </div>
+                <div class="module-stat">
+                    <div class="module-stat-value">5</div>
+                    <div class="module-stat-label">Dashboards</div>
+                </div>
+            </div>
+            <div class="module-actions">
+                <a href="{{ url_for('reportes_academicos') }}" class="btn btn-success btn-sm">
+                    <i class="fas fa-graduation-cap"></i> Académicos
+                </a>
+                <a href="{{ url_for('reportes_sistema_completo') }}" class="btn btn-secondary btn-sm">
+                    <i class="fas fa-chart-line"></i> Completos
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Obras Recientes -->
+{% if obras_recientes %}
+<div class="table-container">
+    <div class="table-header">
+        <h2 class="table-title">📋 Obras Recientes</h2>
+        <div class="table-tools">
+            <div class="table-search">
+                <i class="search-icon fas fa-search"></i>
+                <input type="text" class="form-control" placeholder="Buscar obras...">
+            </div>
+            <a href="{{ url_for('listar_obras') }}" class="btn btn-outline">Ver Todas</a>
+        </div>
+    </div>
+    
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Nombre de la Obra</th>
+                <th>Cliente</th>
+                <th>Estado</th>
+                <th>Fecha Inicio</th>
+                <th>Valor</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for obra in obras_recientes %}
+            <tr>
+                <td>
+                    <strong>{{ obra.nombre }}</strong>
+                </td>
+                <td>{{ obra.cliente or 'Sin asignar' }}</td>
+                <td>
+                    <span class="badge {{ 'badge-success' if obra.estado == 'Activa' else 'badge-warning' }}">
+                        {{ obra.estado or 'Sin estado' }}
+                    </span>
+                </td>
+                <td>{{ obra.fecha_inicio.strftime('%d/%m/%Y') if obra.fecha_inicio else 'Sin fecha' }}</td>
+                <td>
+                    <strong class="text-success">
+                        ${{ "{:,.0f}".format(obra.valor) if obra.valor else '0' }}
+                    </strong>
+                </td>
+                <td>
+                    <div class="table-actions">
+                        <button class="btn btn-sm btn-primary">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn btn-sm btn-secondary">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Nuevo Equipo - Sistema Constructora{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="header-section">
+        <h1>⚒️ Nuevo Equipo</h1>
+        <a href="{{ url_for('listar_equipos') }}" class="btn-secondary">
+            ⬅️ Volver a Equipos
+        </a>
+    </div>
+    
+    <div class="form-container">
+        <form method="POST" class="form-modern">
+            <div class="form-section">
+                <h3>🔧 Información del Equipo</h3>
+                
+                <div class="form-group">
+                    <label for="nombre">Nombre del Equipo *</label>
+                    <input type="text" id="nombre" name="nombre" required 
+                           placeholder="Ej: Taladro Industrial DeWalt" 
+                           value="{{ request.form.nombre if request.form else '' }}">
+                </div>
+                
+                <div class="form-group">
+                    <label for="tipo">Tipo de Equipo</label>
+                    <select id="tipo" name="tipo">
+                        <option value="">Seleccionar tipo...</option>
+                        <option value="Herramientas Eléctricas">🔌 Herramientas Eléctricas</option>
+                        <option value="Herramientas Manuales">🔨 Herramientas Manuales</option>
+                        <option value="Maquinaria Pesada">🏗️ Maquinaria Pesada</option>
+                        <option value="Equipos de Medición">📏 Equipos de Medición</option>
+                        <option value="Equipos de Seguridad">🦺 Equipos de Seguridad</option>
+                        <option value="Otros">📦 Otros</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="estado">Estado</label>
+                    <select id="estado" name="estado">
+                        <option value="Disponible">✅ Disponible</option>
+                        <option value="En Uso">🔄 En Uso</option>
+                        <option value="Mantenimiento">🔧 En Mantenimiento</option>
+                        <option value="Dañado">❌ Dañado</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">✅ Crear Equipo</button>
+                <a href="{{ url_for('listar_equipos') }}" class="btn-secondary">❌ Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

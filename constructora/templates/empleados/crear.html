@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}Nuevo Empleado - Sistema Constructora{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="header-section">
+        <h1>👷‍♂️ Nuevo Empleado</h1>
+        <a href="{{ url_for('listar_empleados') }}" class="btn-secondary">
+            ⬅️ Volver a Empleados
+        </a>
+    </div>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    <div class="form-container">
+        <form method="POST" class="form-modern">
+            <div class="form-section">
+                <h3>📋 Información Personal</h3>
+                
+                <div class="form-group">
+                    <label for="nombre">Nombre Completo *</label>
+                    <input type="text" 
+                           id="nombre" 
+                           name="nombre" 
+                           required 
+                           placeholder="Ej: Juan Carlos Pérez"
+                           value="{{ request.form.nombre if request.form else '' }}">
+                </div>
+                
+                <div class="form-group">
+                    <label for="tipo">Tipo/Cargo *</label>
+                    <select id="tipo" name="tipo" required>
+                        <option value="">Seleccionar cargo...</option>
+                        <option value="Operario" {{ 'selected' if request.form and request.form.tipo == 'Operario' else '' }}>👷 Operario</option>
+                        <option value="Supervisor" {{ 'selected' if request.form and request.form.tipo == 'Supervisor' else '' }}>👨‍💼 Supervisor</option>
+                        <option value="Ingeniero" {{ 'selected' if request.form and request.form.tipo == 'Ingeniero' else '' }}>👨‍🔬 Ingeniero</option>
+                        <option value="Arquitecto" {{ 'selected' if request.form and request.form.tipo == 'Arquitecto' else '' }}>👨‍🎨 Arquitecto</option>
+                        <option value="Administrador" {{ 'selected' if request.form and request.form.tipo == 'Administrador' else '' }}>📊 Administrador</option>
+                        <option value="Seguridad" {{ 'selected' if request.form and request.form.tipo == 'Seguridad' else '' }}>🛡️ Seguridad</option>
+                        <option value="Conductor" {{ 'selected' if request.form and request.form.tipo == 'Conductor' else '' }}>🚛 Conductor</option>
+                        <option value="Almacenista" {{ 'selected' if request.form and request.form.tipo == 'Almacenista' else '' }}>📦 Almacenista</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="salario">Salario Mensual (Q)</label>
+                    <input type="number" 
+                           id="salario" 
+                           name="salario" 
+                           step="0.01" 
+                           min="0"
+                           placeholder="Ej: 5000.00"
+                           value="{{ request.form.salario if request.form else '' }}">
+                    <small class="form-help">Opcional - Puede configurarse después</small>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h3>📞 Información de Contacto (Opcional)</h3>
+                
+                <div class="form-group">
+                    <label for="telefono">Teléfono</label>
+                    <input type="tel" 
+                           id="telefono" 
+                           name="telefono" 
+                           placeholder="Ej: 1234-5678"
+                           value="{{ request.form.telefono if request.form else '' }}">
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" 
+                           id="email" 
+                           name="email" 
+                           placeholder="Ej: empleado@constructora.com"
+                           value="{{ request.form.email if request.form else '' }}">
+                </div>
+                
+                <div class="form-group">
+                    <label for="direccion">Dirección</label>
+                    <textarea id="direccion" 
+                              name="direccion" 
+                              rows="2"
+                              placeholder="Dirección completa del empleado">{{ request.form.direccion if request.form else '' }}</textarea>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">
+                    ✅ Crear Empleado
+                </button>
+                <a href="{{ url_for('listar_empleados') }}" class="btn-secondary">
+                    ❌ Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// Validación del formulario
+document.querySelector('form').addEventListener('submit', function(e) {
+    const nombre = document.getElementById('nombre').value.trim();
+    const tipo = document.getElementById('tipo').value;
+    
+    if (!nombre) {
+        alert('El nombre del empleado es obligatorio');
+        e.preventDefault();
+        return false;
+    }
+    
+    if (!tipo) {
+        alert('Debe seleccionar un tipo/cargo para el empleado');
+        e.preventDefault();
+        return false;
+    }
+    
+    return true;
+});
+</script>
+{% endblock %}

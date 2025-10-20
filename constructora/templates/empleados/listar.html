@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}Empleados - Sistema Constructora{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="header-section">
+        <h1>👷‍♂️ Gestión de Empleados</h1>
+        <a href="{{ url_for('crear_empleado') }}" class="btn-primary">
+            ➕ Nuevo Empleado
+        </a>
+    </div>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    <div class="stats-cards">
+        <div class="stat-card">
+            <h3>{{ empleados|length }}</h3>
+            <p>Total Empleados</p>
+        </div>
+        <div class="stat-card">
+            <h3>{{ empleados|selectattr('tipo', 'equalto', 'Operario')|list|length }}</h3>
+            <p>Operarios</p>
+        </div>
+        <div class="stat-card">
+            <h3>{{ empleados|selectattr('tipo', 'equalto', 'Supervisor')|list|length }}</h3>
+            <p>Supervisores</p>
+        </div>
+        <div class="stat-card">
+            <h3>{{ empleados|selectattr('tipo', 'equalto', 'Ingeniero')|list|length }}</h3>
+            <p>Ingenieros</p>
+        </div>
+    </div>
+    
+    {% if empleados %}
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Tipo/Cargo</th>
+                        <th>Salario</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for empleado in empleados %}
+                    <tr>
+                        <td>{{ empleado.id or empleado.empleado_id or 'N/A' }}</td>
+                        <td>
+                            <strong>{{ empleado.nombre or 'Sin nombre' }}</strong>
+                        </td>
+                        <td>
+                            <span class="badge badge-info">{{ empleado.tipo or 'General' }}</span>
+                        </td>
+                        <td>
+                            {% if empleado.salario %}
+                                Q{{ "{:,.2f}".format(empleado.salario) }}
+                            {% else %}
+                                No especificado
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge badge-success">Activo</span>
+                        </td>
+                        <td>
+                            <button class="btn-sm btn-secondary" onclick="verEmpleado({{ empleado.id or empleado.empleado_id }})">
+                                👁️ Ver
+                            </button>
+                            <button class="btn-sm btn-primary" onclick="editarEmpleado({{ empleado.id or empleado.empleado_id }})">
+                                ✏️ Editar
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">👷‍♂️</div>
+            <h3>No hay empleados registrados</h3>
+            <p>Comienza agregando el primer empleado a tu equipo de trabajo.</p>
+            <a href="{{ url_for('crear_empleado') }}" class="btn-primary">
+                ➕ Agregar Primer Empleado
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+function verEmpleado(id) {
+    alert('Función ver empleado #' + id + ' (por implementar)');
+}
+
+function editarEmpleado(id) {
+    alert('Función editar empleado #' + id + ' (por implementar)');
+}
+</script>
+{% endblock %}

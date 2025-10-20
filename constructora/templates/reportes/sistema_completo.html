@@ -1,0 +1,444 @@
+<!-- templates/reportes/sistema_completo.html -->
+{% extends "base.html" %}
+
+{% block title %}Reportes del Sistema Completo{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <h1><i class="fas fa-chart-bar"></i> Reportes del Sistema Completo</h1>
+    <div class="header-actions">
+        <button class="btn btn-success" onclick="exportarPDF()">
+            <i class="fas fa-file-pdf"></i> Exportar PDF
+        </button>
+        <button class="btn btn-info" onclick="actualizarReportes()">
+            <i class="fas fa-sync-alt"></i> Actualizar
+        </button>
+    </div>
+</div>
+
+<!-- Resumen Ejecutivo -->
+<div class="executive-summary">
+    <h2><i class="fas fa-tachometer-alt"></i> Resumen Ejecutivo del Sistema</h2>
+    <div class="stats-grid">
+        <div class="stat-card primary">
+            <div class="stat-icon">
+                <i class="fas fa-building"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ estadisticas.resumen_general.total_obras }}</h3>
+                <p>Obras Totales</p>
+            </div>
+        </div>
+        
+        <div class="stat-card success">
+            <div class="stat-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ estadisticas.resumen_general.total_empleados }}</h3>
+                <p>Empleados Activos</p>
+            </div>
+        </div>
+        
+        <div class="stat-card warning">
+            <div class="stat-icon">
+                <i class="fas fa-boxes"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ estadisticas.resumen_general.total_materiales }}</h3>
+                <p>Tipos de Materiales</p>
+            </div>
+        </div>
+        
+        <div class="stat-card info">
+            <div class="stat-icon">
+                <i class="fas fa-truck"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ estadisticas.resumen_general.total_vehiculos }}</h3>
+                <p>Vehículos en Flota</p>
+            </div>
+        </div>
+        
+        <div class="stat-card danger">
+            <div class="stat-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ estadisticas.resumen_general.total_incidentes }}</h3>
+                <p>Incidentes Reportados</p>
+            </div>
+        </div>
+        
+        <div class="stat-card dark">
+            <div class="stat-icon">
+                <i class="fas fa-book"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ estadisticas.resumen_general.total_bitacoras }}</h3>
+                <p>Entradas de Bitácora</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Análisis Financiero -->
+<div class="section financial-section">
+    <h2><i class="fas fa-dollar-sign"></i> Análisis Financiero</h2>
+    <div class="financial-grid">
+        <div class="financial-card">
+            <h3>Valor Total de Proyectos</h3>
+            <div class="financial-amount">
+                ${{ "{:,.0f}".format(estadisticas.valor_total_proyectos) }}
+            </div>
+            <p class="financial-desc">Suma total de todas las obras activas</p>
+        </div>
+        
+        <div class="financial-card">
+            <h3>Avance Promedio</h3>
+            <div class="progress-circle">
+                <div class="progress-text">{{ estadisticas.avance_promedio_obras }}%</div>
+            </div>
+            <p class="financial-desc">Progreso físico promedio de obras</p>
+        </div>
+    </div>
+</div>
+
+<!-- Estados de Obras -->
+<div class="section charts-section">
+    <h2><i class="fas fa-chart-pie"></i> Distribución por Estados</h2>
+    <div class="charts-grid">
+        <div class="chart-container">
+            <h3>Obras por Estado</h3>
+            <div class="chart-data">
+                {% for estado, cantidad in estadisticas.obras_por_estado.items() %}
+                <div class="chart-item">
+                    <div class="chart-bar">
+                        <div class="bar-fill" style="width: {{ (cantidad / estadisticas.resumen_general.total_obras * 100) if estadisticas.resumen_general.total_obras > 0 else 0 }}%"></div>
+                        <span class="bar-label">{{ estado }}</span>
+                        <span class="bar-value">{{ cantidad }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <div class="chart-container">
+            <h3>Incidentes por Estado</h3>
+            <div class="chart-data">
+                {% for estado, cantidad in estadisticas.incidentes_por_estado.items() %}
+                <div class="chart-item">
+                    <div class="chart-bar incident-bar">
+                        <div class="bar-fill" style="width: {{ (cantidad / estadisticas.resumen_general.total_incidentes * 100) if estadisticas.resumen_general.total_incidentes > 0 else 0 }}%"></div>
+                        <span class="bar-label">{{ estado }}</span>
+                        <span class="bar-value">{{ cantidad }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Métricas de Control -->
+<div class="section metrics-section">
+    <h2><i class="fas fa-clipboard-check"></i> Métricas de Control y Calidad</h2>
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <h4>Auditorías Realizadas</h4>
+            <div class="metric-value">{{ estadisticas.resumen_general.total_auditorias }}</div>
+            <div class="metric-trend positive">
+                <i class="fas fa-arrow-up"></i> Cumplimiento normativo
+            </div>
+        </div>
+        
+        <div class="metric-card">
+            <h4>Contratos Activos</h4>
+            <div class="metric-value">{{ estadisticas.resumen_general.total_contratos }}</div>
+            <div class="metric-trend neutral">
+                <i class="fas fa-minus"></i> Gestión contractual
+            </div>
+        </div>
+        
+        <div class="metric-card">
+            <h4>Equipos Disponibles</h4>
+            <div class="metric-value">{{ estadisticas.resumen_general.total_equipos }}</div>
+            <div class="metric-trend positive">
+                <i class="fas fa-arrow-up"></i> Recursos disponibles
+            </div>
+        </div>
+        
+        <div class="metric-card">
+            <h4>Registros de Avance</h4>
+            <div class="metric-value">{{ estadisticas.resumen_general.total_avances }}</div>
+            <div class="metric-trend positive">
+                <i class="fas fa-chart-line"></i> Control de progreso
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Información del Sistema -->
+<div class="section system-info">
+    <h2><i class="fas fa-database"></i> Estado del Sistema (56 Tablas)</h2>
+    <div class="system-grid">
+        <div class="system-module">
+            <h4><i class="fas fa-handshake"></i> Módulo Comercial</h4>
+            <ul>
+                <li>Clientes: Activo</li>
+                <li>Obras: {{ estadisticas.resumen_general.total_obras }} registradas</li>
+                <li>Contratos: {{ estadisticas.resumen_general.total_contratos }} activos</li>
+            </ul>
+        </div>
+        
+        <div class="system-module">
+            <h4><i class="fas fa-users"></i> Recursos Humanos</h4>
+            <ul>
+                <li>Empleados: {{ estadisticas.resumen_general.total_empleados }} activos</li>
+                <li>Áreas de Trabajo: Operativas</li>
+                <li>Asignaciones: Funcionales</li>
+            </ul>
+        </div>
+        
+        <div class="system-module">
+            <h4><i class="fas fa-warehouse"></i> Supply Chain</h4>
+            <ul>
+                <li>Materiales: {{ estadisticas.resumen_general.total_materiales }} tipos</li>
+                <li>Inventarios: Controlados</li>
+                <li>Movimientos: Registrados</li>
+            </ul>
+        </div>
+        
+        <div class="system-module">
+            <h4><i class="fas fa-shield-alt"></i> Auditoría y Control</h4>
+            <ul>
+                <li>Bitácoras: {{ estadisticas.resumen_general.total_bitacoras }} entradas</li>
+                <li>Incidentes: {{ estadisticas.resumen_general.total_incidentes }} reportados</li>
+                <li>Auditorías: {{ estadisticas.resumen_general.total_auditorias }} realizadas</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<style>
+.executive-summary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 15px;
+    margin-bottom: 2rem;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.stat-card {
+    background: rgba(255,255,255,0.1);
+    padding: 1.5rem;
+    border-radius: 10px;
+    text-align: center;
+    backdrop-filter: blur(10px);
+}
+
+.stat-card.primary { border-left: 4px solid #3498db; }
+.stat-card.success { border-left: 4px solid #2ecc71; }
+.stat-card.warning { border-left: 4px solid #f39c12; }
+.stat-card.info { border-left: 4px solid #17a2b8; }
+.stat-card.danger { border-left: 4px solid #e74c3c; }
+.stat-card.dark { border-left: 4px solid #34495e; }
+
+.financial-section {
+    background: #f8f9fa;
+    padding: 2rem;
+    border-radius: 10px;
+    margin-bottom: 2rem;
+}
+
+.financial-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+}
+
+.financial-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.financial-amount {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #2ecc71;
+    margin: 1rem 0;
+}
+
+.progress-circle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: conic-gradient(#3498db {{ estadisticas.avance_promedio_obras * 3.6 }}deg, #ecf0f1 0deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 1rem auto;
+    position: relative;
+}
+
+.progress-circle::before {
+    content: '';
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: white;
+    position: absolute;
+}
+
+.progress-text {
+    position: relative;
+    z-index: 1;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.charts-section {
+    margin-bottom: 2rem;
+}
+
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 2rem;
+}
+
+.chart-container {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.chart-bar {
+    display: flex;
+    align-items: center;
+    margin: 1rem 0;
+    position: relative;
+    background: #f8f9fa;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.bar-fill {
+    height: 30px;
+    background: linear-gradient(90deg, #3498db, #2980b9);
+    transition: width 0.5s ease;
+}
+
+.incident-bar .bar-fill {
+    background: linear-gradient(90deg, #e74c3c, #c0392b);
+}
+
+.bar-label {
+    position: absolute;
+    left: 10px;
+    font-weight: 500;
+    color: white;
+    z-index: 1;
+}
+
+.bar-value {
+    position: absolute;
+    right: 10px;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.metric-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.metric-value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #2c3e50;
+    margin: 1rem 0;
+}
+
+.metric-trend {
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.metric-trend.positive { color: #2ecc71; }
+.metric-trend.neutral { color: #95a5a6; }
+
+.system-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.system-module {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.system-module h4 {
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #3498db;
+}
+
+.system-module ul {
+    list-style: none;
+    padding: 0;
+}
+
+.system-module li {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #ecf0f1;
+    display: flex;
+    justify-content: space-between;
+}
+
+@media (max-width: 768px) {
+    .charts-grid,
+    .financial-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<script>
+function exportarPDF() {
+    alert('Funcionalidad de exportación PDF - En desarrollo');
+}
+
+function actualizarReportes() {
+    location.reload();
+}
+</script>
+{% endblock %}

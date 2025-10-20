@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Proyectos - Sistema Constructora{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="header-section">
+        <h1>📋 Gestión de Proyectos</h1>
+        <a href="{{ url_for('crear_proyecto') }}" class="btn-primary">
+            ➕ Nuevo Proyecto
+        </a>
+    </div>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    {% if proyectos %}
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre del Proyecto</th>
+                        <th>Fecha Inicio</th>
+                        <th>Fecha Fin</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for proyecto in proyectos %}
+                    <tr>
+                        <td>{{ proyecto.id or proyecto.proyecto_id or 'N/A' }}</td>
+                        <td><strong>{{ proyecto.nombre or 'Sin nombre' }}</strong></td>
+                        <td>{{ proyecto.fecha_inicio or 'No definida' }}</td>
+                        <td>{{ proyecto.fecha_fin or 'No definida' }}</td>
+                        <td>
+                            <span class="badge badge-info">{{ proyecto.estado or 'Planeación' }}</span>
+                        </td>
+                        <td>
+                            <button class="btn-sm btn-secondary">👁️ Ver</button>
+                            <button class="btn-sm btn-primary">✏️ Editar</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">📋</div>
+            <h3>No hay proyectos registrados</h3>
+            <p>Comienza agregando el primer proyecto de construcción.</p>
+            <a href="{{ url_for('crear_proyecto') }}" class="btn-primary">
+                ➕ Agregar Primer Proyecto
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

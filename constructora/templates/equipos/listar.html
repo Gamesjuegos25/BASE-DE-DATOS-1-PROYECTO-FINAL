@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Equipos - Sistema Constructora{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="header-section">
+        <h1>⚒️ Gestión de Equipos</h1>
+        <a href="{{ url_for('crear_equipo') }}" class="btn-primary">
+            ➕ Nuevo Equipo
+        </a>
+    </div>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    {% if equipos %}
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Tipo</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for equipo in equipos %}
+                    <tr>
+                        <td>{{ equipo.id or equipo.equipo_id or 'N/A' }}</td>
+                        <td><strong>{{ equipo.nombre or 'Sin nombre' }}</strong></td>
+                        <td>{{ equipo.tipo or 'No especificado' }}</td>
+                        <td>
+                            <span class="badge badge-success">{{ equipo.estado or 'Disponible' }}</span>
+                        </td>
+                        <td>
+                            <button class="btn-sm btn-secondary">👁️ Ver</button>
+                            <button class="btn-sm btn-primary">✏️ Editar</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">⚒️</div>
+            <h3>No hay equipos registrados</h3>
+            <p>Comienza agregando el primer equipo para las obras.</p>
+            <a href="{{ url_for('crear_equipo') }}" class="btn-primary">
+                ➕ Agregar Primer Equipo
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}Nuevo Proveedor - Sistema Constructora{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="header-section">
+        <h1>🏪 Nuevo Proveedor</h1>
+        <a href="{{ url_for('listar_proveedores') }}" class="btn-secondary">
+            ⬅️ Volver a Proveedores
+        </a>
+    </div>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    <div class="form-container">
+        <form method="POST" class="form-modern">
+            <div class="form-section">
+                <h3>🏢 Información de la Empresa</h3>
+                
+                <div class="form-group">
+                    <label for="nombre">Nombre del Proveedor *</label>
+                    <input type="text" 
+                           id="nombre" 
+                           name="nombre" 
+                           required 
+                           placeholder="Ej: Distribuidora de Materiales S.A."
+                           value="{{ request.form.nombre if request.form else '' }}">
+                </div>
+                
+                <div class="form-group">
+                    <label for="contacto">Información de Contacto</label>
+                    <textarea id="contacto" 
+                              name="contacto" 
+                              rows="3"
+                              placeholder="Teléfono, email, dirección, persona de contacto...">{{ request.form.contacto if request.form else '' }}</textarea>
+                    <small class="form-help">Incluye teléfono, email, dirección y persona de contacto</small>
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h3>📋 Información Adicional (Opcional)</h3>
+                
+                <div class="form-group">
+                    <label for="tipo_proveedor">Tipo de Proveedor</label>
+                    <select id="tipo_proveedor" name="tipo_proveedor">
+                        <option value="">Seleccionar tipo...</option>
+                        <option value="Materiales" {{ 'selected' if request.form and request.form.tipo_proveedor == 'Materiales' else '' }}>🧱 Materiales de Construcción</option>
+                        <option value="Herramientas" {{ 'selected' if request.form and request.form.tipo_proveedor == 'Herramientas' else '' }}>🔧 Herramientas y Equipos</option>
+                        <option value="Servicios" {{ 'selected' if request.form and request.form.tipo_proveedor == 'Servicios' else '' }}>⚙️ Servicios Especializados</option>
+                        <option value="Transporte" {{ 'selected' if request.form and request.form.tipo_proveedor == 'Transporte' else '' }}>🚛 Transporte y Logística</option>
+                        <option value="Maquinaria" {{ 'selected' if request.form and request.form.tipo_proveedor == 'Maquinaria' else '' }}>🏗️ Maquinaria Pesada</option>
+                        <option value="Consultoria" {{ 'selected' if request.form and request.form.tipo_proveedor == 'Consultoria' else '' }}>💼 Consultoría</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="ruc">RUC/NIT</label>
+                    <input type="text" 
+                           id="ruc" 
+                           name="ruc" 
+                           placeholder="Ej: 12345678-9"
+                           value="{{ request.form.ruc if request.form else '' }}">
+                </div>
+                
+                <div class="form-group">
+                    <label for="telefono">Teléfono Principal</label>
+                    <input type="tel" 
+                           id="telefono" 
+                           name="telefono" 
+                           placeholder="Ej: 2234-5678"
+                           value="{{ request.form.telefono if request.form else '' }}">
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" 
+                           id="email" 
+                           name="email" 
+                           placeholder="Ej: ventas@proveedor.com"
+                           value="{{ request.form.email if request.form else '' }}">
+                </div>
+                
+                <div class="form-group">
+                    <label for="direccion">Dirección</label>
+                    <textarea id="direccion" 
+                              name="direccion" 
+                              rows="2"
+                              placeholder="Dirección completa del proveedor">{{ request.form.direccion if request.form else '' }}</textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="notas">Notas/Observaciones</label>
+                    <textarea id="notas" 
+                              name="notas" 
+                              rows="2"
+                              placeholder="Información adicional, condiciones especiales, etc.">{{ request.form.notas if request.form else '' }}</textarea>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn-primary">
+                    ✅ Crear Proveedor
+                </button>
+                <a href="{{ url_for('listar_proveedores') }}" class="btn-secondary">
+                    ❌ Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// Validación del formulario
+document.querySelector('form').addEventListener('submit', function(e) {
+    const nombre = document.getElementById('nombre').value.trim();
+    
+    if (!nombre) {
+        alert('El nombre del proveedor es obligatorio');
+        e.preventDefault();
+        return false;
+    }
+    
+    return true;
+});
+</script>
+{% endblock %}

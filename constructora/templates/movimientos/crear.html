@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sistema-unificado.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/create-forms.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/calendar-styles.css') }}">
+{% endblock %}
+
+{% block title %}Nuevo Movimiento - Sistema Constructora{% endblock %}
+
+{% block content %}
+<body>
+    <div class="create-form-max-w-7xl mx-auto px-6">
+        <!-- Header -->
+        <div class="create-page-header">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="{{ url_for('dashboard') }}">
+                            <i class="fas fa-home"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="{{ url_for('listar_movimientos_materiales') }}">
+                            <i class="fas fa-list"></i> Movimientos
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        <i class="fas fa-plus"></i> Crear Movimiento
+                    </li>
+                </ol>
+            </nav>
+            
+            <div class="create-title-section">
+                <h1 class="create-title">
+                    <i class="fas fa-plus-circle"></i>
+                    Crear Movimiento
+                </h1>
+                <p class="create-subtitle">Complete el formulario para registrar una nueva movimiento</p>
+            </div>
+        </div>
+
+        <!-- Formulario -->
+        <div class="form-card">
+            <form method="POST" action="{{ url_for('crear_movimiento_material') }}" class="needs-validation" novalidate>
+                <div class="create-form-flex flex-wrap -mx-2">
+                    <div class="create-form-group">
+                        <label class="form-label">
+                            Bodega <span class="required">*</span>
+                        </label>
+                        <select class="form-select" class="form-select" id="bodega_id" name="bodega_id" required>
+                            <option value="">Seleccione una opción</option>
+                            {%- for item in bodegas %}
+                            <option value="{{ item[0] }}">{{ item[1] }}</option>
+                            {%- endfor %}
+                        </select>
+                        <div class="invalid-feedback">
+                            Por favor ingrese bodega.
+                        </div>
+                    </div>
+                    <div class="create-form-group">
+                        <label class="form-label">
+                            Material <span class="required">*</span>
+                        </label>
+                        <select class="form-select" class="form-select" id="material_id" name="material_id" required>
+                            <option value="">Seleccione una opción</option>
+                            {%- for item in materiales %}
+                            <option value="{{ item[0] }}">{{ item[1] }}</option>
+                            {%- endfor %}
+                        </select>
+                        <div class="invalid-feedback">
+                            Por favor ingrese material.
+                        </div>
+                    </div>
+                </div>
+                <div class="create-form-flex flex-wrap -mx-2">
+                    <div class="create-form-group">
+                        <label class="form-label">
+                            Tipo de Movimiento <span class="required">*</span>
+                        </label>
+                        <select class="form-select" class="form-select" id="tipo_movimiento" name="tipo_movimiento" required>
+                            <option value="">Seleccione una opción</option>
+                            <option value="entrada">Entrada</option>
+                            <option value="salida">Salida</option>
+                            <option value="transferencia">Transferencia</option>
+                        </select>
+                        <div class="invalid-feedback">
+                            Por favor ingrese tipo de movimiento.
+                        </div>
+                    </div>
+                    <div class="create-form-group">
+                        <label class="form-label">
+                            Cantidad <span class="required">*</span>
+                        </label>
+                        <input class="form-input" id="cantidad" name="cantidad" required step="0.01" placeholder="Ingrese cantidad">
+                        <div class="invalid-feedback">
+                            Por favor ingrese cantidad.
+                        </div>
+                    </div>
+                </div>
+                <div class="create-form-flex flex-wrap -mx-2">
+                    <!-- Campo de fecha con sistema estandarizado -->
+                    <div class="calendar-field-group">
+                        <label class="form-label">
+                            <i class="fas fa-calendar"></i>Fecha<span class="required">*</span>
+                        </label>
+                        <div class="standardized-calendar" data-field-type="date-movement">
+                            <input class="form-input calendar-field" 
+                                   id="fecha" 
+                                   name="fecha" 
+                                   type="date" 
+                                   value="{{ request.form.fecha if request.form else '' }}" 
+                                   required>
+                            <i class="fas fa-calendar-alt calendar-icon"></i>
+                        </div>
+                        <div class="invalid-feedback">
+                            Por favor, ingrese la fecha del movimiento.
+                        </div>
+                    </div>
+                    <div class="create-form-group">
+                        <label class="form-label">
+                            Responsable <span class="required">*</span>
+                        </label>
+                        <input class="form-input" id="responsable" name="responsable" required placeholder="Ingrese responsable">
+                        <div class="invalid-feedback">
+                            Por favor ingrese responsable.
+                        </div>
+                    </div>
+                </div>
+                <div class="create-form-flex flex-wrap -mx-2">
+                    <div class="create-form-group">
+                        <label class="form-label">
+                            Observaciones
+                        </label>
+                        <textarea class="form-textarea" id="observaciones" name="observaciones" rows="3" placeholder="Ingrese observaciones"></textarea>
+                        <div class="invalid-feedback">
+                            Por favor ingrese observaciones.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones de acción -->
+                <div class="create-form-actions">
+                    <div class="action-buttons">
+                        <a href="{{ url_for('listar_movimientos_materiales') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn btn btn-warm-primary">
+                            <i class="fas fa-save"></i> Guardar Movimiento
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+<script>
+// Validación de formularios Bootstrap
+(function() {
+    'use strict';
+    window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        var validation = Array.prototype.filter.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+})();
+
+// Inicializar sistema de calendarización estandarizada
+document.addEventListener('DOMContentLoaded', function() {
+    // Cargar utilidades de calendario
+    const script = document.createElement('script');
+    script.src = "{{ url_for('static', filename='js/calendar-utils.js') }}";
+    script.onload = function() {
+        // Inicializar campos de fecha
+        if (typeof initializeDateValidations === 'function') {
+            initializeDateValidations();
+        }
+        
+        // Configurar fecha por defecto (hoy)
+        const fechaInput = document.getElementById('fecha');
+        if (fechaInput && !fechaInput.value) {
+            const today = new Date().toISOString().split('T')[0];
+            fechaInput.value = today;
+        }
+    };
+    document.head.appendChild(script);
+});
+</script>
+{% endblock %}

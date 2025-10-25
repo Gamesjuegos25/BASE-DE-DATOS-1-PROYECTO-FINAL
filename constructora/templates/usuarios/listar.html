@@ -1,0 +1,851 @@
+{% extends "base.html" %}
+
+{% block title %}Gestión de Usuarios - ERP Constructora
+<script>
+// Mejoras JavaScript automáticas para tablas
+document.addEventListener('DOMContentLoaded', function() {
+    // Aplicar efectos de hover a filas de tabla
+    const tableRows = document.querySelectorAll('.data-table-enhanced tbody tr, table tbody tr');
+    tableRows.forEach((row, index) => {
+        row.style.animationDelay = `${index * 0.1}s`;
+        row.classList.add('fade-in-up');
+        
+        row.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+            this.style.boxShadow = '0 4px 15px rgba(247, 127, 0, 0.2)';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = 'none';
+        });
+    });
+    
+    // Mejorar botones de acción con tooltips
+    const actionButtons = document.querySelectorAll('.btn-action-enhanced, .action-buttons a, .action-buttons button');
+    actionButtons.forEach(button => {
+        if (!button.querySelector('.custom-tooltip')) {
+            button.addEventListener('mouseenter', function() {
+                const title = this.getAttribute('title');
+                if (title) {
+                    const tooltip = document.createElement('div');
+                    tooltip.className = 'custom-tooltip';
+                    tooltip.textContent = title;
+                    tooltip.style.cssText = `
+                        position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+                        background: var(--prussian-blue-700); color: var(--vanilla);
+                        padding: 4px 8px; border-radius: 4px; font-size: 0.7rem;
+                        white-space: nowrap; z-index: 1000; margin-bottom: 5px;
+                    `;
+                    this.style.position = 'relative';
+                    this.appendChild(tooltip);
+                }
+            });
+            
+            button.addEventListener('mouseleave', function() {
+                const tooltip = this.querySelector('.custom-tooltip');
+                if (tooltip) tooltip.remove();
+            });
+        }
+    });
+    
+    // Contador animado para números
+    const statNumbers = document.querySelectorAll('.stat-number-enhanced, .stat-number');
+    statNumbers.forEach(stat => {
+        const finalNumber = parseInt(stat.textContent) || 0;
+        if (finalNumber > 0) {
+            let currentNumber = 0;
+            const increment = Math.max(1, Math.ceil(finalNumber / 20));
+            const timer = setInterval(() => {
+                currentNumber += increment;
+                if (currentNumber >= finalNumber) {
+                    currentNumber = finalNumber;
+                    clearInterval(timer);
+                }
+                stat.textContent = currentNumber;
+            }, 100);
+        }
+    });
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/enhanced-tables.css') }}">
+
+<div class="page-container"><div class="page-header fade-in-up">
+    <nav class="breadcrumb">
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+        <span class="breadcrumb-separator">/</span>
+        <span>Usuarios del Sistema</span>
+    </nav>
+    <h1 class="page-title">👥 Gestión de Usuarios</h1>
+    <p class="page-subtitle">Administra usuarios, roles y permisos del sistema</p>
+</div>
+
+<!-- Estadísticas de Usuarios -->
+<div class="dashboard-grid mb-8">
+    <div class="stat-stat-card fade-in-up">
+        <div class="stat-header">
+            <div class="stat-title">Total Usuarios</div>
+            <div class="stat-icon primary">
+                <i class="fas fa-users text-orange-wheel"></i>
+            </div>
+        </div>
+
+<!-- Estadísticas del Módulo -->
+<div class="stats-grid">
+    <div class="stat-stat-card fade-in-up">
+        <div class="stat-icon bg-blue">
+            <i class="fas fa-list"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ usuarios|length or 0 }}</div>
+            <div class="stat-label">Total Usuarios</div>
+        </div>
+    </div>
+    
+    <div class="stat-stat-card fade-in-up">
+        <div class="stat-icon bg-green">
+            <i class="fas fa-check-circle text-xanthous-600"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ usuarios|length or 0 }}</div>
+            <div class="stat-label">Activos</div>
+        </div>
+    </div>
+    
+    <div class="stat-stat-card fade-in-up">
+        <div class="stat-icon bg-orange">
+            <i class="fas fa-clock"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">0</div>
+            <div class="stat-label">Pendientes</div>
+        </div>
+    </div>
+</div>
+
+        <div class="stat-value">{{ usuarios|length or 0 }}</div>
+        <div class="stat-change positive">
+            <i class="fas fa-user-plus"></i>
+            <span>Registrados</span>
+        </div>
+    </div>
+    
+    <div class="stat-stat-card fade-in-up">
+        <div class="stat-header">
+            <div class="stat-title">Usuarios Activos</div>
+            <div class="stat-icon success">
+                <i class="fas fa-user-check"></i>
+            </div>
+        </div>
+        <div class="stat-value">{{ usuarios|selectattr('activo', 'equalto', True)|list|length or 0 }}</div>
+        <div class="stat-change positive">
+            <i class="fas fa-check"></i>
+            <span>Habilitados</span>
+        </div>
+    </div>
+    
+    <div class="stat-stat-card fade-in-up">
+        <div class="stat-header">
+            <div class="stat-title">Usuarios Bloqueados</div>
+            <div class="stat-icon danger">
+                <i class="fas fa-user-lock"></i>
+            </div>
+        </div>
+        <div class="stat-value">{{ usuarios|selectattr('bloqueado', 'equalto', True)|list|length or 0 }}</div>
+        <div class="stat-change warning">
+            <i class="fas fa-lock"></i>
+            <span>Bloqueados</span>
+        </div>
+    </div>
+    
+    <div class="stat-stat-card fade-in-up">
+        <div class="stat-header">
+            <div class="stat-title">Roles Disponibles</div>
+            <div class="stat-icon info">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+        </div>
+        <div class="stat-value">{{ roles|length or 0 }}</div>
+        <div class="stat-change">
+            <i class="fas fa-key"></i>
+            <span>Configurados</span>
+        </div>
+    </div>
+</div>
+
+<!-- Filtros y Búsqueda -->
+<div class="filter-section mb-6">
+    <div class="filter-grid">
+        <div class="filter-group">
+            <label for="searchUsuarios" class="filter-label">Buscar Usuario</label>
+            <div class="search-box">
+                <i class="search-icon fas fa-search"></i>
+                <input type="text" 
+                       id="searchUsuarios" 
+                       class="form-control-enhanced" 
+                       placeholder="Buscar por nombre, usuario o email...">
+            </div>
+        </div>
+        
+        <div class="filter-group">
+            <label for="filterRol" class="filter-label">Rol</label>
+            <select id="filterRol" class="form-control form-select">
+                <option value="">Todos los roles</option>
+                {% for rol in roles %}
+                <option value="{{ rol.nombre_rol }}">{{ rol.nombre_rol }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="filter-group">
+            <label for="filterEstado" class="filter-label">Estado</label>
+            <select id="filterEstado" class="form-control form-select">
+                <option value="">Todos</option>
+                <option value="activo">Activos</option>
+                <option value="inactivo">Inactivos</option>
+                <option value="bloqueado">Bloqueados</option>
+            </select>
+        </div>
+        
+        <div class="filter-group">
+            <label for="filterUltimoAcceso" class="filter-label">Último Acceso</label>
+            <select id="filterUltimoAcceso" class="form-control form-select">
+                <option value="">Cualquier fecha</option>
+                <option value="hoy">Hoy</option>
+                <option value="semana">Esta semana</option>
+                <option value="mes">Este mes</option>
+                <option value="nunca">Nunca</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<!-- Tabla de Usuarios -->
+<div class="table-max-w-7xl mx-auto px-6">
+    <div class="table-header">
+        <h2 class="table-title">👤 Lista de Usuarios del Sistema</h2>
+        <div class="table-tools">
+            <div class="flex gap-2">
+                <button class="btn btn-outline-info" onclick="exportarUsuarios()">
+                    <i class="fas fa-download"></i> Exportar
+                </button>
+                <button class="btn btn-outline-warning" onclick="auditarAccesos()">
+                    <i class="fas fa-history"></i> Auditoría
+                </button>
+                <a href="{{ url_for('mostrar_crear_usuario') }}" class="btn btn btn btn-warm-primary">
+                    <i class="fas fa-user-plus"></i> Nuevo Usuario
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="table-wrapper fade-in-up"><div class="table-container-responsive"><table class="data-table-enhanced" id="tablaUsuarios">
+        <thead><tr>
+                <th>Usuario</th>
+                <th>Rol</th>
+                <th>Empleado Asociado</th>
+                <th><i class="fas fa-tasks"></i> Estado</th>
+                <th>Último Acceso</th>
+                <th>Seguridad</th>
+                <th class="text-center"><i class="fas fa-cogs"></i> Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for usuario in usuarios %}
+            <tr data-rol="{{ usuario.nombre_rol or '' }}" 
+                data-estado="{{ 'bloqueado' if usuario.bloqueado else ('activo' if usuario.activo else 'inactivo') }}">
+                <td>
+                    <div class="user-info">
+                        <div class="user-avatar {{ 'bg-gradient-warm-danger text-white' if usuario.bloqueado else ('bg-xanthous-200 text-white' if usuario.activo else 'bg-gradient-warm-secondary text-white') }}">
+                            {{ (usuario.nombre_completo or usuario.nombre_usuario or 'U')[0].upper() }}
+                        </div>
+                        <div>
+                            <div class="font-semibold">{{ usuario.nombre_completo or usuario.nombre_usuario }}</div>
+                            <div class="text-sm text-vanilla-600">
+                                <i class="fas fa-user"></i> {{ usuario.nombre_usuario }}
+                            </div>
+                            {% if usuario.email %}
+                            <div class="text-sm text-vanilla-600">
+                                <i class="fas fa-envelope"></i> {{ usuario.email }}
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    {% if usuario.nombre_rol %}
+                        <span class="badge badge badge-primary">
+                            <i class="fas fa-shield-alt"></i>
+                            {{ usuario.nombre_rol }}
+                        </span>
+                    {% else %}
+                        <span class="text-vanilla-600">Sin rol</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if usuario.empleado_nombre %}
+                        <div class="empleado-info">
+                            <div class="font-medium">{{ usuario.empleado_nombre }}</div>
+                            {% if usuario.cargo %}
+                            <div class="text-sm text-vanilla-600">{{ usuario.cargo }}</div>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <span class="text-vanilla-600">No asociado</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <div class="status-indicators">
+                        {% if usuario.bloqueado %}
+                            <span class="badge badge badge-danger">
+                                <i class="fas fa-lock"></i> Bloqueado
+                            </span>
+                        {% elif usuario.activo %}
+                            <span class="badge badge badge-success">
+                                <i class="fas fa-check"></i> Activo
+                            </span>
+                        {% else %}
+                            <span class="badge badge badge-secondary">
+                                <i class="fas fa-pause"></i> Inactivo
+                            </span>
+                        {% endif %}
+                        
+                        {% if (usuario.intentos_fallidos or 0) > 0 %}
+                        <div class="text-sm text-orange-wheel mt-1">
+                            <i class="fas fa-exclamation-triangle text-fire-engine-red"></i>
+                            {{ usuario.intentos_fallidos }} intentos fallidos
+                        </div>
+                        {% endif %}
+                    </div>
+                </td>
+                <td>
+                    {% if usuario.fecha_ultimo_acceso %}
+                        <div class="access-info">
+                            <div class="text-sm">{{ usuario.fecha_ultimo_acceso.strftime('%d/%m/%Y') }}</div>
+                            <div class="text-xs text-vanilla-600">{{ usuario.fecha_ultimo_acceso.strftime('%H:%M') }}</div>
+                        </div>
+                    {% else %}
+                        <span class="text-vanilla-600">Nunca</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <div class="security-indicators">
+                        {% if usuario.fecha_creacion %}
+                        <div class="text-xs text-vanilla-600">
+                            <i class="fas fa-calendar"></i>
+                            Creado: {{ usuario.fecha_creacion.strftime('%d/%m/%Y') }}
+                        </div>
+                        {% endif %}
+                        
+                        <div class="security-status">
+                            {% if (usuario.intentos_fallidos or 0) >= 3 %}
+                                <span class="security-badge danger">
+                                    <i class="fas fa-shield-virus"></i> Riesgo Alto
+                                </span>
+                            {% elif (usuario.intentos_fallidos or 0) > 0 %}
+                                <span class="security-badge warning">
+                                    <i class="fas fa-shield-alt"></i> Riesgo Medio
+                                </span>
+                            {% else %}
+                                <span class="security-badge success">
+                                    <i class="fas fa-shield-check"></i> Seguro
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="table-actions">
+                        <button class="btn btn-sm btn btn btn-warm-primary" onclick="verUsuario({{ usuario.id_usuario }})" title="Ver Detalles">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <a class="btn btn-sm btn btn btn-warm-secondary" href="{{ url_for('editar_usuario_sistema_route', id=usuario.id_usuario) }}" title="Editar">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <button class="btn btn-sm btn btn btn-warm-primary" onclick="gestionarPermisos({{ usuario.id_usuario }})" title="Permisos">
+                            <i class="fas fa-key"></i>
+                        </button>
+                        
+                        {% if usuario.bloqueado %}
+                        <button class="btn btn-sm btn btn-accent" onclick="desbloquearUsuario({{ usuario.id_usuario }})" title="Desbloquear">
+                            <i class="fas fa-unlock"></i>
+                        </button>
+                        {% else %}
+                        <button class="btn btn-sm btn btn btn-warm-secondary" onclick="bloquearUsuario({{ usuario.id_usuario }})" title="Bloquear">
+                            <i class="fas fa-lock"></i>
+                        </button>
+                        {% endif %}
+                        
+                        <button class="btn btn-sm btn-outline-info" onclick="resetearPassword({{ usuario.id_usuario }})" title="Resetear Password">
+                            <i class="fas fa-key"></i>
+                        </button>
+                        <form action="{{ url_for('eliminar_usuario', id=usuario.id_usuario) }}" 
+                              method="post" 
+                              style="display: inline;"
+                              onsubmit="return confirm('¿Está seguro de eliminar este usuario?');">
+                            <button class="btn btn-sm btn btn btn-warm-danger" title="Eliminar" type="submit">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="7" class="text-center text-vanilla-600 p-8">
+                    <i class="fas fa-users-slash fa-3x mb-6 text-gray-300"></i>
+                    <p class="text-lg">No hay usuarios registrados</p>
+                    <button class="btn btn btn btn-warm-primary mt-6" onclick="crearUsuario()">
+                        <i class="fas fa-user-plus"></i> Crear Primer Usuario
+                    </button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table></div></div></div></div>
+
+<!-- Modal para Crear/Editar Usuario -->
+<div class="modal-overlay" id="modalUsuario" style="display: none;">
+    <div class="modal" style="max-width: 600px;">
+        <div class="modal-header">
+            <h3 class="modal-title" id="modalUsuarioTitle">Nuevo Usuario</h3>
+            <button class="btn btn-warm-primary" class="modal-close" onclick="cerrarModal('modalUsuario')">×</button>
+        </div>
+        <div class="modal-body">
+            <form id="formUsuario" class="modern-form">
+                <div class="form-grid">
+                    <div class="form-group-enhanced">
+                        <label class="form-label required">Nombre de Usuario</label>
+                        <input type="text" name="nombre_usuario" class="form-control-enhanced" placeholder="usuario123" required>
+                    </div>
+                    <div class="form-group-enhanced">
+                        <label class="form-label required">Nombre Completo</label>
+                        <input type="text" name="nombre_completo" class="form-control-enhanced" placeholder="Juan Pérez" required>
+                    </div>
+                </div>
+                
+                <div class="form-group-enhanced">
+                    <label class="form-label required">Email</label>
+                    <input type="email" name="email" class="form-control-enhanced" placeholder="usuario@constructora.com" required>
+                </div>
+                
+                <div class="form-grid">
+                    <div class="form-group-enhanced">
+                        <label class="form-label-enhanced">Empleado Asociado</label>
+                        <select name="id_empleado" class="form-control form-select">
+                            <option value="">Sin asociar</option>
+                            {% for empleado in empleados %}
+                            <option value="{{ empleado.id_empleado }}">{{ empleado.nombre_empleado }} {{ empleado.apellido_empleado }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group-enhanced">
+                        <label class="form-label required">Rol</label>
+                        <select name="id_rol" class="form-control form-select" required>
+                            <option value="">Seleccionar rol</option>
+                            {% for rol in roles %}
+                            <option value="{{ rol.id_rol }}">{{ rol.nombre_rol }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group-enhanced">
+                    <label class="form-label required">Contraseña</label>
+                    <div class="password-input-max-w-7xl mx-auto px-6">
+                        <input type="password" name="password" class="form-control-enhanced" placeholder="Mínimo 8 caracteres" required>
+                        <button class="btn btn-warm-primary" type="button" class="password-toggle" onclick="toggleModalPassword()">
+                            <i class="fas fa-eye" id="modal-password-icon"></i>
+                        </button>
+                    </div>
+                    <div class="form-help">La contraseña debe tener al menos 8 caracteres</div>
+                </div>
+                
+                <div class="form-group-enhanced">
+                    <label class="checkbox-label">
+                        <input class="form-control form-warm" type="checkbox" name="activo" checked>
+                        <span class="checkmark"></span>
+                        Usuario activo al crear
+                    </label>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn btn btn-warm-secondary" onclick="cerrarModal('modalUsuario')">Cancelar</button>
+            <button class="btn btn btn btn-warm-primary" onclick="guardarUsuario()">
+                <i class="fas fa-save"></i> Guardar Usuario
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Gestión de Permisos -->
+<div class="modal-overlay" id="modalPermisos" style="display: none;">
+    <div class="modal" style="max-width: 800px;">
+        <div class="modal-header">
+            <h3 class="modal-title">Gestión de Permisos</h3>
+            <button class="btn btn-warm-primary" class="modal-close" onclick="cerrarModal('modalPermisos')">×</button>
+        </div>
+        <div class="modal-body">
+            <div id="contenidoPermisos">
+                <!-- Contenido cargado dinámicamente -->
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn btn btn-warm-secondary" onclick="cerrarModal('modalPermisos')">Cerrar</button>
+            <button class="btn btn btn btn-warm-primary" onclick="guardarPermisos()">
+                <i class="fas fa-save"></i> Guardar Permisos
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+// Variables globales
+let usuarioSeleccionado = null;
+
+// Filtros en tiempo real
+document.getElementById('searchUsuarios').addEventListener('input', filtrarUsuarios);
+document.getElementById('filterRol').addEventListener('change', filtrarUsuarios);
+document.getElementById('filterEstado').addEventListener('change', filtrarUsuarios);
+document.getElementById('filterUltimoAcceso').addEventListener('change', filtrarUsuarios);
+
+function filtrarUsuarios() {
+    const searchTerm = document.getElementById('searchUsuarios').value.toLowerCase();
+    const rolFilter = document.getElementById('filterRol').value;
+    const estadoFilter = document.getElementById('filterEstado').value;
+    const accesoFilter = document.getElementById('filterUltimoAcceso').value;
+    
+    const rows = document.querySelectorAll('#tablaUsuarios tbody tr');
+    
+    rows.forEach(row => {
+        const texto = row.textContent.toLowerCase();
+        const rol = row.getAttribute('data-rol') || '';
+        const estado = row.getAttribute('data-estado') || '';
+        
+        const matchesSearch = texto.includes(searchTerm);
+        const matchesRol = !rolFilter || rol === rolFilter;
+        const matchesEstado = !estadoFilter || estado === estadoFilter;
+        // TODO: Implementar filtro por último acceso
+        
+        row.style.display = matchesSearch && matchesRol && matchesEstado ? '' : 'none';
+    });
+}
+
+// Funciones de gestión de usuarios
+function verUsuario(id) {
+    // Implementar vista detallada del usuario
+    alert(`Ver detalles del usuario ${id}`);
+}
+
+function crearUsuario() {
+    document.getElementById('modalUsuarioTitle').textContent = 'Nuevo Usuario';
+    document.getElementById('formUsuario').reset();
+    document.getElementById('modalUsuario').style.display = 'flex';
+}
+
+function editarUsuario(id) {
+    usuarioSeleccionado = id;
+    document.getElementById('modalUsuarioTitle').textContent = 'Editar Usuario';
+    // TODO: Cargar datos del usuario
+    document.getElementById('modalUsuario').style.display = 'flex';
+}
+
+function guardarUsuario() {
+    const form = document.getElementById('formUsuario');
+    const formData = new FormData(form);
+    const payload = Object.fromEntries(formData.entries());
+
+    // Validación mínima
+    if (!payload.nombre_usuario || !payload.password || !payload.email || !payload.nombre_completo) {
+        alert('Por favor completa los campos obligatorios.');
+        return;
+    }
+
+    fetch("{{ url_for('crear_usuario_sistema_route') }}", {
+        method: 'POST',
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: formData
+    }).then(async (res) => {
+        let data = null;
+        try { data = await res.json(); } catch (e) {}
+        if (res.ok && data && data.success) {
+            alert('Usuario creado correctamente');
+            location.reload();
+        } else {
+            alert((data && data.error) ? data.error : 'No se pudo crear el usuario');
+        }
+    }).catch(err => {
+        console.error(err);
+        alert('Error de red al crear usuario');
+    }).finally(() => {
+        cerrarModal('modalUsuario');
+    });
+}
+
+function gestionarPermisos(id) {
+    usuarioSeleccionado = id;
+    document.getElementById('contenidoPermisos').innerHTML = `
+        <div class="text-center p-6">
+            <i class="fas fa-spinner fa-spin fa-2x text-prussian-blue"></i>
+            <p class="mt-2">Cargando permisos...</p>
+        </div>
+    `;
+    document.getElementById('modalPermisos').style.display = 'flex';
+    
+    // Simular carga de permisos
+    setTimeout(() => {
+        document.getElementById('contenidoPermisos').innerHTML = `
+            <div class="permisos-grid">
+                <h5>Permisos del Usuario</h5>
+                <div class="permissions-list">
+                    <label class="checkbox-label">
+                        <input class="form-control form-warm" type="checkbox" checked>
+                        <span class="checkmark"></span>
+                        Ver Dashboard
+                    </label>
+                    <label class="checkbox-label">
+                        <input class="form-control form-warm" type="checkbox" checked>
+                        <span class="checkmark"></span>
+                        Gestionar Obras
+                    </label>
+                    <label class="checkbox-label">
+                        <input class="form-control form-warm" type="checkbox">
+                        <span class="checkmark"></span>
+                        Administrar Usuarios
+                    </label>
+                    <!-- Más permisos... -->
+                </div>
+            </div>
+        `;
+    }, 1000);
+}
+
+function bloquearUsuario(id) {
+    if (confirm('¿Estás seguro de bloquear este usuario?')) {
+        fetch(`/usuarios/${id}/bloquear`, {
+            method: 'POST',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        }).then(async (res) => {
+            const data = await res.json().catch(() => null);
+            if (res.ok && data && data.success) {
+                alert('Usuario bloqueado');
+                location.reload();
+            } else {
+                alert((data && data.error) ? data.error : 'No se pudo bloquear el usuario');
+            }
+        }).catch(err => {
+            console.error(err);
+            alert('Error de red al bloquear usuario');
+        });
+    }
+}
+
+function desbloquearUsuario(id) {
+    if (confirm('¿Estás seguro de desbloquear este usuario?')) {
+        fetch(`/usuarios/${id}/desbloquear`, {
+            method: 'POST',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        }).then(async (res) => {
+            const data = await res.json().catch(() => null);
+            if (res.ok && data && data.success) {
+                alert('Usuario desbloqueado');
+                location.reload();
+            } else {
+                alert((data && data.error) ? data.error : 'No se pudo desbloquear el usuario');
+            }
+        }).catch(err => {
+            console.error(err);
+            alert('Error de red al desbloquear usuario');
+        });
+    }
+}
+
+function resetearPassword(id) {
+    if (confirm('¿Generar nueva contraseña temporal para este usuario?')) {
+        // TODO: Implementar reset via AJAX
+        alert(`Contraseña temporal generada para usuario ${id}`);
+    }
+}
+
+function exportarUsuarios() {
+    alert('Exportando lista de usuarios...');
+}
+
+function auditarAccesos() {
+    alert('Abriendo auditoría de accesos...');
+}
+
+function toggleModalPassword() {
+    const passwordInput = document.querySelector('[name="password"]');
+    const icon = document.getElementById('modal-password-icon');
+    
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        icon.classList.replace('fa-eye', 'fa-eye-slash');
+    } else {
+        passwordInput.type = 'password';
+        icon.classList.replace('fa-eye-slash', 'fa-eye');
+    }
+}
+
+function cerrarModal(modalId) {
+    document.getElementById(modalId).style.display = 'none';
+    usuarioSeleccionado = null;
+}
+</script>
+
+<style>
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: var(--font-size-lg);
+}
+
+.status-indicators {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-1);
+}
+
+.access-info {
+    text-align: center;
+}
+
+.security-indicators {
+    font-size: var(--font-size-xs);
+}
+
+.security-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-1);
+    padding: 2px 6px;
+    border-radius: 12px;
+    font-size: var(--font-size-xs);
+    font-weight: 500;
+}
+
+.security-badge.success {
+    background: rgba(34, 197, 94, 0.1);
+    color: var(--color-success);
+}
+
+.security-badge.warning {
+    background: rgba(251, 191, 36, 0.1);
+    color: var(--color-warning);
+}
+
+.security-badge.danger {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--color-danger);
+}
+
+.permissions-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-2);
+    margin-top: var(--spacing-3);
+}
+
+@media (max-width: 768px) {
+    .permissions-list {
+        grid-template-columns: 1fr;
+    }
+    
+    .table-actions {
+        flex-direction: column;
+        gap: var(--spacing-1);
+    }
+    
+    .filter-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<script>
+// Mejoras JavaScript automáticas para tablas
+document.addEventListener('DOMContentLoaded', function() {
+    // Aplicar efectos de hover a filas de tabla
+    const tableRows = document.querySelectorAll('.data-table-enhanced tbody tr, table tbody tr');
+    tableRows.forEach((row, index) => {
+        row.style.animationDelay = `${index * 0.1}s`;
+        row.classList.add('fade-in-up');
+        
+        row.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+            this.style.boxShadow = '0 4px 15px rgba(247, 127, 0, 0.2)';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = 'none';
+        });
+    });
+    
+    // Mejorar botones de acción con tooltips
+    const actionButtons = document.querySelectorAll('.btn-action-enhanced, .action-buttons a, .action-buttons button');
+    actionButtons.forEach(button => {
+        if (!button.querySelector('.custom-tooltip')) {
+            button.addEventListener('mouseenter', function() {
+                const title = this.getAttribute('title');
+                if (title) {
+                    const tooltip = document.createElement('div');
+                    tooltip.className = 'custom-tooltip';
+                    tooltip.textContent = title;
+                    tooltip.style.cssText = `
+                        position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+                        background: var(--prussian-blue-700); color: var(--vanilla);
+                        padding: 4px 8px; border-radius: 4px; font-size: 0.7rem;
+                        white-space: nowrap; z-index: 1000; margin-bottom: 5px;
+                    `;
+                    this.style.position = 'relative';
+                    this.appendChild(tooltip);
+                }
+            });
+            
+            button.addEventListener('mouseleave', function() {
+                const tooltip = this.querySelector('.custom-tooltip');
+                if (tooltip) tooltip.remove();
+            });
+        }
+    });
+    
+    // Contador animado para números
+    const statNumbers = document.querySelectorAll('.stat-number-enhanced, .stat-number');
+    statNumbers.forEach(stat => {
+        const finalNumber = parseInt(stat.textContent) || 0;
+        if (finalNumber > 0) {
+            let currentNumber = 0;
+            const increment = Math.max(1, Math.ceil(finalNumber / 20));
+            const timer = setInterval(() => {
+                currentNumber += increment;
+                if (currentNumber >= finalNumber) {
+                    currentNumber = finalNumber;
+                    clearInterval(timer);
+                }
+                stat.textContent = currentNumber;
+            }, 100);
+        }
+    });
+});
+</script>
+{% endblock %}

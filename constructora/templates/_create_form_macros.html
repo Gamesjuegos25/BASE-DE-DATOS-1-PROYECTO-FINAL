@@ -1,0 +1,89 @@
+<!-- 
+TEMPLATE BASE PARA FORMULARIOS DE CREAR
+Usar este como base para mantener consistencia visual con las vistas de detalle
+-->
+
+{% macro create_page_header(breadcrumbs, title, icon="fas fa-plus-circle") %}
+<div class="create-page-header">
+    <nav class="breadcrumb">
+        {% for crumb in breadcrumbs %}
+            {% if not loop.last %}
+                <a href="{{ crumb.url }}">{{ crumb.text }}</a>
+                <span class="breadcrumb-separator">/</span>
+            {% else %}
+                <span>{{ crumb.text }}</span>
+            {% endif %}
+        {% endfor %}
+    </nav>
+    <h1 class="create-page-title">
+        <i class="{{ icon }}"></i>
+        {{ title }}
+    </h1>
+</div>
+{% endmacro %}
+
+{% macro create_form_card(title, icon, form_content) %}
+<div class="create-form-stat-card fade-in-up">
+    <div class="stat-stat-header">
+        <h5><i class="{{ icon }}"></i> {{ title }}</h5>
+    </div>
+    <div class="stat-module-content">
+        {{ form_content }}
+    </div>
+</div>
+{% endmacro %}
+
+{% macro create_form_field(id, name, label, icon, type="text", required=false, placeholder="", value="", options=[], multiple=false, help_text="") %}
+<div class="create-form-group">
+    <label for="{{ id }}" class="create-form-label">
+        <i class="{{ icon }}"></i>{{ label }}
+        {% if required %}<span class="required">*</span>{% endif %}
+    </label>
+    
+    {% if type == "select" %}
+        <select class="create-form-control" id="{{ id }}" name="{{ name }}" {{ 'required' if required }} {{ 'multiple' if multiple }}>
+            {% if not required and not multiple %}
+                <option value="">Seleccionar...</option>
+            {% endif %}
+            {% for option in options %}
+                <option value="{{ option.value }}" {{ 'selected' if option.selected else '' }}>
+                    {{ option.text }}
+                </option>
+            {% endfor %}
+        </select>
+    {% elif type == "textarea" %}
+        <textarea class="create-form-control" id="{{ id }}" name="{{ name }}" 
+                  placeholder="{{ placeholder }}" {{ 'required' if required }}>{{ value }}</textarea>
+    {% else %}
+        <input type="{{ type }}" class="create-form-control" id="{{ id }}" name="{{ name }}" 
+               placeholder="{{ placeholder }}" value="{{ value }}" {{ 'required' if required }}>
+    {% endif %}
+    
+    {% if required %}
+        <div class="invalid-feedback">
+            Por favor, complete este campo.
+        </div>
+    {% endif %}
+    
+    {% if help_text %}
+        <div class="create-form-text">
+            <i class="fas fa-info-circle text-prussian-blue-700"></i>{{ help_text }}
+        </div>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{% macro create_form_actions(cancel_url, cancel_text="Cancelar", submit_text="Guardar", submit_icon="fas fa-save") %}
+<div class="create-form-stat-card fade-in-up">
+    <div class="create-form-actions">
+        <a href="{{ cancel_url }}" class="create-btn create-btn btn btn-warm-secondary">
+            <i class="fas fa-times"></i>{{ cancel_text }}
+        </a>
+        <button type="submit" class="create-btn create-btn btn btn-warm-primary">
+            <i class="{{ submit_icon }}"></i>{{ submit_text }}
+        </button>
+    </div>
+</div>
+{% endmacro %}
+
+<!-- CSS incluido en cada template que use estos macros -->

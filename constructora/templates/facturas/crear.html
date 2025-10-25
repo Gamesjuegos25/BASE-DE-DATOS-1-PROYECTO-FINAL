@@ -1,332 +1,170 @@
 {% extends "base.html" %}
 
-{% block title %}Crear Factura - ERP Constructora{% endblock %}
+{% block head %}
+    <!-- CSS para formularios -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/form-pages.css') }}">
+    <!-- CSS y JS estandarizados para calendarios -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/calendar-styles.css') }}">
+    <script src="{{ url_for('static', filename='js/calendar-utils.js') }}"></script>
+{% endblock %}
+
+
+{% block title %}Nueva Factura - Sistema Constructora{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2><i class="fas fa-plus-circle"></i> Crear Nueva Factura</h2>
-                <a href="/facturas" class="btn btn-secondary">
-                    <i class="fas fa-arrow-left"></i> Volver a Facturas
-                </a>
-            </div>
-        </div>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/create-forms.css') }}">
+
+<div class="create-form-max-w-7xl mx-auto px-6">
+    <div class="create-page-header">
+        <nav class="breadcrumb">
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <span class="breadcrumb-separator">/</span>
+            <a href="{{ url_for('listar_facturas') }}">Facturas</a>
+            <span class="breadcrumb-separator">/</span>
+            <span>Nueva</span>
+        </nav>
+        <h1 class="create-page-title">
+            <i class="fas fa-file-invoice"></i>
+            Crear Nueva Factura
+        </h1>
     </div>
 
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5>Información de la Factura</h5>
+    <div class="max-w-7xl mx-auto px-6-fluid">
+        <form method="POST" action="{{ url_for('crear_factura') }}" id="create-factura-form" class="needs-validation" novalidate>
+            <div class="create-form-flex flex-wrap -mx-2">
+                <div class="form-card">
+                    <div class="stat-stat-header">
+                        <h5><i class="fas fa-file-alt"></i> Información de la Factura</h5>
+                    </div>
+                    <div class="stat-module-content">
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-hashtag"></i>Número de Factura<span class="required">*</span>
+                            </label>
+                            <input class="form-input" id="numero_factura" name="numero_factura" 
+                                   placeholder="Ej: FAC-2025-001" required>
+                        </div>
+
+                        <!-- Fechas de facturación estandarizadas -->
+                        <div class="date-range-group">
+                            <div class="calendar-field-group" data-field-type="fecha_emision">
+                                <label for="fecha_factura" class="form-label">
+                                    <i class="fas fa-calendar-plus text-xanthous-600"></i> Fecha de Facturación
+                                    <span class="required-mark text-red-500 ml-1">*</span>
+                                </label>
+                                <div class="input-wrapper date-input-wrapper">
+                                    <input 
+                                        type="date" 
+                                        class="form-input standardized-calendar" 
+                                        name="fecha_factura" 
+                                        id="fecha_factura"
+                                        value="{{ request.form.fecha_factura if request.form else '' }}"
+                                        placeholder="Fecha de facturación"
+                                        required
+                                        max="{{ 'now'|strftime('%Y-%m-%d') }}"
+                                        data-field-type="fecha_emision"
+                                    />
+                                    <i class="fas fa-calendar-alt input-icon"></i>
+                                </div>
+                                <small class="form-help text-vanilla-600">
+                                    Fecha de emisión de la factura (no fechas futuras)
+                                </small>
+                            </div>
+                            
+                            <div class="calendar-field-group" data-field-type="fecha_vencimiento">
+                                <label for="fecha_vencimiento" class="form-label">
+                                    <i class="fas fa-exclamation-triangle text-red-500"></i> Fecha de Vencimiento
+                                </label>
+                                <div class="input-wrapper date-input-wrapper">
+                                    <input 
+                                        type="date" 
+                                        class="form-input standardized-calendar" 
+                                        name="fecha_vencimiento" 
+                                        id="fecha_vencimiento"
+                                        value="{{ request.form.fecha_vencimiento if request.form else '' }}"
+                                        placeholder="Seleccionar fecha de vencimiento"
+                                        min="{{ 'now'|strftime('%Y-%m-%d') }}"
+                                        data-field-type="fecha_vencimiento"
+                                        data-depends-on="fecha_factura"
+                                    />
+                                    <i class="fas fa-calendar-alt input-icon"></i>
+                                </div>
+                                <small class="form-help text-vanilla-600">
+                                    Fecha límite de pago (debe ser posterior a fecha de facturación)
+                                </small>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <form id="formCrearFactura">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="numero_factura">Número de Factura <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="numero_factura" name="numero_factura" required>
-                                    <small class="form-text text-muted">Debe ser único en el sistema</small>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="id_cliente">Cliente <span class="text-danger">*</span></label>
-                                    <select class="form-control" id="id_cliente" name="id_cliente" required>
-                                        <option value="">Seleccione un cliente</option>
-                                        {% for cliente in clientes %}
-                                        <option value="{{ cliente.id_cliente }}">{{ cliente.nombre }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                            </div>
+
+                <div class="form-card">
+                    <div class="stat-stat-header">
+                        <h5><i class="fas fa-dollar-sign text-xanthous"></i> Información Financiera</h5>
+                    </div>
+                    <div class="stat-module-content">
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-calculator"></i>Valor Bruto<span class="required">*</span>
+                            </label>
+                            <input class="form-input" id="valor_bruto" name="valor_bruto" 
+                                   placeholder="0.00" step="0.01" min="0" required>
                         </div>
 
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="fecha_factura">Fecha de Factura <span class="text-danger">*</span></label>
-                                    <input type="date" class="form-control" id="fecha_factura" name="fecha_factura" required>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="fecha_vencimiento">Fecha de Vencimiento</label>
-                                    <input type="date" class="form-control" id="fecha_vencimiento" name="fecha_vencimiento">
-                                </div>
-                            </div>
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-percentage"></i>IVA (%)
+                            </label>
+                            <input class="form-input" id="iva" name="iva" 
+                                   placeholder="19" step="0.01" min="0" max="100">
                         </div>
 
-                        <hr>
-
-                        <h5>Detalles de la Factura</h5>
-                        <div id="detalles-factura">
-                            <div class="row detalle-item" data-index="0">
-                                <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label>Concepto <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" name="concepto[]" required>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label>Cantidad <span class="text-danger">*</span></label>
-                                        <input type="number" class="form-control cantidad" name="cantidad[]" min="0" step="0.01" required>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label>Precio Unitario <span class="text-danger">*</span></label>
-                                        <input type="number" class="form-control precio-unitario" name="precio_unitario[]" min="0" step="0.01" required>
-                                    </div>
-                                </div>
-                                <div class="col-md-2">
-                                    <div class="form-group">
-                                        <label>Total</label>
-                                        <input type="number" class="form-control total-linea" readonly>
-                                        <button type="button" class="btn btn-danger btn-sm mt-1" onclick="eliminarDetalle(0)" disabled>
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-check-circle text-xanthous-600"></i>Estado<span class="required">*</span>
+                            </label>
+                            <select class="form-select" id="estado_factura" name="estado_factura" required>
+                                <option value="">Seleccionar estado...</option>
+                                <option value="PENDIENTE">⏳ Pendiente</option>
+                                <option value="PAGADA">✅ Pagada</option>
+                                <option value="VENCIDA">❌ Vencida</option>
+                                <option value="ANULADA">🚫 Anulada</option>
+                            </select>
                         </div>
-
-                        <div class="row">
-                            <div class="col-12">
-                                <button type="button" class="btn btn-success" onclick="agregarDetalle()">
-                                    <i class="fas fa-plus"></i> Agregar Línea
-                                </button>
-                            </div>
-                        </div>
-
-                        <hr>
-
-                        <div class="row">
-                            <div class="col-md-8">
-                                <div class="form-group">
-                                    <label for="observaciones">Observaciones</label>
-                                    <textarea class="form-control" id="observaciones" name="observaciones" rows="3" placeholder="Observaciones adicionales sobre la factura"></textarea>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card bg-light">
-                                    <div class="card-body">
-                                        <h6>Resumen de Factura</h6>
-                                        <div class="d-flex justify-content-between">
-                                            <span>Subtotal:</span>
-                                            <span id="resumen-subtotal">$0.00</span>
-                                        </div>
-                                        <div class="d-flex justify-content-between">
-                                            <span>Descuento:</span>
-                                            <span>
-                                                <input type="number" class="form-control form-control-sm d-inline w-50" id="descuento" name="descuento" min="0" step="0.01" value="0">
-                                            </span>
-                                        </div>
-                                        <div class="d-flex justify-content-between">
-                                            <span>Impuestos (19%):</span>
-                                            <span id="resumen-impuestos">$0.00</span>
-                                        </div>
-                                        <hr>
-                                        <div class="d-flex justify-content-between">
-                                            <strong>Total:</strong>
-                                            <strong id="resumen-total">$0.00</strong>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="row mt-4">
-                            <div class="col-12">
-                                <button type="submit" class="btn btn-primary btn-lg">
-                                    <i class="fas fa-save"></i> Crear Factura
-                                </button>
-                                <a href="/facturas" class="btn btn-secondary btn-lg ml-2">
-                                    <i class="fas fa-times"></i> Cancelar
-                                </a>
-                            </div>
-                        </div>
-                    </form>
+                    </div>
                 </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-6-fluid">
+        <div class="form-card">
+            <div class="create-form-actions">
+                <a href="{{ url_for('listar_facturas') }}" class="create-btn create-btn btn btn-warm-secondary">
+                    <i class="fas fa-times"></i>Cancelar
+                </a>
+                <button type="submit" form="create-factura-form" class="create-btn create-btn btn btn-warm-primary">
+                    <i class="fas fa-file-invoice"></i>Crear Factura
+                </button>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-let contadorDetalles = 0;
-
-// Establecer fecha actual por defecto
-document.getElementById('fecha_factura').value = new Date().toISOString().split('T')[0];
-
-function agregarDetalle() {
-    contadorDetalles++;
-    const detallesContainer = document.getElementById('detalles-factura');
-    
-    const nuevoDetalle = document.createElement('div');
-    nuevoDetalle.className = 'row detalle-item';
-    nuevoDetalle.setAttribute('data-index', contadorDetalles);
-    
-    nuevoDetalle.innerHTML = `
-        <div class="col-md-4">
-            <div class="form-group">
-                <label>Concepto <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" name="concepto[]" required>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="form-group">
-                <label>Cantidad <span class="text-danger">*</span></label>
-                <input type="number" class="form-control cantidad" name="cantidad[]" min="0" step="0.01" required>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="form-group">
-                <label>Precio Unitario <span class="text-danger">*</span></label>
-                <input type="number" class="form-control precio-unitario" name="precio_unitario[]" min="0" step="0.01" required>
-            </div>
-        </div>
-        <div class="col-md-2">
-            <div class="form-group">
-                <label>Total</label>
-                <input type="number" class="form-control total-linea" readonly>
-                <button type="button" class="btn btn-danger btn-sm mt-1" onclick="eliminarDetalle(${contadorDetalles})">
-                    <i class="fas fa-trash"></i>
-                </button>
-            </div>
-        </div>
-    `;
-    
-    detallesContainer.appendChild(nuevoDetalle);
-    
-    // Agregar event listeners para cálculos
-    const cantidad = nuevoDetalle.querySelector('.cantidad');
-    const precio = nuevoDetalle.querySelector('.precio-unitario');
-    
-    cantidad.addEventListener('input', calcularTotales);
-    precio.addEventListener('input', calcularTotales);
-    
-    actualizarBotonesEliminar();
-}
-
-function eliminarDetalle(index) {
-    const detalle = document.querySelector(`[data-index="${index}"]`);
-    if (detalle) {
-        detalle.remove();
-        calcularTotales();
-        actualizarBotonesEliminar();
-    }
-}
-
-function actualizarBotonesEliminar() {
-    const detalles = document.querySelectorAll('.detalle-item');
-    detalles.forEach((detalle, index) => {
-        const boton = detalle.querySelector('.btn-danger');
-        if (detalles.length === 1) {
-            boton.disabled = true;
-        } else {
-            boton.disabled = false;
-        }
-    });
-}
-
-function calcularTotales() {
-    let subtotal = 0;
-    
-    // Calcular total de cada línea
-    document.querySelectorAll('.detalle-item').forEach(detalle => {
-        const cantidad = parseFloat(detalle.querySelector('.cantidad').value) || 0;
-        const precio = parseFloat(detalle.querySelector('.precio-unitario').value) || 0;
-        const total = cantidad * precio;
-        
-        detalle.querySelector('.total-linea').value = total.toFixed(2);
-        subtotal += total;
-    });
-    
-    // Calcular descuento
-    const descuento = parseFloat(document.getElementById('descuento').value) || 0;
-    const subtotalConDescuento = subtotal - descuento;
-    
-    // Calcular impuestos (19%)
-    const impuestos = subtotalConDescuento * 0.19;
-    
-    // Total final
-    const totalFinal = subtotalConDescuento + impuestos;
-    
-    // Actualizar resumen
-    document.getElementById('resumen-subtotal').textContent = `$${subtotal.toFixed(2)}`;
-    document.getElementById('resumen-impuestos').textContent = `$${impuestos.toFixed(2)}`;
-    document.getElementById('resumen-total').textContent = `$${totalFinal.toFixed(2)}`;
-}
-
-// Event listeners para cálculos automáticos
-document.addEventListener('DOMContentLoaded', function() {
-    // Agregar listeners a la primera línea
-    document.querySelector('.cantidad').addEventListener('input', calcularTotales);
-    document.querySelector('.precio-unitario').addEventListener('input', calcularTotales);
-    document.getElementById('descuento').addEventListener('input', calcularTotales);
-    
-    // Submit del formulario
-    document.getElementById('formCrearFactura').addEventListener('submit', function(e) {
-        e.preventDefault();
-        crearFactura();
-    });
-});
-
-function crearFactura() {
-    const formData = new FormData(document.getElementById('formCrearFactura'));
-    
-    // Calcular totales finales
-    const subtotal = parseFloat(document.getElementById('resumen-subtotal').textContent.replace('$', ''));
-    const descuento = parseFloat(document.getElementById('descuento').value) || 0;
-    const impuestos = parseFloat(document.getElementById('resumen-impuestos').textContent.replace('$', ''));
-    const total = parseFloat(document.getElementById('resumen-total').textContent.replace('$', ''));
-    
-    const facturaData = {
-        numero_factura: formData.get('numero_factura'),
-        id_cliente: parseInt(formData.get('id_cliente')),
-        fecha_factura: formData.get('fecha_factura'),
-        fecha_vencimiento: formData.get('fecha_vencimiento'),
-        subtotal: subtotal,
-        impuestos: impuestos,
-        descuento: descuento,
-        total: total,
-        observaciones: formData.get('observaciones')
-    };
-    
-    fetch('/facturas/crear', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(facturaData)
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert('Factura creada correctamente');
-            window.location.href = '/facturas';
-        } else {
-            alert('Error al crear la factura');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Error al crear la factura');
-    });
-}
-
-// Generar número de factura automático
-function generarNumeroFactura() {
-    const fecha = new Date();
-    const numero = `FAC-${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, '0')}-${String(Date.now()).slice(-4)}`;
-    document.getElementById('numero_factura').value = numero;
-}
-
-// Generar número automáticamente al cargar
-generarNumeroFactura();
+(function() {
+    'use strict';
+    window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        var validation = Array.prototype.filter.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+})();
 </script>
 {% endblock %}

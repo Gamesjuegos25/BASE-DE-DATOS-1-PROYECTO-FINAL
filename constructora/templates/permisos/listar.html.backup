@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block title %}Permisos de Acceso{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h2><i class="bi bi-shield-lock"></i> Permisos de Acceso</h2>
+            <p class="text-muted">Gestión de permisos del sistema y asignación a usuarios</p>
+        </div>
+        <div class="col-md-6 text-end">
+            <a href="{{ url_for('crear_permiso') }}" class="btn btn-success">
+                <i class="bi bi-plus-circle"></i> Crear Permiso
+            </a>
+        </div>
+    </div>
+
+    {% if permisos %}
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Módulo</th>
+                            <th>Nivel de Acceso</th>
+                            <th>Usuarios Asignados</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for permiso in permisos %}
+                        <tr>
+                            <td><strong>#{{ permiso.id_permiso }}</strong></td>
+                            <td>
+                                <span class="badge bg-primary">{{ permiso.modulo_permiso }}</span>
+                            </td>
+                            <td>
+                                {% if permiso.nivel_acceso_permiso %}
+                                    <span class="badge 
+                                        {% if 'admin' in permiso.nivel_acceso_permiso|lower %}bg-danger
+                                        {% elif 'escritura' in permiso.nivel_acceso_permiso|lower %}bg-warning
+                                        {% elif 'lectura' in permiso.nivel_acceso_permiso|lower %}bg-info
+                                        {% else %}bg-secondary
+                                        {% endif %}">
+                                        {{ permiso.nivel_acceso_permiso }}
+                                    </span>
+                                {% else %}
+                                    <span class="text-muted">Sin nivel</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge bg-dark">
+                                    {{ permiso.usuarios_asignados }} usuario(s)
+                                </span>
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="{{ url_for('ver_permiso', id=permiso.id_permiso) }}" 
+                                       class="btn btn-outline-info" title="Ver detalle">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="{{ url_for('editar_permiso', id=permiso.id_permiso) }}" 
+                                       class="btn btn-outline-warning" title="Editar">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a href="{{ url_for('asignar_permiso', id=permiso.id_permiso) }}" 
+                                       class="btn btn-outline-success" title="Asignar usuarios">
+                                        <i class="bi bi-person-plus"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-outline-danger" 
+                                            onclick="confirmarEliminacion({{ permiso.id_permiso }})" title="Eliminar">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="5" class="text-muted text-center">
+                                <small>Total de permisos: {{ permisos|length }}</small>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i> 
+        No hay permisos registrados. 
+        <a href="{{ url_for('crear_permiso') }}" class="alert-link">Crear el primero</a>
+    </div>
+    {% endif %}
+
+    <div class="card mt-4 bg-light border-0">
+        <div class="card-body">
+            <h6 class="card-title"><i class="bi bi-info-circle"></i> Información sobre Permisos</h6>
+            <ul class="mb-0 small text-muted">
+                <li><strong>Módulo:</strong> Área o sección del sistema (Obras, Empleados, Reportes, etc.)</li>
+                <li><strong>Nivel de Acceso:</strong> Tipo de permisos (Lectura, Escritura, Admin, etc.)</li>
+                <li><strong>Asignación:</strong> Los permisos se asignan individualmente a usuarios</li>
+                <li><strong>Cascade:</strong> Al eliminar un permiso, se revocan automáticamente todas las asignaciones</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmación de eliminación -->
+<div class="modal fade" id="modalEliminar" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-exclamation-triangle"></i> Confirmar Eliminación
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro que desea eliminar este permiso?</p>
+                <p class="text-danger"><strong>Advertencia:</strong> Se revocarán todas las asignaciones a usuarios.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="formEliminar" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function confirmarEliminacion(id) {
+    const form = document.getElementById('formEliminar');
+    form.action = `/permisos/${id}/eliminar`;
+    const modal = new bootstrap.Modal(document.getElementById('modalEliminar'));
+    modal.show();
+}
+</script>
+{% endblock %}

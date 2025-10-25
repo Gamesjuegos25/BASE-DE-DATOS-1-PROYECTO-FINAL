@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <!-- CSS para formularios -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/form-pages.css') }}">{% endblock %}
+
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/create-forms.css') }}">
+
+
+<div class="content-wrapper fade-in-up">
+    <div class="page-header">
+        <div class="form-header"><div class="form-header-content"><h1 class="form-title"><i class="fas fa-edit"></i>Editar Área</h1></div></div>
+        <p class="page-subtitle">Modifica el nombre del área</p>
+    </div>
+
+    <div class="form-max-w-7xl mx-auto px-6">
+        <div class="create-form-max-w-7xl mx-auto px-6">
+<form method="post" action="{{ url_for('editar_area', area_id=area.id or area.id_area) }}">
+            <div class="form-group">
+                <label class="form-label">Nombre del área</label>
+                <input class="form-input" 
+                       required maxlength="100" value="{{ area.nombre_area or area.nombre }}" placeholder="Ingrese el nombre del área">
+                <div class="form-help">El nombre debe ser único y descriptivo</div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn btn btn-warm-primary">
+                    <i class="fas fa-save"></i>
+                    Guardar Cambios
+                </button>
+                <a href="{{ url_for('detalle_area', area_id=area.id or area.id_area) }}" class="btn btn btn btn-warm-secondary">
+                    <i class="fas fa-times"></i>
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

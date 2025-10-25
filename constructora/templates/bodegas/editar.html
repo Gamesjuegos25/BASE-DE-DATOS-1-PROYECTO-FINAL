@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <!-- CSS para formularios -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/form-pages.css') }}">{% endblock %}
+
+
+{% block title %}Editar Bodega{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/create-forms.css') }}">
+
+
+<div class="max-w-7xl mx-auto px-6-fluid">
+    <div class="flex flex-wrap -mx-2 mb-6">
+        <div class="flex-1 px-2-md-12">
+            <h2><i class="bi bi-building-gear"></i> Editar Bodega</h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Inicio</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('listar_bodegas') }}">Bodegas</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('ver_bodega', id=bodega.id_bodega) }}">Bodega #{{ bodega.id_bodega }}</a></li>
+                    <li class="breadcrumb-item active">Editar</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="flex flex-wrap -mx-2">
+        <div class="flex-1 px-2-md-8">
+            <div class="form-card">
+                <div class="stat-stat-header bg-gradient-warm-secondary text-white text-dark">
+                    <h5 class="mb-0"><i class="bi bi-pencil-square"></i> Modificar Información de la Bodega</h5>
+                </div>
+                <div class="stat-module-content">
+                    <div class="create-form-max-w-7xl mx-auto px-6">
+<form method="POST">
+                        <div class="mb-3">
+                            <label class="form-label">
+                                <i class="bi bi-person-badge"></i> Responsable de la Bodega *
+                            </label>
+                            <input class="form-input" 
+                                   id="responsable_bodega" 
+                                   name="responsable_bodega" 
+                                   value="{{ bodega.responsable_bodega }}"
+                                   placeholder="Nombre del responsable o encargado" 
+                                   required>
+                            <div class="form-text">
+                                Persona encargada de administrar y supervisar la bodega
+                            </div>
+                        </div>
+
+                        <div class="alert alert alert-info">
+                            <i class="bi bi-info-circle"></i>
+                            <strong>Nota:</strong> Los cambios no afectarán las asignaciones existentes a obras ni los inventarios registrados.
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-6">
+                            <a href="{{ url_for('ver_bodega', id=bodega.id_bodega) }}" class="btn btn btn btn-warm-secondary">
+                                <i class="bi bi-x-circle"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn btn btn-warm-secondary">
+                                <i class="bi bi-check-circle"></i> Guardar Cambios
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex-1 px-2-md-4">
+            <div class="form-card">
+                <div class="stat-module-content">
+                    <h6 class="stat-card-title"><i class="bi bi-building"></i> Bodega Actual</h6>
+                    <ul class="small mb-0">
+                        <li><strong>ID:</strong> {{ bodega.id_bodega }}</li>
+                        <li><strong>Responsable:</strong> {{ bodega.responsable_bodega }}</li>
+                        <li><strong>Obras asignadas:</strong> {{ bodega.obras_asignadas }}</li>
+                        <li><strong>Inventarios:</strong> {{ bodega.inventarios_asignados }}</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="form-card">
+                <div class="stat-module-content">
+                    <h6 class="stat-card-title text-prussian-blue-700"><i class="bi bi-info-circle"></i> Información</h6>
+                    <p class="small mb-0">
+                        Al cambiar el responsable, todas las operaciones y registros asociados 
+                        a esta bodega se mantendrán intactos. Solo se actualiza quién está a cargo.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

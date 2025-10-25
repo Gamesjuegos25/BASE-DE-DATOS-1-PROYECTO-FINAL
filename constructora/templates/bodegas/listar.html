@@ -1,0 +1,381 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <!-- CSS para páginas de listado -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/list-pages.css') }}">{% endblock %}
+
+
+{% block title %}Bodegas
+<script>
+// Mejoras JavaScript automáticas para tablas
+document.addEventListener('DOMContentLoaded', function() {
+    // Aplicar efectos de hover a filas de tabla
+    const tableRows = document.querySelectorAll('.data-table-enhanced tbody tr, table tbody tr');
+    tableRows.forEach((row, index) => {
+        row.style.animationDelay = `${index * 0.1}s`;
+        row.classList.add('fade-in-up');
+        
+        row.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+            this.style.boxShadow = '0 4px 15px rgba(247, 127, 0, 0.2)';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = 'none';
+        });
+    });
+    
+    // Mejorar botones de acción con tooltips
+    const actionButtons = document.querySelectorAll('.btn-action-enhanced, .action-buttons a, .action-buttons button');
+    actionButtons.forEach(button => {
+        if (!button.querySelector('.custom-tooltip')) {
+            button.addEventListener('mouseenter', function() {
+                const title = this.getAttribute('title');
+                if (title) {
+                    const tooltip = document.createElement('div');
+                    tooltip.className = 'custom-tooltip';
+                    tooltip.textContent = title;
+                    tooltip.style.cssText = `
+                        position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+                        background: var(--prussian-blue-700); color: var(--vanilla);
+                        padding: 4px 8px; border-radius: 4px; font-size: 0.7rem;
+                        white-space: nowrap; z-index: 1000; margin-bottom: 5px;
+                    `;
+                    this.style.position = 'relative';
+                    this.appendChild(tooltip);
+                }
+            });
+            
+            button.addEventListener('mouseleave', function() {
+                const tooltip = this.querySelector('.custom-tooltip');
+                if (tooltip) tooltip.remove();
+            });
+        }
+    });
+    
+    // Contador animado para números
+    const statNumbers = document.querySelectorAll('.stat-number-enhanced, .stat-number');
+    statNumbers.forEach(stat => {
+        const finalNumber = parseInt(stat.textContent) || 0;
+        if (finalNumber > 0) {
+            let currentNumber = 0;
+            const increment = Math.max(1, Math.ceil(finalNumber / 20));
+            const timer = setInterval(() => {
+                currentNumber += increment;
+                if (currentNumber >= finalNumber) {
+                    currentNumber = finalNumber;
+                    clearInterval(timer);
+                }
+                stat.textContent = currentNumber;
+            }, 100);
+        }
+    });
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/enhanced-tables.css') }}">
+
+<div class="page-container"><div class="page-header fade-in-up">
+    <div class="header-content">
+        <div class="header-left">
+            <h1 class="page-title">
+                <i class="fas fa-list"></i>
+                Gestión de Bodegas
+            </h1>
+            <p class="page-subtitle">Control y administración de bodegas</p>
+        </div>
+        <div class="header-actions">
+            <a href="{{ url_for('crear_bodega') }}" class="btn btn btn btn-warm-primary">
+                <i class="fas fa-plus"></i>
+                Nuevo Bodega
+            </a>
+        </div>
+</div>
+
+<!-- Estadísticas del Módulo -->
+<div class="stats-grid">
+    <div class="stat-stat-card fade-in-up">
+        <div class="stat-icon bg-blue">
+            <i class="fas fa-list"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ datos|length or 0 }}</div>
+            <div class="stat-label">Total Registros</div>
+        </div>
+    </div>
+    
+    <div class="stat-stat-card fade-in-up">
+        <div class="stat-icon bg-green">
+            <i class="fas fa-check-circle text-xanthous-600"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ datos|length or 0 }}</div>
+            <div class="stat-label">Activos</div>
+        </div>
+    </div>
+    
+    <div class="stat-stat-card fade-in-up">
+        <div class="stat-icon bg-orange">
+            <i class="fas fa-clock"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">0</div>
+            <div class="stat-label">Pendientes</div>
+        </div>
+    </div>
+</div>
+
+</div>
+
+
+<div class="max-w-7xl mx-auto px-6-fluid">
+    <div class="flex flex-wrap -mx-2 mb-6">
+        <div class="flex-1 px-2-md-6">
+            <h2><i class="bi bi-building"></i> Bodegas</h2>
+            <p class="text-vanilla-600">Gestión de almacenes y centros de distribución</p>
+        </div>
+        <div class="flex-1 px-2-md-6 text-end">
+            <a href="{{ url_for('crear_bodega') }}" class="btn btn btn-accent">
+                <i class="bi bi-plus-circle"></i> Nueva Bodega
+            </a>
+        </div>
+    </div>
+
+    {% if bodegas %}
+    <div class="stat-card shadow-sm fade-in-up">
+        <div class="stat-module-content">
+            <div class="list-table-container">
+                <div class="list-table-container"><div class="list-table-container"><table class="data-table-enhanced table">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Responsable</th>
+                            <th>Ubicación</th>
+                            <th>Capacidad</th>
+                            <th><i class="fas fa-tasks"></i> Estado</th>
+                            <th>Relaciones</th>
+                            <th class="text-center"><i class="fas fa-cogs"></i> Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for bodega in bodegas %}
+                        <tr>
+                            <td><strong>#{{ bodega.id_bodega }}</strong></td>
+                            <td>
+                                <div class="flex items-center">
+                                    <i class="fas fa-user text-prussian-blue me-2"></i>
+                                    <div>
+                                        <div class="fw-bold">{{ bodega.responsable_bodega or 'Sin asignar' }}</div>
+                                        {% if bodega.telefono_bodega %}
+                                            <small class="text-vanilla-600">
+                                                <i class="fas fa-phone"></i> {{ bodega.telefono_bodega }}
+                                            </small>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                {% if bodega.ubicacion_bodega %}
+                                    <div class="text-truncate" style="max-width: 200px;" title="{{ bodega.ubicacion_bodega }}">
+                                        <i class="fas fa-map-marker-alt text-xanthous-600 me-1"></i>
+                                        {{ bodega.ubicacion_bodega }}
+                                    </div>
+                                {% else %}
+                                    <span class="text-vanilla-600">Sin ubicación</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if bodega.capacidad_bodega %}
+                                    <span class="status-badge">
+                                        <i class="fas fa-boxes text-vanilla-100"></i> {{ bodega.capacidad_bodega }}
+                                    </span>
+                                {% else %}
+                                    <span class="text-vanilla-600">Sin especificar</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% set estado_class = 'success' if bodega.estado_bodega == 'Activa' else 'secondary' %}
+                                {% if bodega.estado_bodega == 'Mantenimiento' %}
+                                    {% set estado_class = 'warning' %}
+                                {% elif bodega.estado_bodega == 'Inactiva' %}
+                                    {% set estado_class = 'danger' %}
+                                {% endif %}
+                                <span class="status-badge">
+                                    {{ bodega.estado_bodega or 'Activa' }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="flex gap-1">
+                                    <span class="status-badge">
+                                        <i class="fas fa-building text-prussian-blue"></i> {{ bodega.obras_asignadas }}
+                                    </span>
+                                    <span class="status-badge">
+                                        <i class="fas fa-boxes text-vanilla-100"></i> {{ bodega.inventarios_asignados }}
+                                    </span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="{{ url_for('ver_bodega', id=bodega.id_bodega) }}" class="btn btn-outline-info transition-all hover:scale-110 hover:-translate-y-1" title="Ver detalle">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="{{ url_for('editar_bodega', id=bodega.id_bodega) }}" class="btn btn-outline-warning transition-all hover:scale-110 hover:-translate-y-1" title="Editar">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a href="{{ url_for('asignar_bodega_obras', id=bodega.id_bodega) }}" class="btn btn-outline-success transition-all hover:scale-110 hover:-translate-y-1" title="Asignar a obras">
+                                        <i class="bi bi-link-45deg"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-outline-danger" 
+                                            data-bodega-id="{{ bodega.id_bodega }}"
+                                            data-bodega-responsable="{{ bodega.responsable_bodega }}"
+                                            onclick="confirmarEliminacion(this)" title="Eliminar">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="5" class="text-vanilla-600 text-center">
+                                <small>Total de bodegas: {{ bodegas|length }}</small>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table></div></div></div></div>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert alert-info">
+        <i class="bi bi-info-circle"></i> 
+        No hay bodegas registradas. 
+        <a href="{{ url_for('crear_bodega') }}" class="alert-link">Crear la primera</a>
+    </div>
+    {% endif %}
+
+    <div class="stat-card mt-6 bg-vanilla-800 border-0 fade-in-up">
+        <div class="stat-module-content">
+            <h6 class="stat-card-title"><i class="bi bi-info-circle"></i> Información sobre Bodegas</h6>
+            <ul class="mb-0 small text-vanilla-600">
+                <li><strong>Responsable:</strong> Persona encargada de la bodega o almacén</li>
+                <li><strong>Obras Asignadas:</strong> Proyectos que utilizan esta bodega</li>
+                <li><strong>Inventarios:</strong> Registros de materiales almacenados</li>
+                <li><strong>Cascade:</strong> Al eliminar una bodega, se eliminan sus asignaciones de obras e inventarios</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmación de eliminación -->
+<div class="modal fade" id="modalEliminar" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-gradient-warm-danger text-white text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-exclamation-triangle"></i> Confirmar Eliminación
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro que desea eliminar la bodega <strong id="bodega-nombre"></strong>?</p>
+                <p class="text-fire-engine-red"><strong>Advertencia:</strong> Se eliminarán todas las asignaciones a obras e inventarios.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn btn btn-warm-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="formEliminar" method="POST">
+                    <button type="submit" class="btn btn btn btn-warm-danger">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function confirmarEliminacion(button) {
+    const bodegaId = button.getAttribute('data-bodega-id');
+    const bodegaResponsable = button.getAttribute('data-bodega-responsable');
+    
+    document.getElementById('bodega-nombre').textContent = `Bodega #${bodegaId} (${bodegaResponsable})`;
+    
+    const form = document.getElementById('formEliminar');
+    form.action = `/bodegas/${bodegaId}/eliminar`;
+    
+    const modal = new bootstrap.Modal(document.getElementById('modalEliminar'));
+    modal.show();
+}
+</script>
+
+<script>
+// Mejoras JavaScript automáticas para tablas
+document.addEventListener('DOMContentLoaded', function() {
+    // Aplicar efectos de hover a filas de tabla
+    const tableRows = document.querySelectorAll('.data-table-enhanced tbody tr, table tbody tr');
+    tableRows.forEach((row, index) => {
+        row.style.animationDelay = `${index * 0.1}s`;
+        row.classList.add('fade-in-up');
+        
+        row.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+            this.style.boxShadow = '0 4px 15px rgba(247, 127, 0, 0.2)';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = 'none';
+        });
+    });
+    
+    // Mejorar botones de acción con tooltips
+    const actionButtons = document.querySelectorAll('.btn-action-enhanced, .action-buttons a, .action-buttons button');
+    actionButtons.forEach(button => {
+        if (!button.querySelector('.custom-tooltip')) {
+            button.addEventListener('mouseenter', function() {
+                const title = this.getAttribute('title');
+                if (title) {
+                    const tooltip = document.createElement('div');
+                    tooltip.className = 'custom-tooltip';
+                    tooltip.textContent = title;
+                    tooltip.style.cssText = `
+                        position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+                        background: var(--prussian-blue-700); color: var(--vanilla);
+                        padding: 4px 8px; border-radius: 4px; font-size: 0.7rem;
+                        white-space: nowrap; z-index: 1000; margin-bottom: 5px;
+                    `;
+                    this.style.position = 'relative';
+                    this.appendChild(tooltip);
+                }
+            });
+            
+            button.addEventListener('mouseleave', function() {
+                const tooltip = this.querySelector('.custom-tooltip');
+                if (tooltip) tooltip.remove();
+            });
+        }
+    });
+    
+    // Contador animado para números
+    const statNumbers = document.querySelectorAll('.stat-number-enhanced, .stat-number');
+    statNumbers.forEach(stat => {
+        const finalNumber = parseInt(stat.textContent) || 0;
+        if (finalNumber > 0) {
+            let currentNumber = 0;
+            const increment = Math.max(1, Math.ceil(finalNumber / 20));
+            const timer = setInterval(() => {
+                currentNumber += increment;
+                if (currentNumber >= finalNumber) {
+                    currentNumber = finalNumber;
+                    clearInterval(timer);
+                }
+                stat.textContent = currentNumber;
+            }, 100);
+        }
+    });
+});
+</script>
+{% endblock %}

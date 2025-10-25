@@ -1,0 +1,133 @@
+:root {
+    /* Warm Autumn Glow - Extended Properties */
+    
+    /* Component-specific colors */
+    --navbar-bg: linear-gradient(135deg, var(--prussian-blue), var(--prussian-blue-600));
+    --sidebar-bg: linear-gradient(180deg, var(--prussian-blue-300), var(--prussian-blue));
+    --content-bg: var(--vanilla-100);
+    --card-bg: linear-gradient(135deg, var(--vanilla), var(--vanilla-200));
+    --button-primary: linear-gradient(135deg, var(--prussian-blue), var(--prussian-blue-600));
+    --button-secondary: linear-gradient(135deg, var(--orange-wheel), var(--orange-wheel-600));
+    --button-success: linear-gradient(135deg, var(--xanthous-600), var(--xanthous));
+    --button-danger: linear-gradient(135deg, var(--fire-engine-red), var(--fire-engine-red-600));
+    
+    /* Interactive states */
+    --hover-transform: translateY(-2px) scale(1.02);
+    --hover-shadow: 0 8px 25px rgba(0, 48, 73, 0.2);
+    --focus-outline: 0 0 0 3px rgba(247, 127, 0, 0.2);
+    
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    
+    /* Spacing using theme multipliers */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 3rem;
+    
+    /* Border radius */
+    --radius-sm: 0.25rem;
+    --radius-md: 0.375rem;
+    --radius-lg: 0.5rem;
+    --radius-xl: 0.75rem;
+    --radius-full: 9999px;
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 48, 73, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 48, 73, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 48, 73, 0.1);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 48, 73, 0.1);
+    
+    /* Typography */
+    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-size-xs: 0.75rem;
+    --font-size-sm: 0.875rem;
+    --font-size-base: 1rem;
+    --font-size-lg: 1.125rem;
+    --font-size-xl: 1.25rem;
+    --font-size-2xl: 1.5rem;
+    --font-size-3xl: 1.875rem;
+    
+    /* Z-index layers */
+    --z-dropdown: 1000;
+    --z-sticky: 1020;
+    --z-fixed: 1030;
+    --z-modal-backdrop: 1040;
+    --z-modal: 1050;
+    --z-popover: 1060;
+    --z-tooltip: 1070;
+}
+
+/* Global classes using custom properties */
+.warm-gradient-primary {
+    background: var(--button-primary);
+}
+
+.warm-gradient-secondary {
+    background: var(--button-secondary);
+}
+
+.warm-hover-effect:hover {
+    transform: var(--hover-transform);
+    box-shadow: var(--hover-shadow);
+}
+
+.warm-transition {
+    transition: var(--transition-smooth);
+}
+
+.warm-transition-bounce {
+    transition: var(--transition-bounce);
+}
+
+.warm-focus:focus {
+    outline: none;
+    box-shadow: var(--focus-outline);
+}
+
+.warm-card {
+    background: var(--card-bg);
+    border: 1px solid var(--prussian-blue-200);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+}
+
+.warm-button {
+    background: var(--button-primary);
+    color: var(--vanilla);
+    border: 2px solid var(--prussian-blue-400);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-family: var(--font-family);
+    font-weight: 600;
+    transition: var(--transition-smooth);
+    cursor: pointer;
+}
+
+.warm-button:hover {
+    background: var(--button-secondary);
+    transform: var(--hover-transform);
+    box-shadow: var(--hover-shadow);
+}
+
+/* Utility classes */
+.text-warm-primary { color: var(--prussian-blue) !important; }
+.text-warm-secondary { color: var(--orange-wheel) !important; }
+.text-warm-accent { color: var(--xanthous) !important; }
+.text-warm-danger { color: var(--fire-engine-red) !important; }
+.text-warm-light { color: var(--vanilla) !important; }
+
+.bg-warm-primary { background-color: var(--prussian-blue) !important; }
+.bg-warm-secondary { background-color: var(--orange-wheel) !important; }
+.bg-warm-accent { background-color: var(--xanthous) !important; }
+.bg-warm-danger { background-color: var(--fire-engine-red) !important; }
+.bg-warm-light { background-color: var(--vanilla) !important; }
+
+.border-warm-primary { border-color: var(--prussian-blue) !important; }
+.border-warm-secondary { border-color: var(--orange-wheel) !important; }
+.border-warm-accent { border-color: var(--xanthous) !important; }
+.border-warm-danger { border-color: var(--fire-engine-red) !important; }
+.border-warm-light { border-color: var(--vanilla) !important; }

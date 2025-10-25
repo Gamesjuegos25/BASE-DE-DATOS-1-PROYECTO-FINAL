@@ -1,0 +1,266 @@
+{% extends "base.html" %}
+
+{% block title %}Crear Empleado - ERP Constructora{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <nav class="breadcrumb">
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+        <span class="breadcrumb-separator">/</span>
+        <a href="{{ url_for('listar_empleados') }}">Empleados</a>
+        <span class="breadcrumb-separator">/</span>
+        <span>Nuevo Empleado</span>
+    </nav>
+    <h1 class="page-title">👥 Crear Nuevo Empleado</h1>
+    <p class="page-subtitle">Registra un nuevo empleado en el sistema</p>
+</div>
+
+<div class="form-container">
+    <form method="POST" class="space-y-6">
+        <div class="form-row">
+            <div class="form-group">
+                <label for="nombre" class="form-label required">Nombre</label>
+                <input type="text" 
+                       id="nombre" 
+                       name="nombre" 
+                       class="form-control" 
+                       placeholder="Ingrese el nombre del empleado"
+                       required>
+                <div class="form-help">Nombre completo del empleado</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="apellido" class="form-label required">Apellido</label>
+                <input type="text" 
+                       id="apellido" 
+                       name="apellido" 
+                       class="form-control" 
+                       placeholder="Ingrese el apellido del empleado"
+                       required>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" 
+                       id="email" 
+                       name="email" 
+                       class="form-control" 
+                       placeholder="empleado@empresa.com">
+                <div class="form-help">Email corporativo del empleado</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="telefono" class="form-label">Teléfono</label>
+                <input type="tel" 
+                       id="telefono" 
+                       name="telefono" 
+                       class="form-control" 
+                       placeholder="+52 123 456 7890">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="cargo" class="form-label required">Cargo</label>
+                <select id="cargo" name="cargo" class="form-control form-select" required>
+                    <option value="">Seleccionar cargo...</option>
+                    <option value="Ingeniero Civil">Ingeniero Civil</option>
+                    <option value="Arquitecto">Arquitecto</option>
+                    <option value="Maestro de Obra">Maestro de Obra</option>
+                    <option value="Electricista">Electricista</option>
+                    <option value="Plomero">Plomero</option>
+                    <option value="Soldador">Soldador</option>
+                    <option value="Operador de Maquinaria">Operador de Maquinaria</option>
+                    <option value="Albañil">Albañil</option>
+                    <option value="Supervisor">Supervisor</option>
+                    <option value="Administrador">Administrador</option>
+                    <option value="Contador">Contador</option>
+                    <option value="Recursos Humanos">Recursos Humanos</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="salario" class="form-label">Salario</label>
+                <input type="number" 
+                       id="salario" 
+                       name="salario" 
+                       class="form-control" 
+                       placeholder="0.00"
+                       step="0.01"
+                       min="0">
+                <div class="form-help">Salario mensual en pesos mexicanos</div>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="fecha_contratacion" class="form-label">Fecha de Contratación</label>
+                <input type="date" 
+                       id="fecha_contratacion" 
+                       name="fecha_contratacion" 
+                       class="form-control"
+                       value="{{ date.today() }}">
+            </div>
+            
+            <div class="form-group">
+                <label for="estado" class="form-label required">Estado</label>
+                <select id="estado" name="estado" class="form-control form-select" required>
+                    <option value="Activo">Activo</option>
+                    <option value="Inactivo">Inactivo</option>
+                    <option value="Vacaciones">Vacaciones</option>
+                    <option value="Licencia">Licencia</option>
+                    <option value="Suspendido">Suspendido</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="direccion" class="form-label">Dirección</label>
+            <textarea id="direccion" 
+                      name="direccion" 
+                      class="form-control form-textarea" 
+                      placeholder="Dirección completa del empleado"
+                      rows="3"></textarea>
+            <div class="form-help">Dirección completa para correspondencia</div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label for="nss" class="form-label">NSS</label>
+                <input type="text" 
+                       id="nss" 
+                       name="nss" 
+                       class="form-control" 
+                       placeholder="12345678901">
+                <div class="form-help">Número de Seguridad Social</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="rfc" class="form-label">RFC</label>
+                <input type="text" 
+                       id="rfc" 
+                       name="rfc" 
+                       class="form-control" 
+                       placeholder="ABCD123456EFG"
+                       pattern="[A-Z]{4}[0-9]{6}[A-Z0-9]{3}">
+                <div class="form-help">Registro Federal de Contribuyentes</div>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <a href="{{ url_for('listar_empleados') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Cancelar
+            </a>
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Guardar Empleado
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+// Validación en tiempo real
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+    const inputs = form.querySelectorAll('input[required], select[required]');
+    
+    // Validar RFC en tiempo real
+    const rfcInput = document.getElementById('rfc');
+    if (rfcInput) {
+        rfcInput.addEventListener('input', function() {
+            const value = this.value.toUpperCase();
+            this.value = value;
+            
+            if (value.length > 0 && !/^[A-Z]{0,4}[0-9]{0,6}[A-Z0-9]{0,3}$/.test(value)) {
+                this.setCustomValidity('RFC inválido. Formato: ABCD123456EFG');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+    }
+    
+    // Validar NSS
+    const nssInput = document.getElementById('nss');
+    if (nssInput) {
+        nssInput.addEventListener('input', function() {
+            const value = this.value.replace(/\D/g, '');
+            this.value = value;
+            
+            if (value.length > 0 && value.length !== 11) {
+                this.setCustomValidity('NSS debe tener 11 dígitos');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+    }
+    
+    // Validación de formulario
+    form.addEventListener('submit', function(e) {
+        let isValid = true;
+        
+        inputs.forEach(input => {
+            if (!input.value.trim()) {
+                input.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                input.classList.remove('is-invalid');
+            }
+        });
+        
+        if (!isValid) {
+            e.preventDefault();
+            alert('Por favor complete todos los campos requeridos');
+        }
+    });
+    
+    // Remover error al escribir
+    inputs.forEach(input => {
+        input.addEventListener('input', function() {
+            this.classList.remove('is-invalid');
+        });
+    });
+});
+
+// Auto-formatear teléfono
+document.getElementById('telefono').addEventListener('input', function() {
+    let value = this.value.replace(/\D/g, '');
+    if (value.length >= 10) {
+        value = value.replace(/(\d{2})(\d{3})(\d{3})(\d{4})/, '+$1 $2 $3 $4');
+    }
+    this.value = value;
+});
+</script>
+
+<style>
+.space-y-6 > * + * {
+    margin-top: 1.5rem;
+}
+
+.form-control.is-invalid {
+    border-color: var(--danger-color);
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.form-control:valid {
+    border-color: var(--success-color);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--spacing-6);
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+    }
+}
+</style>
+{% endblock %}

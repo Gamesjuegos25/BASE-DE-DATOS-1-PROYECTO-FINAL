@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/create-forms.css') }}">
+
+
+<div class="dashboard-header">
+  <h1><i class="fas fa-edit"></i> Editar Incidente #{{ incidente.id_incidente or incidente.id }}</h1>
+  <a href="{{ url_for('ver_incidente', id=incidente.id_incidente or incidente.id) }}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Volver</a>
+</div>
+
+<div class="create-form-container">
+<form method="post" class="form-card">
+  <div class="form-row">
+    <div class="form-group col-md-4">
+      <label for="fecha_incidente">Fecha</label>
+      <input type="date" id="fecha_incidente" name="fecha_incidente" class="form-control" value="{{ incidente.fecha_incidente|default('', true) }}" />
+    </div>
+    <div class="form-group col-md-4">
+      <label for="estado">Estado</label>
+      <select id="estado" name="estado" class="form-control">
+        {% set est = incidente.estado_incidente %}
+        {% for op in ['Reportado','En Proceso','Resuelto','Cerrado'] %}
+        <option value="{{ op }}" {% if est == op %}selected{% endif %}>{{ op }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-group col-md-4">
+      <label for="obra_id">Obra (opcional)</label>
+      <select id="obra_id" name="obra_id" class="form-control">
+        <option value="">Sin obra</option>
+        {% for o in obras %}
+        {% set oid = o.id_obra or o.id %}
+        <option value="{{ oid }}" {% if incidente.id_obra and incidente.id_obra == oid %}selected{% endif %}>
+          {{ o.nombre_obra or o.nombre }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="descripcion">Descripción</label>
+    <textarea id="descripcion" name="descripcion" class="form-control" rows="5">{{ incidente.descripcion_incidente }}</textarea>
+  </div>
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Guardar</button>
+    <a href="{{ url_for('ver_incidente', id=incidente.id_incidente or incidente.id) }}" class="btn btn-secondary">Cancelar</a>
+  </div>
+</form>
+</div>
+
+{% endblock %}

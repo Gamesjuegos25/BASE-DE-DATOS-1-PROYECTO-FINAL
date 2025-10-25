@@ -1,0 +1,279 @@
+{% extends "base.html" %}
+
+{% block title %}Gestión de Materiales - Sistema ERP{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="header-content">
+        <div class="header-left">
+            <h1 class="page-title">
+                <i class="fas fa-cubes"></i>
+                Gestión de Materiales
+            </h1>
+            <p class="page-subtitle">Control de inventario y materiales de construcción</p>
+        </div>
+        <div class="header-actions">
+            <a href="{{ url_for('crear_material') }}" class="btn btn-primary">
+                <i class="fas fa-plus"></i>
+                Nuevo Material
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Estadísticas del Inventario -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon bg-blue">
+            <i class="fas fa-cubes"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ materiales|length }}</div>
+            <div class="stat-label">Total Materiales</div>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon bg-green">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ materiales|selectattr('precio')|list|length }}</div>
+            <div class="stat-label">Con Precio Definido</div>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon bg-orange">
+            <i class="fas fa-balance-scale"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ materiales|selectattr('unidad')|list|length }}</div>
+            <div class="stat-label">Con Unidad</div>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon bg-purple">
+            <i class="fas fa-coins"></i>
+        </div>
+        <div class="stat-content">
+            {% set total_valor = materiales|selectattr('precio')|sum(attribute='precio') %}
+            <div class="stat-number">Q{{ "{:,.0f}".format(total_valor) if total_valor else "0" }}</div>
+            <div class="stat-label">Valor Total Inventario</div>
+        </div>
+    </div>
+</div>
+
+<!-- Filtros y Búsqueda -->
+<div class="filters-container">
+    <div class="filter-group">
+        <select id="filtroCategoria" class="filter-select" onchange="filtrarMateriales()">
+            <option value="">Todas las categorías</option>
+            <option value="Cemento">Cemento</option>
+            <option value="Agregados">Agregados</option>
+            <option value="Acero">Acero</option>
+            <option value="Herramientas">Herramientas</option>
+            <option value="Eléctrico">Eléctrico</option>
+            <option value="Plomería">Plomería</option>
+        </select>
+    </div>
+    
+    <div class="filter-group">
+        <select id="filtroUnidad" class="filter-select" onchange="filtrarMateriales()">
+            <option value="">Todas las unidades</option>
+            <option value="kg">Kilogramos</option>
+            <option value="m3">Metro cúbico</option>
+            <option value="m2">Metro cuadrado</option>
+            <option value="unidad">Unidades</option>
+            <option value="sacos">Sacos</option>
+        </select>
+    </div>
+    
+    <div class="search-group">
+        <input type="text" 
+               id="buscarMaterial" 
+               class="search-input" 
+               placeholder="Buscar material..."
+               onkeyup="filtrarMateriales()">
+        <i class="fas fa-search search-icon"></i>
+    </div>
+</div>
+
+<!-- Lista de Materiales -->
+<div class="data-table-container">
+    <div class="table-header">
+        <div class="table-title">
+            <h3>Lista de Materiales</h3>
+            <span class="record-count">{{ materiales|length }} registros</span>
+        </div>
+        <div class="table-actions">
+            <button class="btn btn-outline" onclick="exportarMateriales()">
+                <i class="fas fa-download"></i>
+                Exportar
+            </button>
+        </div>
+    </div>
+    
+    <div class="table-responsive">
+        <table class="data-table" id="tablaMateriales">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Material</th>
+                    <th>Categoría</th>
+                    <th>Unidad</th>
+                    <th>Precio Unitario</th>
+                    <th>Stock</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for material in materiales %}
+                <tr data-categoria="{{ material.categoria or '' }}" 
+                    data-unidad="{{ material.unidad or '' }}" 
+                    data-nombre="{{ material.nombre or '' }}">
+                    <td>{{ material.id or material.material_id or 'N/A' }}</td>
+                    <td>
+                        <div class="material-info">
+                            <div class="material-icon">
+                                {% if material.categoria == 'Cemento' %}
+                                    <i class="fas fa-fill-drip"></i>
+                                {% elif material.categoria == 'Acero' %}
+                                    <i class="fas fa-industry"></i>
+                                {% elif material.categoria == 'Herramientas' %}
+                                    <i class="fas fa-tools"></i>
+                                {% else %}
+                                    <i class="fas fa-cube"></i>
+                                {% endif %}
+                            </div>
+                            <div class="material-details">
+                                <strong>{{ material.nombre or 'Sin nombre' }}</strong>
+                                {% if material.descripcion %}
+                                <div class="material-desc">{{ material.descripcion[:50] }}...</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="category-badge category-{{ material.categoria|lower if material.categoria else 'general' }}">
+                            {{ material.categoria or 'General' }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if material.unidad %}
+                            <span class="unit-badge">{{ material.unidad }}</span>
+                        {% else %}
+                            <span class="text-muted">Sin unidad</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if material.precio %}
+                            <span class="price-amount">Q{{ "{:,.2f}".format(material.precio) }}</span>
+                        {% else %}
+                            <span class="text-muted">No definido</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="stock-info">
+                            {% set stock = material.stock or 0 %}
+                            {% if stock > 10 %}
+                                <span class="stock-badge stock-high">{{ stock }}</span>
+                            {% elif stock > 0 %}
+                                <span class="stock-badge stock-low">{{ stock }}</span>
+                            {% else %}
+                                <span class="stock-badge stock-empty">Sin stock</span>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td>
+                        {% set stock = material.stock or 0 %}
+                        {% if stock > 10 %}
+                            <span class="status-badge status-success">
+                                <i class="fas fa-circle"></i>
+                                Disponible
+                            </span>
+                        {% elif stock > 0 %}
+                            <span class="status-badge status-warning">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Stock Bajo
+                            </span>
+                        {% else %}
+                            <span class="status-badge status-danger">
+                                <i class="fas fa-times-circle"></i>
+                                Agotado
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td class="actions-cell">
+                        <div class="table-actions">
+                            <a class="btn-action btn-view" 
+                               title="Ver detalles"
+                               href="{{ url_for('ver_material', id=(material.id or material.material_id)) }}">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a class="btn-action btn-edit" 
+                               title="Editar"
+                               href="{{ url_for('editar_material', id=(material.id or material.material_id)) }}">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form action="{{ url_for('eliminar_material', id=(material.id or material.material_id)) }}" 
+                                  method="post" 
+                                  onsubmit="return confirm('¿Eliminar este material?');">
+                                <button class="btn-action btn-danger" title="Eliminar" type="submit">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="8" class="empty-state">
+                        <div class="empty-content">
+                            <i class="fas fa-cubes"></i>
+                            <h3>No hay materiales registrados</h3>
+                            <p>Comienza agregando el primer material para tus obras</p>
+                            <a href="{{ url_for('crear_material') }}" class="btn btn-primary">
+                                <i class="fas fa-plus"></i>
+                                Agregar Primer Material
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+function filtrarMateriales() {
+    const filtroCategoria = document.getElementById('filtroCategoria').value.toLowerCase();
+    const filtroUnidad = document.getElementById('filtroUnidad').value.toLowerCase();
+    const busqueda = document.getElementById('buscarMaterial').value.toLowerCase();
+    const filas = document.querySelectorAll('#tablaMateriales tbody tr');
+    
+    filas.forEach(fila => {
+        const categoria = fila.getAttribute('data-categoria').toLowerCase();
+        const unidad = fila.getAttribute('data-unidad').toLowerCase();
+        const nombre = fila.getAttribute('data-nombre').toLowerCase();
+        
+        const cumpleCategoria = !filtroCategoria || categoria.includes(filtroCategoria);
+        const cumpleUnidad = !filtroUnidad || unidad.includes(filtroUnidad);
+        const cumpleBusqueda = !busqueda || nombre.includes(busqueda);
+        
+        if (cumpleCategoria && cumpleUnidad && cumpleBusqueda) {
+            fila.style.display = '';
+        } else {
+            fila.style.display = 'none';
+        }
+    });
+}
+
+function exportarMateriales() {
+    alert('Exportar materiales (por implementar)');
+}
+</script>
+{% endblock %}

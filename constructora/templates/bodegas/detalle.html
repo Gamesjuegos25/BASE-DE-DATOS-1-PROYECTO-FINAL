@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <!-- CSS específico para páginas de detalle -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/detail-page.css') }}">
+    
+    <!-- CSS para páginas de detalle -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/detail-page.css') }}">{% endblock %}
+
+
+{% block title %}Detalle de Bodega{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-6-fluid">
+    <div class="flex flex-wrap -mx-2 mb-6">
+        <div class="flex-1 px-2-md-12">
+            <h2><i class="bi bi-building"></i> Detalle de Bodega</h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Inicio</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('listar_bodegas') }}">Bodegas</a></li>
+                    <li class="breadcrumb-item active">Bodega #{{ bodega.id_bodega }}</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="flex flex-wrap -mx-2">
+        <div class="flex-1 px-2-md-8">
+            <div class="detail-card">
+                <div class="stat-stat-header bg-gradient-warm-primary text-white text-white flex justify-between items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-building"></i> Bodega #{{ bodega.id_bodega }}
+                    </h5>
+                    <span class="status-badge-detail">
+                        <i class="bi bi-person-badge"></i> {{ bodega.responsable_bodega }}
+                    </span>
+                </div>
+                <div class="stat-module-content">
+                    <div class="flex flex-wrap -mx-2">
+                        <div class="flex-1 px-2-md-4">
+                            <div class="mb-3">
+                                <label class="text-vanilla-600 small">ID de Bodega</label>
+                                <p class="h5">#{{ bodega.id_bodega }}</p>
+                            </div>
+                        </div>
+                        <div class="flex-1 px-2-md-8">
+                            <div class="mb-3">
+                                <label class="text-vanilla-600 small">Responsable</label>
+                                <p class="h5">
+                                    <i class="bi bi-person-badge text-prussian-blue"></i> {{ bodega.responsable_bodega }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap -mx-2 mt-3">
+                        <div class="flex-1 px-2-md-6">
+                            <div class="mb-3">
+                                <label class="text-vanilla-600 small">Obras Asignadas</label>
+                                <p class="h4">
+                                    <span class="status-badge-detail">{{ bodega.obras_asignadas }}</span> obra(s)
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex-1 px-2-md-6">
+                            <div class="mb-3">
+                                <label class="text-vanilla-600 small">Inventarios Registrados</label>
+                                <p class="h4">
+                                    <span class="status-badge-detail">{{ bodega.inventarios_asignados }}</span> inventario(s)
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-6">
+                        <a href="{{ url_for('listar_bodegas') }}" class="btn btn btn btn-warm-secondary">
+                            <i class="bi bi-arrow-left"></i> Volver
+                        </a>
+                        <a href="{{ url_for('asignar_bodega_obras', id=bodega.id_bodega) }}" class="btn btn btn-accent">
+                            <i class="bi bi-link-45deg"></i> Asignar a Obras
+                        </a>
+                        <a href="{{ url_for('editar_bodega', id=bodega.id_bodega) }}" class="btn btn btn btn-warm-secondary">
+                            <i class="bi bi-pencil"></i> Editar
+                        </a>
+                        <button type="button" class="btn btn btn btn-warm-danger" data-bs-toggle="modal" data-bs-target="#modalEliminar">
+                            <i class="bi bi-trash"></i> Eliminar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            {% if obras_asignadas %}
+            <div class="detail-card">
+                <div class="stat-stat-header bg-vanilla-800">
+                    <h6 class="mb-0"><i class="bi bi-tools"></i> Obras que Utilizan esta Bodega</h6>
+                </div>
+                <div class="stat-module-content">
+                    <div class="table-max-w-7xl mx-auto px-6">
+                        <table class="assignment-table">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nombre de Obra</th>
+                                    <th>Ubicación</th>
+                                    <th>Fecha Inicio</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for obra in obras_asignadas %}
+                                <tr>
+                                    <td><strong>#{{ obra.id_obra }}</strong></td>
+                                    <td>{{ obra.nombre_obra }}</td>
+                                    <td><small>{{ obra.ubicacion_obra or 'N/A' }}</small></td>
+                                    <td>
+                                        <small class="text-vanilla-600">
+                                            {{ obra.fecha_inicio_obra.strftime('%d/%m/%Y') if obra.fecha_inicio_obra else 'N/A' }}
+                                        </small>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="flex-1 px-2-md-4">
+            <div class="detail-card">
+                <div class="stat-module-content">
+                    <h6 class="stat-card-title"><i class="bi bi-info-circle"></i> Información de la Bodega</h6>
+                    <ul class="small mb-0">
+                        <li><strong>ID:</strong> {{ bodega.id_bodega }}</li>
+                        <li><strong>Responsable:</strong> {{ bodega.responsable_bodega }}</li>
+                        <li><strong>Obras Asignadas:</strong> {{ bodega.obras_asignadas }}</li>
+                        <li><strong>Inventarios:</strong> {{ bodega.inventarios_asignados }}</li>
+                        <li class="mt-2">Las bodegas permiten gestionar materiales por ubicación física</li>
+                        <li>Puedes asignar la misma bodega a múltiples obras</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="detail-card">
+                <div class="stat-module-content">
+                    <h6 class="stat-card-title text-orange-wheel"><i class="bi bi-exclamation-triangle"></i> Advertencia</h6>
+                    <p class="small mb-0">
+                        Al eliminar esta bodega, se eliminarán automáticamente:
+                    </p>
+                    <ul class="small mb-0">
+                        <li>Todas las asignaciones a obras</li>
+                        <li>Todos los inventarios registrados</li>
+                    </ul>
+                    <p class="small mb-0 mt-2 text-fire-engine-red">
+                        <strong>Esta acción no se puede deshacer.</strong>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmación de eliminación -->
+<div class="modal fade" id="modalEliminar" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-gradient-warm-danger text-white text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-exclamation-triangle"></i> Confirmar Eliminación
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro que desea eliminar la <strong>Bodega #{{ bodega.id_bodega }}</strong>?</p>
+                <p class="text-fire-engine-red">
+                    <strong>Advertencia:</strong> Se eliminarán las asignaciones de {{ bodega.obras_asignadas }} obra(s) 
+                    y {{ bodega.inventarios_asignados }} inventario(s).
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn btn btn-warm-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form method="POST" action="{{ url_for('eliminar_bodega', id=bodega.id_bodega) }}">
+                    <button type="submit" class="btn btn btn btn-warm-danger">
+                        <i class="bi bi-trash"></i> Eliminar Bodega
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

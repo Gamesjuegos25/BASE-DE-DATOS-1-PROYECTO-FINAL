@@ -1,14 +1,93 @@
 {% extends "base.html" %}
 
-{% block title %}Facturas - ERP Constructora{% endblock %}
+{% block head %}
+    <!-- CSS para páginas de listado -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/list-pages.css') }}"></div>
+{% endblock %}
+
+
+{% block title %}Facturas - ERP Constructora</div>
+
+<script>
+// Mejoras JavaScript automáticas para tablas
+document.addEventListener('DOMContentLoaded', function() {
+    // Aplicar efectos de hover a filas de tabla
+    const tableRows = document.querySelectorAll('.data-table-enhanced tbody tr, table tbody tr');
+    tableRows.forEach((row, index) => {
+        row.style.animationDelay = `${index * 0.1}s`;
+        row.classList.add('fade-in-up');
+        
+        row.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+            this.style.boxShadow = '0 4px 15px rgba(247, 127, 0, 0.2)';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = 'none';
+        });
+    });
+    
+    // Mejorar botones de acción con tooltips
+    const actionButtons = document.querySelectorAll('.btn-action-enhanced, .action-buttons a, .action-buttons button');
+    actionButtons.forEach(button => {
+        if (!button.querySelector('.custom-tooltip')) {
+            button.addEventListener('mouseenter', function() {
+                const title = this.getAttribute('title');
+                if (title) {
+                    const tooltip = document.createElement('div');
+                    tooltip.className = 'custom-tooltip';
+                    tooltip.textContent = title;
+                    tooltip.style.cssText = `
+                        position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+                        background: var(--prussian-blue-700); color: var(--vanilla);
+                        padding: 4px 8px; border-radius: 4px; font-size: 0.7rem;
+                        white-space: nowrap; z-index: 1000; margin-bottom: 5px;
+                    `;
+                    this.style.position = 'relative';
+                    this.appendChild(tooltip);
+                }
+            });
+            
+            button.addEventListener('mouseleave', function() {
+                const tooltip = this.querySelector('.custom-tooltip');
+                if (tooltip) tooltip.remove();
+            });
+        }
+    });
+    
+    // Contador animado para números
+    const statNumbers = document.querySelectorAll('.stat-number-enhanced, .stat-number');
+    statNumbers.forEach(stat => {
+        const finalNumber = parseInt(stat.textContent) || 0;
+        if (finalNumber > 0) {
+            let currentNumber = 0;
+            const increment = Math.max(1, Math.ceil(finalNumber / 20));
+            const timer = setInterval(() => {
+                currentNumber += increment;
+                if (currentNumber >= finalNumber) {
+                    currentNumber = finalNumber;
+                    clearInterval(timer);
+                }
+                stat.textContent = currentNumber;
+            }, 100);
+        }
+    });
+});
+</script>
+</div>
+</div>
+{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center mb-4">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/enhanced-tables.css') }}">
+
+<div class="max-w-7xl mx-auto px-6-fluid">
+    <div class="flex flex-wrap -mx-2">
+        <div class="flex-1 px-2-12">
+            <div class="flex justify-between items-center mb-6">
                 <h2><i class="fas fa-file-invoice"></i> Gestión de Facturas</h2>
-                <a href="/facturas/crear" class="btn btn-primary">
+                <a href="/facturas/crear" class="btn btn btn btn-warm-primary">
                     <i class="fas fa-plus"></i> Nueva Factura
                 </a>
             </div>
@@ -16,12 +95,12 @@
     </div>
 
     <!-- Filtros -->
-    <div class="row mb-3">
-        <div class="col-md-4">
-            <input type="text" class="form-control" id="filtro-numero" placeholder="Buscar por número de factura">
+    <div class="flex flex-wrap -mx-2 mb-3">
+        <div class="flex-1 px-2-md-4">
+            <input type="text" class="form-control-enhanced" id="filtro-numero" placeholder="Buscar por número de factura">
         </div>
-        <div class="col-md-4">
-            <select class="form-control" id="filtro-estado">
+        <div class="flex-1 px-2-md-4">
+            <select class="form-control-enhanced" id="filtro-estado">
                 <option value="">Todos los estados</option>
                 <option value="Pendiente">Pendiente</option>
                 <option value="Pagada">Pagada</option>
@@ -29,33 +108,32 @@
                 <option value="Anulada">Anulada</option>
             </select>
         </div>
-        <div class="col-md-4">
-            <input type="date" class="form-control" id="filtro-fecha" placeholder="Fecha de factura">
+        <div class="flex-1 px-2-md-4">
+            <input type="date" class="form-control-enhanced" id="filtro-fecha" placeholder="Fecha de factura">
         </div>
     </div>
 
     <!-- Lista de Facturas -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
+    <div class="flex flex-wrap -mx-2">
+        <div class="flex-1 px-2-12">
+            <div class="stat-card fade-in-up">
+                <div class="stat-stat-header">
                     <h5>Lista de Facturas</h5>
                 </div>
-                <div class="card-body">
+                <div class="stat-module-content">
                     {% if facturas %}
-                    <div class="table-responsive">
-                        <table class="table table-striped table-hover">
-                            <thead>
-                                <tr>
+                    <div class="list-table-container">
+                        <div class="list-table-container"><div class="list-table-container"><table class="data-table-enhanced table table">
+                            <thead><tr>
                                     <th>Número</th>
-                                    <th>Cliente</th>
-                                    <th>Fecha</th>
+                                    <th class="hidden-sm"><i class="fas fa-user"></i> Cliente</th>
+                                    <th class="hidden-md"><i class="fas fa-calendar-alt"></i> Fecha</th>
                                     <th>Vencimiento</th>
                                     <th>Subtotal</th>
                                     <th>Impuestos</th>
                                     <th>Total</th>
-                                    <th>Estado</th>
-                                    <th>Acciones</th>
+                                    <th><i class="fas fa-tasks"></i> Estado</th>
+                                    <th class="text-center"><i class="fas fa-cogs"></i> Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -70,44 +148,50 @@
                                     <td><strong>{{ format_currency(factura.total) }}</strong></td>
                                     <td>
                                         {% if factura.estado_factura == 'Pendiente' %}
-                                            <span class="badge badge-warning">{{ factura.estado_factura }}</span>
+                                            <span class="status-badge">{{ factura.estado_factura }}</span>
                                         {% elif factura.estado_factura == 'Pagada' %}
-                                            <span class="badge badge-success">{{ factura.estado_factura }}</span>
+                                            <span class="status-badge">{{ factura.estado_factura }}</span>
                                         {% elif factura.estado_factura == 'Vencida' %}
-                                            <span class="badge badge-danger">{{ factura.estado_factura }}</span>
+                                            <span class="status-badge">{{ factura.estado_factura }}</span>
                                         {% else %}
-                                            <span class="badge badge-secondary">{{ factura.estado_factura }}</span>
+                                            <span class="status-badge">{{ factura.estado_factura }}</span>
                                         {% endif %}
                                     </td>
                                     <td>
                                         <div class="btn-group" role="group">
-                                            <a href="/facturas/{{ factura.id_factura }}/detalle" 
-                                               class="btn btn-sm btn-info" title="Ver detalle">
+                                            <a href="/facturas/{{ factura.id_factura }}/detalle" class="btn btn-sm btn btn btn-warm-primary transition-all hover:scale-110 hover:-translate-y-1" title="Ver detalle">
                                                 <i class="fas fa-eye"></i>
                                             </a>
-                                            <button class="btn btn-sm btn-warning" 
+                                            <button class="btn btn-sm btn btn btn-warm-secondary" 
                                                     onclick="editarFactura({{ factura.id_factura }})" 
                                                     title="Editar">
                                                 <i class="fas fa-edit"></i>
                                             </button>
-                                            <button class="btn btn-sm btn-success" 
+                                            <button class="btn btn-sm btn btn-accent" 
                                                     onclick="imprimirFactura({{ factura.id_factura }})" 
                                                     title="Imprimir">
                                                 <i class="fas fa-print"></i>
                                             </button>
+                                            <form action="{{ url_for('eliminar_factura', id=factura.id_factura) }}" 
+                                                  method="post" 
+                                                  style="display: inline;"
+                                                  onsubmit="return confirm('¿Está seguro de eliminar esta factura?');">
+                                                <button class="btn btn-sm btn btn btn-warm-danger" title="Eliminar" type="submit">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
                                         </div>
                                     </td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
-                        </table>
-                    </div>
+                        </table></div></div></div></div>
                     {% else %}
-                    <div class="text-center py-4">
-                        <i class="fas fa-file-invoice fa-3x text-muted mb-3"></i>
-                        <h5 class="text-muted">No hay facturas registradas</h5>
-                        <p class="text-muted">Comience creando su primera factura</p>
-                        <a href="/facturas/crear" class="btn btn-primary">
+                    <div class="text-center py-6">
+                        <i class="fas fa-file-invoice fa-3x text-vanilla-600 mb-3"></i>
+                        <h5 class="text-vanilla-600">No hay facturas registradas</h5>
+                        <p class="text-vanilla-600">Comience creando su primera factura</p>
+                        <a href="/facturas/crear" class="btn btn btn btn-warm-primary">
                             <i class="fas fa-plus"></i> Crear Primera Factura
                         </a>
                     </div>
@@ -118,34 +202,34 @@
     </div>
 
     <!-- Estadísticas Rápidas -->
-    <div class="row mt-4">
-        <div class="col-md-3">
-            <div class="card bg-primary text-white">
-                <div class="card-body">
+    <div class="flex flex-wrap -mx-2 mt-6">
+        <div class="flex-1 px-2-md-3">
+            <div class="stat-card bg-gradient-warm-primary text-white text-white fade-in-up">
+                <div class="stat-module-content">
                     <h5>Total Facturas</h5>
                     <h3>{{ facturas|length }}</h3>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card bg-success text-white">
-                <div class="card-body">
+        <div class="flex-1 px-2-md-3">
+            <div class="stat-card bg-xanthous-200 text-white text-white fade-in-up">
+                <div class="stat-module-content">
                     <h5>Facturas Pagadas</h5>
                     <h3>{{ facturas|selectattr("estado_factura", "equalto", "Pagada")|list|length }}</h3>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card bg-warning text-white">
-                <div class="card-body">
+        <div class="flex-1 px-2-md-3">
+            <div class="stat-card bg-gradient-warm-secondary text-white text-white fade-in-up">
+                <div class="stat-module-content">
                     <h5>Facturas Pendientes</h5>
                     <h3>{{ facturas|selectattr("estado_factura", "equalto", "Pendiente")|list|length }}</h3>
                 </div>
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card bg-info text-white">
-                <div class="card-body">
+        <div class="flex-1 px-2-md-3">
+            <div class="stat-card bg-gradient-warm-primary text-white text-white fade-in-up">
+                <div class="stat-module-content">
                     <h5>Total Facturado</h5>
                     <h3>
                         {% set total = facturas|sum(attribute='total') %}
@@ -163,17 +247,17 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Editar Factura</h5>
-                <button type="button" class="close" data-dismiss="modal">
+                <button class="btn btn-warm-primary" type="button" class="close" data-dismiss="modal">
                     <span>&times;</span>
                 </button>
             </div>
             <div class="modal-body">
                 <form id="formEditarFactura">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
+                    <div class="flex flex-wrap -mx-2">
+                        <div class="flex-1 px-2-md-6">
+                            <div class="form-group-enhanced">
                                 <label>Estado de la Factura</label>
-                                <select class="form-control" name="estado_factura" required>
+                                <select class="form-control-enhanced" name="estado_factura" required>
                                     <option value="Pendiente">Pendiente</option>
                                     <option value="Pagada">Pagada</option>
                                     <option value="Vencida">Vencida</option>
@@ -181,22 +265,22 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
+                        <div class="flex-1 px-2-md-6">
+                            <div class="form-group-enhanced">
                                 <label>Fecha de Vencimiento</label>
-                                <input type="date" class="form-control" name="fecha_vencimiento" required>
+                                <input type="date" class="form-control-enhanced" name="fecha_vencimiento" required>
                             </div>
                         </div>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group-enhanced">
                         <label>Observaciones</label>
-                        <textarea class="form-control" name="observaciones" rows="3"></textarea>
+                        <textarea class="form-control-enhanced" name="observaciones" rows="3"></textarea>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" onclick="guardarCambiosFactura()">
+                <button type="button" class="btn btn btn btn-warm-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn btn btn-warm-primary" onclick="guardarCambiosFactura()">
                     <i class="fas fa-save"></i> Guardar Cambios
                 </button>
             </div>
@@ -277,4 +361,75 @@ function filtrarFacturas() {
     });
 }
 </script>
+</div>
+
+<script>
+// Mejoras JavaScript automáticas para tablas
+document.addEventListener('DOMContentLoaded', function() {
+    // Aplicar efectos de hover a filas de tabla
+    const tableRows = document.querySelectorAll('.data-table-enhanced tbody tr, table tbody tr');
+    tableRows.forEach((row, index) => {
+        row.style.animationDelay = `${index * 0.1}s`;
+        row.classList.add('fade-in-up');
+        
+        row.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+            this.style.boxShadow = '0 4px 15px rgba(247, 127, 0, 0.2)';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = 'none';
+        });
+    });
+    
+    // Mejorar botones de acción con tooltips
+    const actionButtons = document.querySelectorAll('.btn-action-enhanced, .action-buttons a, .action-buttons button');
+    actionButtons.forEach(button => {
+        if (!button.querySelector('.custom-tooltip')) {
+            button.addEventListener('mouseenter', function() {
+                const title = this.getAttribute('title');
+                if (title) {
+                    const tooltip = document.createElement('div');
+                    tooltip.className = 'custom-tooltip';
+                    tooltip.textContent = title;
+                    tooltip.style.cssText = `
+                        position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+                        background: var(--prussian-blue-700); color: var(--vanilla);
+                        padding: 4px 8px; border-radius: 4px; font-size: 0.7rem;
+                        white-space: nowrap; z-index: 1000; margin-bottom: 5px;
+                    `;
+                    this.style.position = 'relative';
+                    this.appendChild(tooltip);
+                }
+            });
+            
+            button.addEventListener('mouseleave', function() {
+                const tooltip = this.querySelector('.custom-tooltip');
+                if (tooltip) tooltip.remove();
+            });
+        }
+    });
+    
+    // Contador animado para números
+    const statNumbers = document.querySelectorAll('.stat-number-enhanced, .stat-number');
+    statNumbers.forEach(stat => {
+        const finalNumber = parseInt(stat.textContent) || 0;
+        if (finalNumber > 0) {
+            let currentNumber = 0;
+            const increment = Math.max(1, Math.ceil(finalNumber / 20));
+            const timer = setInterval(() => {
+                currentNumber += increment;
+                if (currentNumber >= finalNumber) {
+                    currentNumber = finalNumber;
+                    clearInterval(timer);
+                }
+                stat.textContent = currentNumber;
+            }, 100);
+        }
+    });
+});
+</script>
+</div>
+</div>
 {% endblock %}

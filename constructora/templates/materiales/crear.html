@@ -1,154 +1,175 @@
 {% extends "base.html" %}
 
+{% block head %}
+    <!-- CSS para formularios -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/form-pages.css') }}">{% endblock %}
+
+
 {% block title %}Nuevo Material - Sistema Constructora{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="header-section">
-        <h1>🧱 Nuevo Material</h1>
-        <a href="{{ url_for('listar_materiales') }}" class="btn-secondary">
-            ⬅️ Volver a Materiales
-        </a>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/create-forms.css') }}">
+
+<div class="create-form-max-w-7xl mx-auto px-6">
+    <!-- Header de página estilo detalle -->
+    <div class="create-page-header">
+        <nav class="breadcrumb">
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <span class="breadcrumb-separator">/</span>
+            <a href="{{ url_for('listar_materiales') }}">Materiales</a>
+            <span class="breadcrumb-separator">/</span>
+            <span>Nuevo</span>
+        </nav>
+        <h1 class="create-page-title">
+            <i class="fas fa-cubes"></i>
+            Crear Nuevo Material
+        </h1>
     </div>
-    
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="alert alert-{{ category }}">
-                    {{ message }}
+
+    <div class="max-w-7xl mx-auto px-6-fluid">
+        <form method="POST" action="{{ url_for('crear_material') }}" id="create-material-form" class="needs-validation" novalidate>
+            <div class="create-form-flex flex-wrap -mx-2">
+                <!-- Información del Material -->
+                <div class="form-card">
+                    <div class="stat-stat-header">
+                        <h5><i class="fas fa-cube"></i> Información del Material</h5>
+                    </div>
+                    <div class="stat-module-content">
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-tag"></i>Nombre del Material<span class="required">*</span>
+                            </label>
+                            <input class="form-input" id="nombre_material" name="nombre_material" 
+                                   placeholder="Ej: Cemento Portland" 
+                                   value="{{ request.form.nombre_material if request.form else '' }}" required>
+                            <div class="invalid-feedback">
+                                Por favor, ingrese el nombre del material.
+                            </div>
+                        </div>
+
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-list"></i>Tipo de Material<span class="required">*</span>
+                            </label>
+                            <select class="form-select" id="tipo_material" name="tipo_material" required>
+                                <option value="">Seleccionar tipo...</option>
+                                <option value="CEMENTO" {{ 'selected' if request.form and request.form.tipo_material == 'CEMENTO' else '' }}>🏗️ Cemento</option>
+                                <option value="ARENA" {{ 'selected' if request.form and request.form.tipo_material == 'ARENA' else '' }}>🏖️ Arena</option>
+                                <option value="GRAVA" {{ 'selected' if request.form and request.form.tipo_material == 'GRAVA' else '' }}>🪨 Grava</option>
+                                <option value="HIERRO" {{ 'selected' if request.form and request.form.tipo_material == 'HIERRO' else '' }}>🔩 Hierro</option>
+                                <option value="LADRILLO" {{ 'selected' if request.form and request.form.tipo_material == 'LADRILLO' else '' }}>🧱 Ladrillo</option>
+                                <option value="TUBERIA" {{ 'selected' if request.form and request.form.tipo_material == 'TUBERIA' else '' }}>🚿 Tubería</option>
+                                <option value="ELECTRICO" {{ 'selected' if request.form and request.form.tipo_material == 'ELECTRICO' else '' }}>⚡ Eléctrico</option>
+                                <option value="OTRO" {{ 'selected' if request.form and request.form.tipo_material == 'OTRO' else '' }}>❓ Otro</option>
+                            </select>
+                            <div class="invalid-feedback">
+                                Por favor, seleccione el tipo de material.
+                            </div>
+                        </div>
+
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-ruler"></i>Unidad de Medida<span class="required">*</span>
+                            </label>
+                            <select class="form-select" id="unidad_medida" name="unidad_medida" required>
+                                <option value="">Seleccionar unidad...</option>
+                                <option value="KG" {{ 'selected' if request.form and request.form.unidad_medida == 'KG' else '' }}>⚖️ Kilogramos (KG)</option>
+                                <option value="TONELADAS" {{ 'selected' if request.form and request.form.unidad_medida == 'TONELADAS' else '' }}>🏗️ Toneladas</option>
+                                <option value="M3" {{ 'selected' if request.form and request.form.unidad_medida == 'M3' else '' }}>📦 Metros Cúbicos (M³)</option>
+                                <option value="M2" {{ 'selected' if request.form and request.form.unidad_medida == 'M2' else '' }}>📐 Metros Cuadrados (M²)</option>
+                                <option value="ML" {{ 'selected' if request.form and request.form.unidad_medida == 'ML' else '' }}>📏 Metros Lineales (ML)</option>
+                                <option value="UNIDADES" {{ 'selected' if request.form and request.form.unidad_medida == 'UNIDADES' else '' }}>🔢 Unidades</option>
+                            </select>
+                            <div class="invalid-feedback">
+                                Por favor, seleccione la unidad de medida.
+                            </div>
+                        </div>
+
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-warehouse"></i>Stock Inicial
+                            </label>
+                            <input class="form-input" id="stock_actual" name="stock_actual" 
+                                   placeholder="0" step="0.01" min="0"
+                                   value="{{ request.form.stock_actual if request.form else '' }}">
+                        </div>
+                    </div>
                 </div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-    
-    <div class="form-container">
-        <form method="POST" class="form-modern">
-            <div class="form-section">
-                <h3>📦 Información del Material</h3>
-                
-                <div class="form-group">
-                    <label for="nombre">Nombre del Material *</label>
-                    <input type="text" 
-                           id="nombre" 
-                           name="nombre" 
-                           required 
-                           placeholder="Ej: Cemento Portland"
-                           value="{{ request.form.nombre if request.form else '' }}">
+
+                <!-- Información Adicional -->
+                <div class="form-card">
+                    <div class="stat-stat-header">
+                        <h5><i class="fas fa-info-circle text-prussian-blue-700"></i> Información Adicional</h5>
+                    </div>
+                    <div class="stat-module-content">
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-dollar-sign text-xanthous"></i>Precio Unitario
+                            </label>
+                            <input class="form-input" id="precio_unitario" name="precio_unitario" 
+                                   placeholder="0.00" step="0.01" min="0"
+                                   value="{{ request.form.precio_unitario if request.form else '' }}">
+                            <div class="create-form-text">
+                                <i class="fas fa-info-circle text-prussian-blue-700"></i>Precio por unidad de medida en pesos colombianos
+                            </div>
+                        </div>
+
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-exclamation-triangle text-fire-engine-red"></i>Stock Mínimo
+                            </label>
+                            <input class="form-input" id="stock_minimo" name="stock_minimo" 
+                                   placeholder="0" step="0.01" min="0"
+                                   value="{{ request.form.stock_minimo if request.form else '' }}">
+                            <div class="create-form-text">
+                                <i class="fas fa-info-circle text-prussian-blue-700"></i>Cantidad mínima antes de alertar por reabastecimiento
+                            </div>
+                        </div>
+
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-sticky-note"></i>Descripción
+                            </label>
+                            <textarea class="form-textarea" id="descripcion" name="descripcion" rows="3"
+                                      placeholder="Descripción detallada del material">{{ request.form.descripcion if request.form else '' }}</textarea>
+                        </div>
+                    </div>
                 </div>
-                
-                <div class="form-group">
-                    <label for="unidad">Unidad de Medida *</label>
-                    <select id="unidad" name="unidad" required>
-                        <option value="">Seleccionar unidad...</option>
-                        <option value="Bolsa" {{ 'selected' if request.form and request.form.unidad == 'Bolsa' else '' }}>📦 Bolsa</option>
-                        <option value="Metro Cúbico" {{ 'selected' if request.form and request.form.unidad == 'Metro Cúbico' else '' }}>📏 Metro Cúbico (m³)</option>
-                        <option value="Metro Cuadrado" {{ 'selected' if request.form and request.form.unidad == 'Metro Cuadrado' else '' }}>📐 Metro Cuadrado (m²)</option>
-                        <option value="Metro Lineal" {{ 'selected' if request.form and request.form.unidad == 'Metro Lineal' else '' }}>📏 Metro Lineal (m)</option>
-                        <option value="Kilogramo" {{ 'selected' if request.form and request.form.unidad == 'Kilogramo' else '' }}>⚖️ Kilogramo (kg)</option>
-                        <option value="Quintal" {{ 'selected' if request.form and request.form.unidad == 'Quintal' else '' }}>⚖️ Quintal (qq)</option>
-                        <option value="Tonelada" {{ 'selected' if request.form and request.form.unidad == 'Tonelada' else '' }}>⚖️ Tonelada (ton)</option>
-                        <option value="Litro" {{ 'selected' if request.form and request.form.unidad == 'Litro' else '' }}>🥤 Litro (L)</option>
-                        <option value="Galón" {{ 'selected' if request.form and request.form.unidad == 'Galón' else '' }}>🪣 Galón</option>
-                        <option value="Pieza" {{ 'selected' if request.form and request.form.unidad == 'Pieza' else '' }}>🔧 Pieza/Unidad</option>
-                        <option value="Docena" {{ 'selected' if request.form and request.form.unidad == 'Docena' else '' }}>📦 Docena</option>
-                        <option value="Ciento" {{ 'selected' if request.form and request.form.unidad == 'Ciento' else '' }}>💯 Ciento</option>
-                        <option value="Millar" {{ 'selected' if request.form and request.form.unidad == 'Millar' else '' }}>📦 Millar</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="precio">Precio Unitario (Q)</label>
-                    <input type="number" 
-                           id="precio" 
-                           name="precio" 
-                           step="0.01" 
-                           min="0"
-                           placeholder="Ej: 125.50"
-                           value="{{ request.form.precio if request.form else '' }}">
-                    <small class="form-help">Precio por unidad de medida</small>
-                </div>
-            </div>
-            
-            <div class="form-section">
-                <h3>📋 Información Adicional (Opcional)</h3>
-                
-                <div class="form-group">
-                    <label for="categoria">Categoría</label>
-                    <select id="categoria" name="categoria">
-                        <option value="">Seleccionar categoría...</option>
-                        <option value="Cemento y Aglomerantes" {{ 'selected' if request.form and request.form.categoria == 'Cemento y Aglomerantes' else '' }}>🏗️ Cemento y Aglomerantes</option>
-                        <option value="Agregados" {{ 'selected' if request.form and request.form.categoria == 'Agregados' else '' }}>🪨 Agregados (Arena, Grava)</option>
-                        <option value="Hierro y Acero" {{ 'selected' if request.form and request.form.categoria == 'Hierro y Acero' else '' }}>🔩 Hierro y Acero</option>
-                        <option value="Madera" {{ 'selected' if request.form and request.form.categoria == 'Madera' else '' }}>🌳 Madera</option>
-                        <option value="Ladrillos y Blocks" {{ 'selected' if request.form and request.form.categoria == 'Ladrillos y Blocks' else '' }}>🧱 Ladrillos y Blocks</option>
-                        <option value="Tuberías y Accesorios" {{ 'selected' if request.form and request.form.categoria == 'Tuberías y Accesorios' else '' }}>🔧 Tuberías y Accesorios</option>
-                        <option value="Electricidad" {{ 'selected' if request.form and request.form.categoria == 'Electricidad' else '' }}>⚡ Materiales Eléctricos</option>
-                        <option value="Pintura y Acabados" {{ 'selected' if request.form and request.form.categoria == 'Pintura y Acabados' else '' }}>🎨 Pintura y Acabados</option>
-                        <option value="Herramientas" {{ 'selected' if request.form and request.form.categoria == 'Herramientas' else '' }}>🔨 Herramientas</option>
-                        <option value="Otros" {{ 'selected' if request.form and request.form.categoria == 'Otros' else '' }}>📦 Otros</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="proveedor">Proveedor Principal</label>
-                    <input type="text" 
-                           id="proveedor" 
-                           name="proveedor" 
-                           placeholder="Ej: Distribuidora Central"
-                           value="{{ request.form.proveedor if request.form else '' }}">
-                </div>
-                
-                <div class="form-group">
-                    <label for="stock_minimo">Stock Mínimo</label>
-                    <input type="number" 
-                           id="stock_minimo" 
-                           name="stock_minimo" 
-                           min="0"
-                           placeholder="Ej: 10"
-                           value="{{ request.form.stock_minimo if request.form else '' }}">
-                    <small class="form-help">Cantidad mínima en inventario</small>
-                </div>
-                
-                <div class="form-group">
-                    <label for="descripcion">Descripción/Especificaciones</label>
-                    <textarea id="descripcion" 
-                              name="descripcion" 
-                              rows="3"
-                              placeholder="Características técnicas, especificaciones, notas...">{{ request.form.descripcion if request.form else '' }}</textarea>
-                </div>
-            </div>
-            
-            <div class="form-actions">
-                <button type="submit" class="btn-primary">
-                    ✅ Crear Material
-                </button>
-                <a href="{{ url_for('listar_materiales') }}" class="btn-secondary">
-                    ❌ Cancelar
-                </a>
             </div>
         </form>
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="max-w-7xl mx-auto px-6-fluid">
+        <div class="form-card">
+            <div class="create-form-actions">
+                <a href="{{ url_for('listar_materiales') }}" class="create-btn create-btn btn btn-warm-secondary">
+                    <i class="fas fa-times"></i>Cancelar
+                </a>
+                <button type="submit" form="create-material-form" class="create-btn create-btn btn btn-warm-primary">
+                    <i class="fas fa-cubes"></i>Crear Material
+                </button>
+            </div>
+        </div>
     </div>
 </div>
 
 <script>
 // Validación del formulario
-document.querySelector('form').addEventListener('submit', function(e) {
-    const nombre = document.getElementById('nombre').value.trim();
-    const unidad = document.getElementById('unidad').value;
-    
-    if (!nombre) {
-        alert('El nombre del material es obligatorio');
-        e.preventDefault();
-        return false;
-    }
-    
-    if (!unidad) {
-        alert('La unidad de medida es obligatoria');
-        e.preventDefault();
-        return false;
-    }
-    
-    return true;
-});
+(function() {
+    'use strict';
+    window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        var validation = Array.prototype.filter.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+})();
 </script>
 {% endblock %}

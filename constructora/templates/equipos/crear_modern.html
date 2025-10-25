@@ -1,0 +1,682 @@
+{% extends "base.html" %}
+
+{% block title %}Crear Equipo - ERP Constructora{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <nav class="breadcrumb">
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+        <span class="breadcrumb-separator">/</span>
+        <a href="{{ url_for('listar_equipos') }}">Equipos</a>
+        <span class="breadcrumb-separator">/</span>
+        <span>Nuevo Equipo</span>
+    </nav>
+    <h1 class="page-title">🏗️ Crear Nuevo Equipo</h1>
+    <p class="page-subtitle">Registra maquinaria y equipos de construcción</p>
+</div>
+
+<div class="form-max-w-7xl mx-auto px-6">
+    <form method="POST" id="formEquipo" class="modern-form" novalidate>
+        <div class="form-section">
+            <h3 class="section-title">
+                <i class="fas fa-info-circle text-prussian-blue-700"></i>
+                Información General del Equipo
+            </h3>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="nombre" class="form-label required">Nombre del Equipo</label>
+                    <input type="text" 
+                           id="nombre" 
+                           name="nombre" 
+                           class="form-control" 
+                           placeholder="Ej: Excavadora CAT 320D"
+                           required 
+                           maxlength="100">
+                    <div class="form-help">Marca, modelo y especificaciones principales</div>
+                    <div class="form-error" id="error-nombre"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="tipo_equipo" class="form-label required">Tipo de Equipo</label>
+                    <select id="tipo_equipo" name="tipo_equipo" class="form-control form-select" required>
+                        <option value="">Seleccionar tipo</option>
+                        <option value="Excavadora">Excavadora</option>
+                        <option value="Retroexcavadora">Retroexcavadora</option>
+                        <option value="Bulldozer">Bulldozer</option>
+                        <option value="Cargador Frontal">Cargador Frontal</option>
+                        <option value="Grúa">Grúa</option>
+                        <option value="Montacargas">Montacargas</option>
+                        <option value="Compactadora">Compactadora</option>
+                        <option value="Mezcladora">Mezcladora de Concreto</option>
+                        <option value="Bomba de Concreto">Bomba de Concreto</option>
+                        <option value="Generador">Generador Eléctrico</option>
+                        <option value="Compresor">Compresor de Aire</option>
+                        <option value="Soldadora">Soldadora</option>
+                        <option value="Vibrador">Vibrador de Concreto</option>
+                        <option value="Martillo Neumático">Martillo Neumático</option>
+                        <option value="Otros">Otros</option>
+                    </select>
+                    <div class="form-error" id="error-tipo_equipo"></div>
+                </div>
+            </div>
+            
+            <div class="form-grid grid-3">
+                <div class="form-group">
+                    <label for="marca" class="form-label required">Marca</label>
+                    <input type="text" 
+                           id="marca" 
+                           name="marca" 
+                           class="form-control" 
+                           placeholder="Ej: Caterpillar, Komatsu"
+                           required 
+                           maxlength="50">
+                    <div class="form-error" id="error-marca"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="modelo" class="form-label required">Modelo</label>
+                    <input type="text" 
+                           id="modelo" 
+                           name="modelo" 
+                           class="form-control" 
+                           placeholder="Ej: 320D, PC200"
+                           required 
+                           maxlength="50">
+                    <div class="form-error" id="error-modelo"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="numero_serie" class="form-label">Número de Serie</label>
+                    <input type="text" 
+                           id="numero_serie" 
+                           name="numero_serie" 
+                           class="form-control" 
+                           placeholder="Serie del fabricante"
+                           maxlength="50">
+                    <div class="form-help">Serie única del fabricante</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h3 class="section-title">
+                <i class="fas fa-calendar-alt"></i>
+                Información de Adquisición
+            </h3>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="fecha_adquisicion" class="form-label">Fecha de Adquisición</label>
+                    <input type="date" 
+                           id="fecha_adquisicion" 
+                           name="fecha_adquisicion" 
+                           class="form-control">
+                    <div class="form-help">Fecha de compra o adquisición</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="valor_adquisicion" class="form-label">Valor de Adquisición</label>
+                    <div class="input-group">
+                        <span class="input-group-text">$</span>
+                        <input type="number" 
+                               id="valor_adquisicion" 
+                               name="valor_adquisicion" 
+                               class="form-control" 
+                               placeholder="0.00" 
+                               step="0.01" 
+                               min="0">
+                    </div>
+                    <div class="form-help">Precio de compra del equipo</div>
+                </div>
+            </div>
+            
+            <div class="form-grid grid-3">
+                <div class="form-group">
+                    <label for="proveedor" class="form-label">Proveedor</label>
+                    <select id="proveedor" name="proveedor" class="form-control form-select">
+                        <option value="">Sin proveedor</option>
+                        {% for proveedor in proveedores %}
+                        <option value="{{ proveedor.id_proveedor }}">{{ proveedor.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="form-help">Empresa proveedora</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="numero_factura" class="form-label">Número de Factura</label>
+                    <input type="text" 
+                           id="numero_factura" 
+                           name="numero_factura" 
+                           class="form-control" 
+                           placeholder="Ej: FAC-2024-001"
+                           maxlength="30">
+                </div>
+                
+                <div class="form-group">
+                    <label for="garantia_meses" class="form-label">Garantía (meses)</label>
+                    <input type="number" 
+                           id="garantia_meses" 
+                           name="garantia_meses" 
+                           class="form-control" 
+                           placeholder="0" 
+                           min="0" 
+                           max="120">
+                    <div class="form-help">Duración de la garantía</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h3 class="section-title">
+                <i class="fas fa-cogs"></i>
+                Especificaciones Técnicas
+            </h3>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="capacidad" class="form-label">Capacidad</label>
+                    <input type="text" 
+                           id="capacidad" 
+                           name="capacidad" 
+                           class="form-control" 
+                           placeholder="Ej: 20 ton, 300 HP, 5000 L"
+                           maxlength="50">
+                    <div class="form-help">Capacidad de carga, potencia, volumen, etc.</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="combustible" class="form-label">Tipo de Combustible</label>
+                    <select id="combustible" name="combustible" class="form-control form-select">
+                        <option value="">No aplica</option>
+                        <option value="Diesel">Diesel</option>
+                        <option value="Gasolina">Gasolina</option>
+                        <option value="Eléctrico">Eléctrico</option>
+                        <option value="Gas LP">Gas LP</option>
+                        <option value="Híbrido">Híbrido</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-grid grid-3">
+                <div class="form-group">
+                    <label for="peso" class="form-label">Peso (kg)</label>
+                    <input type="number" 
+                           id="peso" 
+                           name="peso" 
+                           class="form-control" 
+                           placeholder="0" 
+                           min="0" 
+                           step="0.1">
+                </div>
+                
+                <div class="form-group">
+                    <label for="horas_trabajo" class="form-label">Horas de Trabajo</label>
+                    <input type="number" 
+                           id="horas_trabajo" 
+                           name="horas_trabajo" 
+                           class="form-control" 
+                           placeholder="0" 
+                           min="0" 
+                           step="0.1">
+                    <div class="form-help">Horas acumuladas de uso</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="consumo_promedio" class="form-label">Consumo (L/h)</label>
+                    <input type="number" 
+                           id="consumo_promedio" 
+                           name="consumo_promedio" 
+                           class="form-control" 
+                           placeholder="0.0" 
+                           min="0" 
+                           step="0.1">
+                    <div class="form-help">Litros por hora promedio</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h3 class="section-title">
+                <i class="fas fa-wrench"></i>
+                Mantenimiento y Estado
+            </h3>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="estado_actual" class="form-label required">Estado Actual</label>
+                    <select id="estado_actual" name="estado_actual" class="form-control form-select" required>
+                        <option value="">Seleccionar estado</option>
+                        <option value="Operativo" selected>Operativo</option>
+                        <option value="En Mantenimiento">En Mantenimiento</option>
+                        <option value="Fuera de Servicio">Fuera de Servicio</option>
+                        <option value="En Reparación">En Reparación</option>
+                        <option value="Disponible">Disponible</option>
+                        <option value="En Uso">En Uso</option>
+                    </select>
+                    <div class="form-error" id="error-estado_actual"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="ubicacion_actual" class="form-label">Ubicación Actual</label>
+                    <input type="text" 
+                           id="ubicacion_actual" 
+                           name="ubicacion_actual" 
+                           class="form-control" 
+                           placeholder="Ej: Bodega Principal, Obra Centro"
+                           maxlength="100">
+                    <div class="form-help">Dónde se encuentra actualmente</div>
+                </div>
+            </div>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="proximo_mantenimiento" class="form-label">Próximo Mantenimiento</label>
+                    <input type="date" 
+                           id="proximo_mantenimiento" 
+                           name="proximo_mantenimiento" 
+                           class="form-control">
+                    <div class="form-help">Fecha programada para mantenimiento</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="frecuencia_mantenimiento" class="form-label">Frecuencia Mantenimiento</label>
+                    <select id="frecuencia_mantenimiento" name="frecuencia_mantenimiento" class="form-control form-select">
+                        <option value="">Sin programar</option>
+                        <option value="Semanal">Semanal</option>
+                        <option value="Mensual">Mensual</option>
+                        <option value="Trimestral">Trimestral</option>
+                        <option value="Semestral">Semestral</option>
+                        <option value="Anual">Anual</option>
+                        <option value="Por Horas">Por Horas de Uso</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h3 class="section-title">
+                <i class="fas fa-clipboard-list"></i>
+                Información Adicional
+            </h3>
+            
+            <div class="form-group">
+                <label for="descripcion" class="form-label">Descripción y Observaciones</label>
+                <textarea id="descripcion" 
+                          name="descripcion" 
+                          class="form-control" 
+                          placeholder="Características especiales, accesorios incluidos, historial relevante..."
+                          rows="4"
+                          maxlength="500"></textarea>
+                <div class="form-help">
+                    Información adicional sobre el equipo
+                    <span class="char-count">0/500 caracteres</span>
+                </div>
+            </div>
+            
+            <!-- Checkboxes para características -->
+            <div class="form-group">
+                <label class="form-label">Características Especiales</label>
+                <div class="checkbox-grid">
+                    <label class="checkbox-label">
+                        <input class="form-control form-warm" type="checkbox" name="caracteristicas" value="aire_acondicionado">
+                        <span class="checkmark"></span>
+                        Aire Acondicionado
+                    </label>
+                    <label class="checkbox-label">
+                        <input class="form-control form-warm" type="checkbox" name="caracteristicas" value="gps">
+                        <span class="checkmark"></span>
+                        Sistema GPS
+                    </label>
+                    <label class="checkbox-label">
+                        <input class="form-control form-warm" type="checkbox" name="caracteristicas" value="cabina_cerrada">
+                        <span class="checkmark"></span>
+                        Cabina Cerrada
+                    </label>
+                    <label class="checkbox-label">
+                        <input class="form-control form-warm" type="checkbox" name="caracteristicas" value="sistema_hidraulico">
+                        <span class="checkmark"></span>
+                        Sistema Hidráulico
+                    </label>
+                    <label class="checkbox-label">
+                        <input class="form-control form-warm" type="checkbox" name="caracteristicas" value="control_remoto">
+                        <span class="checkmark"></span>
+                        Control Remoto
+                    </label>
+                    <label class="checkbox-label">
+                        <input class="form-control form-warm" type="checkbox" name="caracteristicas" value="luces_led">
+                        <span class="checkmark"></span>
+                        Luces LED
+                    </label>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Resumen del Equipo -->
+        <div class="form-section bg-gray-50">
+            <h3 class="section-title">
+                <i class="fas fa-receipt"></i>
+                Resumen del Equipo
+            </h3>
+            
+            <div class="equipment-summary" id="equipmentSummary">
+                <div class="summary-grid">
+                    <div class="summary-item">
+                        <strong>Equipo:</strong> <span id="summary-nombre">-</span>
+                    </div>
+                    <div class="summary-item">
+                        <strong>Tipo:</strong> <span id="summary-tipo">-</span>
+                    </div>
+                    <div class="summary-item">
+                        <strong>Marca/Modelo:</strong> <span id="summary-marca">-</span>
+                    </div>
+                    <div class="summary-item">
+                        <strong>Estado:</strong> <span id="summary-estado">-</span>
+                    </div>
+                    <div class="summary-item">
+                        <strong>Valor:</strong> Q<span id="summary-valor">0.00</span>
+                    </div>
+                    <div class="summary-item">
+                        <strong>Capacidad:</strong> <span id="summary-capacidad">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-actions">
+            <button type="button" class="btn btn btn btn-warm-secondary" onclick="limpiarFormulario()">
+                <i class="fas fa-broom"></i> Limpiar
+            </button>
+            <button type="button" class="btn btn btn btn-warm-primary" onclick="vistaPrevia()">
+                <i class="fas fa-eye"></i> Vista Previa
+            </button>
+            <button type="submit" class="btn btn btn btn-warm-primary" id="btnSubmit">
+                <i class="fas fa-save"></i> Crear Equipo
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+// Variables del formulario
+const form = document.getElementById('formEquipo');
+const submitBtn = document.getElementById('btnSubmit');
+
+// Validación en tiempo real
+document.querySelectorAll('.form-control').forEach(input => {
+    input.addEventListener('input', function() {
+        validarCampo(this);
+        actualizarResumen();
+    });
+    
+    input.addEventListener('blur', function() {
+        validarCampo(this);
+    });
+});
+
+// Contador de caracteres
+const descripcionTextarea = document.getElementById('descripcion');
+const charCount = document.querySelector('.char-count');
+
+descripcionTextarea.addEventListener('input', function() {
+    const length = this.value.length;
+    charCount.textContent = `${length}/500 caracteres`;
+    charCount.style.color = length > 450 ? 'var(--color-danger)' : 'var(--color-text-secondary)';
+});
+
+// Validación de campos
+function validarCampo(campo) {
+    const valor = campo.value.trim();
+    const nombre = campo.name;
+    const errorElement = document.getElementById(`error-${nombre}`);
+    let esValido = true;
+    let mensaje = '';
+    
+    // Limpiar errores previos
+    campo.classList.remove('error');
+    if (errorElement) errorElement.textContent = '';
+    
+    // Validaciones específicas
+    switch (nombre) {
+        case 'nombre':
+            if (!valor) {
+                mensaje = 'El nombre del equipo es obligatorio';
+                esValido = false;
+            } else if (valor.length < 3) {
+                mensaje = 'El nombre debe tener al menos 3 caracteres';
+                esValido = false;
+            }
+            break;
+            
+        case 'tipo_equipo':
+            if (!valor) {
+                mensaje = 'Selecciona el tipo de equipo';
+                esValido = false;
+            }
+            break;
+            
+        case 'marca':
+            if (!valor) {
+                mensaje = 'La marca es obligatoria';
+                esValido = false;
+            }
+            break;
+            
+        case 'modelo':
+            if (!valor) {
+                mensaje = 'El modelo es obligatorio';
+                esValido = false;
+            }
+            break;
+            
+        case 'estado_actual':
+            if (!valor) {
+                mensaje = 'Selecciona el estado actual';
+                esValido = false;
+            }
+            break;
+    }
+    
+    if (!esValido) {
+        campo.classList.add('error');
+        if (errorElement) errorElement.textContent = mensaje;
+    }
+    
+    return esValido;
+}
+
+// Validación completa
+function validarFormulario() {
+    let formularioValido = true;
+    const camposRequeridos = ['nombre', 'tipo_equipo', 'marca', 'modelo', 'estado_actual'];
+    
+    camposRequeridos.forEach(campo => {
+        const elemento = document.getElementById(campo);
+        if (!validarCampo(elemento)) {
+            formularioValido = false;
+        }
+    });
+    
+    return formularioValido;
+}
+
+// Actualizar resumen
+function actualizarResumen() {
+    const nombre = document.getElementById('nombre').value || '-';
+    const tipo = document.getElementById('tipo_equipo').value || '-';
+    const marca = document.getElementById('marca').value || '-';
+    const modelo = document.getElementById('modelo').value || '-';
+    const estado = document.getElementById('estado_actual').value || '-';
+    const valor = document.getElementById('valor_adquisicion').value || '0.00';
+    const capacidad = document.getElementById('capacidad').value || '-';
+    
+    document.getElementById('summary-nombre').textContent = nombre;
+    document.getElementById('summary-tipo').textContent = tipo;
+    document.getElementById('summary-marca').textContent = `${marca} ${modelo}`;
+    document.getElementById('summary-estado').textContent = estado;
+    document.getElementById('summary-valor').textContent = parseFloat(valor).toFixed(2);
+    document.getElementById('summary-capacidad').textContent = capacidad;
+}
+
+// Limpiar formulario
+function limpiarFormulario() {
+    if (confirm('¿Estás seguro de que quieres limpiar todos los campos?')) {
+        form.reset();
+        
+        document.querySelectorAll('.form-control').forEach(campo => {
+            campo.classList.remove('error');
+        });
+        document.querySelectorAll('.form-error').forEach(error => {
+            error.textContent = '';
+        });
+        
+        charCount.textContent = '0/500 caracteres';
+        charCount.style.color = 'var(--color-text-secondary)';
+        
+        actualizarResumen();
+        document.getElementById('nombre').focus();
+    }
+}
+
+// Vista previa
+function vistaPrevia() {
+    if (!validarFormulario()) {
+        alert('Por favor, completa todos los campos requeridos.');
+        return;
+    }
+    
+    const formData = new FormData(form);
+    let preview = 'VISTA PREVIA DEL EQUIPO\n\n';
+    
+    preview += `Nombre: ${formData.get('nombre')}\n`;
+    preview += `Tipo: ${formData.get('tipo_equipo')}\n`;
+    preview += `Marca: ${formData.get('marca')}\n`;
+    preview += `Modelo: ${formData.get('modelo')}\n`;
+    preview += `Estado: ${formData.get('estado_actual')}\n`;
+    
+    if (formData.get('capacidad')) {
+        preview += `Capacidad: ${formData.get('capacidad')}\n`;
+    }
+    
+    alert(preview);
+}
+
+// Envío del formulario
+form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    if (!validarFormulario()) {
+        alert('Por favor, corrige los errores en el formulario.');
+        return;
+    }
+    
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creando...';
+    
+    setTimeout(() => {
+        alert('Equipo creado exitosamente!');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-save"></i> Crear Equipo';
+    }, 2000);
+});
+
+// Inicializar
+document.addEventListener('DOMContentLoaded', function() {
+    actualizarResumen();
+    document.getElementById('nombre').focus();
+});
+</script>
+
+<style>
+.grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.checkbox-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-3);
+    margin-top: var(--spacing-2);
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    cursor: pointer;
+    padding: var(--spacing-2);
+    border-radius: var(--border-radius);
+    transition: background-color 0.2s ease;
+}
+
+.checkbox-label:hover {
+    background-color: var(--color-gray-50);
+}
+
+.checkbox-label input[type="checkbox"] {
+    display: none;
+}
+
+.checkmark {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--color-gray-300);
+    border-radius: 4px;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.checkbox-label input[type="checkbox"]:checked + .checkmark {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+.checkbox-label input[type="checkbox"]:checked + .checkmark::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.equipment-summary {
+    padding: var(--spacing-4);
+    background: white;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--color-gray-200);
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-3);
+}
+
+.summary-item {
+    padding: var(--spacing-2);
+}
+
+.char-count {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    float: right;
+}
+
+@media (max-width: 768px) {
+    .grid-3 {
+        grid-template-columns: 1fr;
+    }
+    
+    .checkbox-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .summary-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}

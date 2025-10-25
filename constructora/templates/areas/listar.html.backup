@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="content-wrapper">
+    <div class="page-header">
+        <h1 class="page-title">Gestión de Áreas</h1>
+        <p class="page-subtitle">Administra las áreas de la empresa</p>
+    </div>
+
+    <div class="table-container">
+        <div class="table-header">
+            <div class="table-tools">
+                <div class="table-search">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" class="form-control" placeholder="Buscar áreas..." id="searchInput">
+                </div>
+                <a href="{{ url_for('crear_area') }}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i>
+                    Nueva Área
+                </a>
+            </div>
+</div>
+
+<!-- Estadísticas del Módulo -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon bg-blue">
+            <i class="fas fa-list"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ datos|length or 0 }}</div>
+            <div class="stat-label">Total Registros</div>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon bg-green">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ datos|length or 0 }}</div>
+            <div class="stat-label">Activos</div>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon bg-orange">
+            <i class="fas fa-clock"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">0</div>
+            <div class="stat-label">Pendientes</div>
+        </div>
+    </div>
+</div>
+
+{% if areas and areas|length > 0 %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre del Área</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for area in areas %}
+                <tr>
+                    <td>{{ area.get('id', 'N/A') }}</td>
+                    <td>
+                        <a href="{{ url_for('detalle_area', area_id=area.get('id')) }}">{{ area.get('nombre', area.get('name', 'Área sin nombre')) }}</a>
+                    </td>
+                    <td class="table-actions">
+                        <div class="table-actions">
+                            <a class="btn-action btn-view" 
+                               title="Ver detalles"
+                               href="{{ url_for('detalle_area', area_id=area.get('id')) }}">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a class="btn-action btn-edit" 
+                               title="Editar"
+                               href="{{ url_for('editar_area', area_id=area.get('id')) }}">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form action="{{ url_for('eliminar_area', area_id=area.get('id')) }}" 
+                                  method="post" 
+                                  style="display: inline;"
+                                  onsubmit="return confirm('¿Está seguro de eliminar esta área?');">
+                                <button class="btn-action btn-danger" title="Eliminar" type="submit">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="text-center p-6">
+            <i class="fas fa-folder-open text-gray-400 text-5xl mb-4"></i>
+            <p class="text-gray-500">No hay áreas registradas</p>
+            <a href="{{ url_for('crear_area') }}" class="btn btn-primary mt-4">
+                <i class="fas fa-plus"></i>
+                Crear Primera Área
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

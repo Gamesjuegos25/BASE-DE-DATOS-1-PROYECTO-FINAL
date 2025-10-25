@@ -3,7 +3,7 @@
 {% block title %}Reportes Académicos - Sistema Constructora{% endblock %}
 
 {% block content %}
-<div class="container">
+<div class="max-w-7xl mx-auto px-6">
     <div class="header-section">
         <h1>📊 Reportes Académicos</h1>
         <p>Principales salidas requeridas por el proyecto académico</p>
@@ -20,28 +20,28 @@
     {% endwith %}
     
     <!-- REPORTE 1: Control de gastos por obra y área -->
-    <div class="card">
-        <div class="card-header">
-            <h2 class="card-title">💰 1. Control de Gastos por Obra y Área</h2>
+    <div class="stat-card fade-in-up">
+        <div class="stat-stat-header">
+            <h2 class="stat-card-title">💰 1. Control de Gastos por Obra y Área</h2>
         </div>
-        <div class="card-body">
+        <div class="stat-module-content">
             <div class="report-stats">
-                <div class="stat-card">
+                <div class="stat-stat-card fade-in-up">
                     <h3>Q{{ "{:,.2f}".format(reportes.gastos_totales) if reportes.gastos_totales else '0.00' }}</h3>
                     <p>Gastos Totales</p>
                 </div>
-                <div class="stat-card">
+                <div class="stat-stat-card fade-in-up">
                     <h3>{{ reportes.obras_con_gastos or 0 }}</h3>
                     <p>Obras con Gastos</p>
                 </div>
-                <div class="stat-card">
+                <div class="stat-stat-card fade-in-up">
                     <h3>{{ reportes.areas_activas or 0 }}</h3>
                     <p>Áreas Activas</p>
                 </div>
             </div>
             
             {% if reportes.gastos_por_obra %}
-            <div class="table-container">
+            <div class="table-max-w-7xl mx-auto px-6">
                 <table class="data-table">
                     <thead>
                         <tr>
@@ -74,28 +74,28 @@
     </div>
     
     <!-- REPORTE 2: Control de materiales por área -->
-    <div class="card">
-        <div class="card-header">
-            <h2 class="card-title">🧱 2. Control de Materiales por Área</h2>
+    <div class="stat-card fade-in-up">
+        <div class="stat-stat-header">
+            <h2 class="stat-card-title">🧱 2. Control de Materiales por Área</h2>
         </div>
-        <div class="card-body">
+        <div class="stat-module-content">
             <div class="report-stats">
-                <div class="stat-card">
+                <div class="stat-stat-card fade-in-up">
                     <h3>{{ reportes.materiales_asignados or 0 }}</h3>
                     <p>Materiales Asignados</p>
                 </div>
-                <div class="stat-card">
+                <div class="stat-stat-card fade-in-up">
                     <h3>{{ reportes.areas_con_materiales or 0 }}</h3>
                     <p>Áreas con Materiales</p>
                 </div>
-                <div class="stat-card">
+                <div class="stat-stat-card fade-in-up">
                     <h3>Q{{ "{:,.2f}".format(reportes.valor_materiales) if reportes.valor_materiales else '0.00' }}</h3>
                     <p>Valor en Materiales</p>
                 </div>
             </div>
             
             {% if reportes.materiales_por_area %}
-            <div class="table-container">
+            <div class="table-max-w-7xl mx-auto px-6">
                 <table class="data-table">
                     <thead>
                         <tr>
@@ -116,7 +116,7 @@
                             <td>{{ material.unidad or 'N/A' }}</td>
                             <td>Q{{ "{:,.2f}".format(material.valor_total) if material.valor_total else '0.00' }}</td>
                             <td>
-                                <span class="badge badge-success">{{ material.estado or 'Disponible' }}</span>
+                                <span class="badge badge badge-success">{{ material.estado or 'Disponible' }}</span>
                             </td>
                         </tr>
                         {% endfor %}
@@ -132,28 +132,28 @@
     </div>
     
     <!-- REPORTE 3: Asignaciones de proyectos -->
-    <div class="card">
-        <div class="card-header">
-            <h2 class="card-title">📋 3. Asignaciones de Proyectos</h2>
+    <div class="stat-card fade-in-up">
+        <div class="stat-stat-header">
+            <h2 class="stat-card-title">📋 3. Asignaciones de Proyectos</h2>
         </div>
-        <div class="card-body">
+        <div class="stat-module-content">
             <div class="report-stats">
-                <div class="stat-card">
+                <div class="stat-stat-card fade-in-up">
                     <h3>{{ reportes.proyectos_activos or 0 }}</h3>
                     <p>Proyectos Activos</p>
                 </div>
-                <div class="stat-card">
+                <div class="stat-stat-card fade-in-up">
                     <h3>{{ reportes.ingenieros_asignados or 0 }}</h3>
                     <p>Ingenieros Asignados</p>
                 </div>
-                <div class="stat-card">
+                <div class="stat-stat-card fade-in-up">
                     <h3>{{ reportes.arquitectos_asignados or 0 }}</h3>
                     <p>Arquitectos Asignados</p>
                 </div>
             </div>
             
             {% if reportes.asignaciones_proyectos %}
-            <div class="table-container">
+            <div class="table-max-w-7xl mx-auto px-6">
                 <table class="data-table">
                     <thead>
                         <tr>
@@ -171,11 +171,11 @@
                             <td>{{ asignacion.proyecto or 'N/A' }}</td>
                             <td>{{ asignacion.responsable or 'Sin asignar' }}</td>
                             <td>
-                                <span class="badge badge-info">{{ asignacion.cargo or 'N/A' }}</span>
+                                <span class="badge badge badge-primary">{{ asignacion.cargo or 'N/A' }}</span>
                             </td>
                             <td>{{ asignacion.fecha_asignacion or 'N/A' }}</td>
                             <td>
-                                <span class="badge badge-primary">{{ asignacion.estado or 'Planeación' }}</span>
+                                <span class="badge badge badge-primary">{{ asignacion.estado or 'Planeación' }}</span>
                             </td>
                             <td>
                                 <div class="progress-bar">
@@ -197,28 +197,28 @@
     </div>
     
     <!-- REPORTE 4: Control de actividades del personal -->
-    <div class="card">
-        <div class="card-header">
-            <h2 class="card-title">👷‍♂️ 4. Control de Actividades del Personal</h2>
+    <div class="stat-card fade-in-up">
+        <div class="stat-stat-header">
+            <h2 class="stat-card-title">👷‍♂️ 4. Control de Actividades del Personal</h2>
         </div>
-        <div class="card-body">
+        <div class="stat-module-content">
             <div class="report-stats">
-                <div class="stat-card">
+                <div class="stat-stat-card fade-in-up">
                     <h3>{{ reportes.empleados_activos or 0 }}</h3>
                     <p>Empleados Activos</p>
                 </div>
-                <div class="stat-card">
+                <div class="stat-stat-card fade-in-up">
                     <h3>{{ reportes.actividades_diarias or 0 }}</h3>
                     <p>Actividades Hoy</p>
                 </div>
-                <div class="stat-card">
+                <div class="stat-stat-card fade-in-up">
                     <h3>{{ reportes.areas_ocupadas or 0 }}</h3>
                     <p>Áreas Ocupadas</p>
                 </div>
             </div>
             
             {% if reportes.actividades_personal %}
-            <div class="table-container">
+            <div class="table-max-w-7xl mx-auto px-6">
                 <table class="data-table">
                     <thead>
                         <tr>
@@ -237,7 +237,7 @@
                             <td>{{ actividad.actividad or 'Sin actividad' }}</td>
                             <td>{{ actividad.horario or 'N/A' }}</td>
                             <td>
-                                <span class="badge badge-success">{{ actividad.estado or 'Activo' }}</span>
+                                <span class="badge badge badge-success">{{ actividad.estado or 'Activo' }}</span>
                             </td>
                         </tr>
                         {% endfor %}
@@ -253,28 +253,28 @@
     </div>
     
     <!-- REPORTE 5: Actualización automática de precios -->
-    <div class="card">
-        <div class="card-header">
-            <h2 class="card-title">💱 5. Actualización Automática de Precios</h2>
+    <div class="stat-card fade-in-up">
+        <div class="stat-stat-header">
+            <h2 class="stat-card-title">💱 5. Actualización Automática de Precios</h2>
         </div>
-        <div class="card-body">
+        <div class="stat-module-content">
             <div class="report-stats">
-                <div class="stat-card">
+                <div class="stat-stat-card fade-in-up">
                     <h3>{{ reportes.precios_actualizados or 0 }}</h3>
                     <p>Precios Actualizados Hoy</p>
                 </div>
-                <div class="stat-card">
+                <div class="stat-stat-card fade-in-up">
                     <h3>{{ reportes.variacion_promedio or 0 }}%</h3>
                     <p>Variación Promedio</p>
                 </div>
-                <div class="stat-card">
+                <div class="stat-stat-card fade-in-up">
                     <h3>{{ reportes.materiales_con_precio or 0 }}</h3>
                     <p>Materiales con Precio</p>
                 </div>
             </div>
             
             {% if reportes.historial_precios %}
-            <div class="table-container">
+            <div class="table-max-w-7xl mx-auto px-6">
                 <table class="data-table">
                     <thead>
                         <tr>
@@ -294,12 +294,12 @@
                             <td>
                                 {% if precio.variacion %}
                                     {% if precio.variacion > 0 %}
-                                        <span class="badge badge-danger">+{{ precio.variacion }}%</span>
+                                        <span class="badge badge badge-danger">+{{ precio.variacion }}%</span>
                                     {% else %}
-                                        <span class="badge badge-success">{{ precio.variacion }}%</span>
+                                        <span class="badge badge badge-success">{{ precio.variacion }}%</span>
                                     {% endif %}
                                 {% else %}
-                                    <span class="badge badge-secondary">0%</span>
+                                    <span class="badge badge badge-secondary">0%</span>
                                 {% endif %}
                             </td>
                             <td>{{ precio.fecha_actualizacion or 'N/A' }}</td>

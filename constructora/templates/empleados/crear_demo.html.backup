@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block title %}Nuevo Empleado - Sistema Constructora{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/create-forms.css') }}">
+
+<div class="create-form-container">
+    <!-- Header de página estilo detalle -->
+    <div class="create-page-header">
+        <nav class="breadcrumb">
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <span class="breadcrumb-separator">/</span>
+            <a href="{{ url_for('listar_empleados') }}">Empleados</a>
+            <span class="breadcrumb-separator">/</span>
+            <span>Nuevo</span>
+        </nav>
+        <h1 class="create-page-title">
+            <i class="fas fa-user-plus"></i>
+            Crear Nuevo Empleado
+        </h1>
+    </div>
+
+    <div class="container-fluid">
+        <form method="POST" action="{{ url_for('crear_empleado') }}" id="create-empleado-form" class="needs-validation" novalidate>
+            <div class="create-form-row">
+                <!-- Información Personal -->
+                <div class="create-form-card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-user"></i> Información Personal</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="create-form-group">
+                            <label for="nombre_empleado" class="create-form-label">
+                                <i class="fas fa-id-card"></i>Nombre<span class="required">*</span>
+                            </label>
+                            <input type="text" class="create-form-control" id="nombre_empleado" name="nombre_empleado" 
+                                   placeholder="Nombre del empleado" required>
+                            <div class="invalid-feedback">
+                                Por favor, ingrese el nombre del empleado.
+                            </div>
+                        </div>
+
+                        <div class="create-form-group">
+                            <label for="apellido_empleado" class="create-form-label">
+                                <i class="fas fa-id-card"></i>Apellido<span class="required">*</span>
+                            </label>
+                            <input type="text" class="create-form-control" id="apellido_empleado" name="apellido_empleado" 
+                                   placeholder="Apellido del empleado" required>
+                            <div class="invalid-feedback">
+                                Por favor, ingrese el apellido del empleado.
+                            </div>
+                        </div>
+
+                        <div class="create-form-group">
+                            <label for="tipo_empleado" class="create-form-label">
+                                <i class="fas fa-briefcase"></i>Tipo de Empleado<span class="required">*</span>
+                            </label>
+                            <select class="create-form-control" id="tipo_empleado" name="tipo_empleado" required>
+                                <option value="">Seleccionar tipo...</option>
+                                <option value="ARQUITECTO">🏗️ Arquitecto</option>
+                                <option value="INGENIERO">⚡ Ingeniero</option>
+                                <option value="OBRERO">👷 Obrero</option>
+                                <option value="SUPERVISOR">👨‍💼 Supervisor</option>
+                                <option value="ADMINISTRATIVO">📋 Administrativo</option>
+                            </select>
+                            <div class="invalid-feedback">
+                                Por favor, seleccione el tipo de empleado.
+                            </div>
+                        </div>
+
+                        <div class="create-form-group">
+                            <label for="fecha_ingreso" class="create-form-label">
+                                <i class="fas fa-calendar-plus"></i>Fecha de Ingreso
+                            </label>
+                            <input type="date" class="create-form-control" id="fecha_ingreso" name="fecha_ingreso">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Información de Contacto y Salario -->
+                <div class="create-form-card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-contact-card"></i> Contacto y Salario</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="create-form-group">
+                            <label for="telefono" class="create-form-label">
+                                <i class="fas fa-phone"></i>Teléfono
+                            </label>
+                            <input type="tel" class="create-form-control" id="telefono" name="telefono" 
+                                   placeholder="Ej: +57 300 123 4567">
+                        </div>
+
+                        <div class="create-form-group">
+                            <label for="email" class="create-form-label">
+                                <i class="fas fa-envelope"></i>Email
+                            </label>
+                            <input type="email" class="create-form-control" id="email" name="email" 
+                                   placeholder="empleado@empresa.com">
+                        </div>
+
+                        <div class="create-form-group">
+                            <label for="salario_fijo_empleado" class="create-form-label">
+                                <i class="fas fa-dollar-sign"></i>Salario Fijo
+                            </label>
+                            <input type="number" class="create-form-control" id="salario_fijo_empleado" name="salario_fijo_empleado" 
+                                   placeholder="0" step="1000" min="0">
+                            <div class="create-form-text">
+                                <i class="fas fa-info-circle"></i>Salario mensual en pesos colombianos
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="container-fluid">
+        <div class="create-form-card">
+            <div class="create-form-actions">
+                <a href="{{ url_for('listar_empleados') }}" class="create-btn create-btn-secondary">
+                    <i class="fas fa-times"></i>Cancelar
+                </a>
+                <button type="submit" form="create-empleado-form" class="create-btn create-btn-primary">
+                    <i class="fas fa-user-plus"></i>Crear Empleado
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Validación del formulario
+(function() {
+    'use strict';
+    window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        var validation = Array.prototype.filter.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+})();
+</script>
+{% endblock %}

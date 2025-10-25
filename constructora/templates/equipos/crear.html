@@ -1,57 +1,192 @@
 {% extends "base.html" %}
 
+{% block head %}
+    <!-- CSS para formularios -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/form-pages.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/calendar-styles.css') }}">
+{% endblock %}
+
+
 {% block title %}Nuevo Equipo - Sistema Constructora{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="header-section">
-        <h1>⚒️ Nuevo Equipo</h1>
-        <a href="{{ url_for('listar_equipos') }}" class="btn-secondary">
-            ⬅️ Volver a Equipos
-        </a>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/create-forms.css') }}">
+
+<div class="create-form-max-w-7xl mx-auto px-6">
+    <div class="create-page-header">
+        <nav class="breadcrumb">
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <span class="breadcrumb-separator">/</span>
+            <a href="{{ url_for('listar_equipos') }}">Equipos</a>
+            <span class="breadcrumb-separator">/</span>
+            <span>Nuevo</span>
+        </nav>
+        <h1 class="create-page-title">
+            <i class="fas fa-tools text-xanthous-100"></i>
+            Crear Nuevo Equipo
+        </h1>
     </div>
-    
-    <div class="form-container">
-        <form method="POST" class="form-modern">
-            <div class="form-section">
-                <h3>🔧 Información del Equipo</h3>
-                
-                <div class="form-group">
-                    <label for="nombre">Nombre del Equipo *</label>
-                    <input type="text" id="nombre" name="nombre" required 
-                           placeholder="Ej: Taladro Industrial DeWalt" 
-                           value="{{ request.form.nombre if request.form else '' }}">
+
+    <div class="max-w-7xl mx-auto px-6-fluid">
+        <form method="POST" action="{{ url_for('crear_equipo') }}" id="create-equipo-form" class="needs-validation" novalidate>
+            <div class="create-form-flex flex-wrap -mx-2">
+                <div class="form-card">
+                    <div class="stat-stat-header">
+                        <h5><i class="fas fa-cog"></i> Información del Equipo</h5>
+                    </div>
+                    <div class="stat-module-content">
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-tag"></i>Nombre del Equipo<span class="required">*</span>
+                            </label>
+                            <input class="form-input" id="nombre_equipo" name="nombre_equipo" 
+                                   placeholder="Ej: Taladro Industrial Bosch" required>
+                        </div>
+
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-list"></i>Tipo de Equipo<span class="required">*</span>
+                            </label>
+                            <select class="form-select" id="tipo_equipo" name="tipo_equipo" required>
+                                <option value="">Seleccionar tipo...</option>
+                                <option value="HERRAMIENTA_MANUAL">🔨 Herramienta Manual</option>
+                                <option value="HERRAMIENTA_ELECTRICA">⚡ Herramienta Eléctrica</option>
+                                <option value="MAQUINARIA_PESADA">🏗️ Maquinaria Pesada</option>
+                                <option value="EQUIPO_SEGURIDAD">🦺 Equipo de Seguridad</option>
+                                <option value="EQUIPO_MEDICION">📏 Equipo de Medición</option>
+                                <option value="OTRO">❓ Otro</option>
+                            </select>
+                        </div>
+
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-check-circle text-xanthous-600"></i>Estado<span class="required">*</span>
+                            </label>
+                            <select class="form-select" id="estado_equipo" name="estado_equipo" required>
+                                <option value="">Seleccionar estado...</option>
+                                <option value="DISPONIBLE">✅ Disponible</option>
+                                <option value="EN_USO">🔄 En Uso</option>
+                                <option value="MANTENIMIENTO">🔧 Mantenimiento</option>
+                                <option value="FUERA_SERVICIO">❌ Fuera de Servicio</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
-                
-                <div class="form-group">
-                    <label for="tipo">Tipo de Equipo</label>
-                    <select id="tipo" name="tipo">
-                        <option value="">Seleccionar tipo...</option>
-                        <option value="Herramientas Eléctricas">🔌 Herramientas Eléctricas</option>
-                        <option value="Herramientas Manuales">🔨 Herramientas Manuales</option>
-                        <option value="Maquinaria Pesada">🏗️ Maquinaria Pesada</option>
-                        <option value="Equipos de Medición">📏 Equipos de Medición</option>
-                        <option value="Equipos de Seguridad">🦺 Equipos de Seguridad</option>
-                        <option value="Otros">📦 Otros</option>
-                    </select>
+
+                <div class="form-card">
+                    <div class="stat-stat-header">
+                        <h5><i class="fas fa-info-circle text-prussian-blue-700"></i> Detalles Adicionales</h5>
+                    </div>
+                    <div class="stat-module-content">
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-copyright"></i>Marca
+                            </label>
+                            <input class="form-input" id="marca_equipo" name="marca_equipo" 
+                                   placeholder="Ej: Bosch, DeWalt, Caterpillar">
+                        </div>
+
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-code"></i>Modelo
+                            </label>
+                            <input class="form-input" id="modelo_equipo" name="modelo_equipo" 
+                                   placeholder="Ej: HD-2020">
+                        </div>
+
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-barcode"></i>Número de Serie
+                            </label>
+                            <input class="form-input" id="numero_serie" name="numero_serie" 
+                                   placeholder="Número de serie único">
+                        </div>
+
+                        <!-- Campo de fecha con sistema estandarizado -->
+                        <div class="calendar-field-group">
+                            <label class="form-label">
+                                <i class="fas fa-calendar-plus"></i>Fecha de Compra
+                            </label>
+                            <div class="standardized-calendar" data-field-type="date-purchase">
+                                <input class="form-input calendar-field" 
+                                       id="fecha_compra" 
+                                       name="fecha_compra" 
+                                       type="date" 
+                                       value="{{ request.form.fecha_compra if request.form else '' }}">
+                                <i class="fas fa-calendar-alt calendar-icon"></i>
+                            </div>
+                            <div class="invalid-feedback">
+                                Por favor, ingrese una fecha de compra válida.
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                
-                <div class="form-group">
-                    <label for="estado">Estado</label>
-                    <select id="estado" name="estado">
-                        <option value="Disponible">✅ Disponible</option>
-                        <option value="En Uso">🔄 En Uso</option>
-                        <option value="Mantenimiento">🔧 En Mantenimiento</option>
-                        <option value="Dañado">❌ Dañado</option>
-                    </select>
-                </div>
-            </div>
-            
-            <div class="form-actions">
-                <button type="submit" class="btn-primary">✅ Crear Equipo</button>
-                <a href="{{ url_for('listar_equipos') }}" class="btn-secondary">❌ Cancelar</a>
             </div>
         </form>
     </div>
+
+    <div class="max-w-7xl mx-auto px-6-fluid">
+        <div class="form-card">
+            <div class="create-form-actions">
+                <a href="{{ url_for('listar_equipos') }}" class="create-btn create-btn btn btn-warm-secondary">
+                    <i class="fas fa-times"></i>Cancelar
+                </a>
+                <button type="submit" form="create-equipo-form" class="create-btn create-btn btn btn-warm-primary">
+                    <i class="fas fa-tools text-xanthous-100"></i>Crear Equipo
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
+
+<script>
+(function() {
+    'use strict';
+    window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        var validation = Array.prototype.filter.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+})();
+
+// Inicializar sistema de calendarización estandarizada
+document.addEventListener('DOMContentLoaded', function() {
+    // Cargar utilidades de calendario
+    const script = document.createElement('script');
+    script.src = "{{ url_for('static', filename='js/calendar-utils.js') }}";
+    script.onload = function() {
+        // Inicializar campos de fecha
+        if (typeof initializeDateValidations === 'function') {
+            initializeDateValidations();
+        }
+        
+        // Configurar validación de fecha de compra
+        const fechaCompra = document.getElementById('fecha_compra');
+        if (fechaCompra) {
+            // La fecha de compra no puede ser futura
+            const today = new Date().toISOString().split('T')[0];
+            fechaCompra.max = today;
+            
+            fechaCompra.addEventListener('change', function() {
+                const selectedDate = new Date(this.value);
+                const todayDate = new Date();
+                
+                if (selectedDate > todayDate) {
+                    this.setCustomValidity('La fecha de compra no puede ser futura');
+                } else {
+                    this.setCustomValidity('');
+                }
+            });
+        }
+    };
+    document.head.appendChild(script);
+});
+</script>
 {% endblock %}

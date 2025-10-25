@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sistema-unificado.css') }}">
+{% endblock %}
+
+
+
+{%extends "base.html"%}
+
+{%block title%}Nueva Requisición - Sistema Constructora{%endblock%}
+
+{%block content%}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/create-forms.css') }}">
+
+<div class="create-form-max-w-7xl mx-auto px-6">
+    <!-- Header de página estilo detalle -->
+    <div class="create-page-header">
+        <nav class="breadcrumb">
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <span class="breadcrumb-separator">/</span>
+            <a href="{{ url_for('listar_requisiciones') }}">Requisiciones</a>
+            <span class="breadcrumb-separator">/</span>
+            <span>Nueva</span>
+        </nav>
+        <h1 class="create-page-title">
+            <i class="fas fa-clipboard-list"></i>
+            Crear Nueva Requisición
+        </h1>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-6-fluid">
+        <form method="POST" action="{{ url_for('crear_requisicion') }}" id="create-requisicion-form" class="needs-validation" novalidate>
+            <div class="create-form-flex flex-wrap -mx-2">
+                <!-- Información General -->
+                <div class="form-card">
+                    <div class="stat-stat-header">
+                        <h5><i class="fas fa-info-circle text-prussian-blue-700"></i> Información de la Requisición</h5>
+                    </div>
+                    <div class="stat-module-content">
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-building text-prussian-blue"></i>Obra<span class="required">*</span>
+                            </label>
+                            <select class="form-select" id="obra_id" name="obra_id" required>
+                                <option value="">Seleccione una obra</option>
+                                {%- for item in obras %}
+                                <option value="{{ item[0] }}" {{ 'selected' if request.form.obra_id == item[0]|string else '' }}>{{ item[1] }}</option>
+                                {%- endfor %}
+                            </select>
+                            <div class="invalid-feedback">
+                                Por favor, seleccione una obra.
+                            </div>
+                        </div>
+
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-user"></i>Empleado Solicitante<span class="required">*</span>
+                            </label>
+                            <select class="form-select" id="empleado_id" name="empleado_id" required>
+                                <option value="">Seleccione un empleado</option>
+                                {%- for item in empleados %}
+                                <option value="{{ item[0] }}" {{ 'selected' if request.form.empleado_id == item[0]|string else '' }}>{{ item[1] }}</option>
+                                {%- endfor %}
+                            </select>
+                            <div class="invalid-feedback">
+                                Por favor, seleccione un empleado.
+                            </div>
+                        </div>
+
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-calendar"></i>Fecha de Solicitud<span class="required">*</span>
+                            </label>
+                            <input class="form-input" id="fecha_solicitud" name="fecha_solicitud" 
+                                   value="{{ request.form.fecha_solicitud if request.form else '' }}" required>
+                            <div class="invalid-feedback">
+                                Por favor, ingrese la fecha de solicitud.
+                            </div>
+                        </div>
+
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-align-left"></i>Descripción<span class="required">*</span>
+                            </label>
+                            <textarea class="form-textarea" id="descripcion" name="descripcion" rows="4" 
+                                      placeholder="Describe lo que se necesita" required>{{ request.form.descripcion if request.form else '' }}</textarea>
+                            <div class="invalid-feedback">
+                                Por favor, ingrese la descripción.
+                            </div>
+                        </div>
+
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-sort-numeric-up"></i>Cantidad Solicitada<span class="required">*</span>
+                            </label>
+                            <input class="form-input" id="cantidad_solicitada" name="cantidad_solicitada" 
+                                   placeholder="0.00" 
+                                   value="{{ request.form.cantidad_solicitada if request.form else '' }}" required>
+                            <div class="invalid-feedback">
+                                Por favor, ingrese la cantidad solicitada.
+                            </div>
+                        </div>
+
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-exclamation-triangle text-fire-engine-red"></i>Prioridad<span class="required">*</span>
+                            </label>
+                            <select class="form-select" id="prioridad" name="prioridad" required>
+                                <option value="">Seleccione una prioridad</option>
+                                <option value="baja" {{ 'selected' if request.form.prioridad == 'baja' else '' }}>Baja</option>
+                                <option value="media" {{ 'selected' if request.form.prioridad == 'media' else '' }}>Media</option>
+                                <option value="alta" {{ 'selected' if request.form.prioridad == 'alta' else '' }}>Alta</option>
+                                <option value="urgente" {{ 'selected' if request.form.prioridad == 'urgente' else '' }}>Urgente</option>
+                            </select>
+                            <div class="invalid-feedback">
+                                Por favor, seleccione una prioridad.
+                            </div>
+                        </div>
+
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-flag"></i>Estado<span class="required">*</span>
+                            </label>
+                            <select class="form-select" id="estado" name="estado" required>
+                                <option value="">Seleccione un estado</option>
+                                <option value="pendiente" {{ 'selected' if request.form.estado == 'pendiente' else '' }}>Pendiente</option>
+                                <option value="aprobada" {{ 'selected' if request.form.estado == 'aprobada' else '' }}>Aprobada</option>
+                                <option value="rechazada" {{ 'selected' if request.form.estado == 'rechazada' else '' }}>Rechazada</option>
+                                <option value="entregada" {{ 'selected' if request.form.estado == 'entregada' else '' }}>Entregada</option>
+                            </select>
+                            <div class="invalid-feedback">
+                                Por favor, seleccione un estado.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Botones de acción -->
+            <div class="form-actions mt-6">
+                <div class="flex justify-between">
+                    <a href="{{ url_for('listar_requisiciones') }}" class="btn btn btn btn-warm-secondary">
+                        <i class="fas fa-times"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn btn btn btn-warm-primary">
+                        <i class="fas fa-save"></i> Guardar Requisición
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// Validación de formularios Bootstrap
+(function() {
+    'use strict';
+    window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        var validation = Array.prototype.filter.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+})();
+</script>
+{%endblock%}

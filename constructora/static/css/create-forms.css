@@ -1,0 +1,328 @@
+/* ============================================
+   FORMULARIOS DE CREAR - ESTILO CONSISTENTE
+   ============================================ */
+
+/* Estilos para mantener consistencia con las vistas de detalle */
+.create-form-container {
+    background: var(--gray-50, #f8fafc);
+    min-height: 100vh;
+    padding: var(--spacing-6, 1.5rem) 0;
+}
+
+/* Header de página consistente */
+.create-page-header {
+    background: white;
+    border-bottom: 1px solid var(--gray-200, #e2e8f0);
+    padding: var(--spacing-4, 1rem) var(--spacing-6, 1.5rem);
+    margin-bottom: var(--spacing-6, 1.5rem);
+}
+
+.create-page-header .breadcrumb {
+    display: flex;
+    align-items: center;
+    margin-bottom: var(--spacing-3, 0.75rem);
+    font-size: var(--font-size-sm, 0.875rem);
+}
+
+.create-page-header .breadcrumb a {
+    color: var(--primary-color, #2563eb);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.create-page-header .breadcrumb a:hover {
+    color: var(--primary-dark, #1d4ed8);
+    text-decoration: underline;
+}
+
+.create-page-header .breadcrumb-separator {
+    margin: 0 var(--spacing-2, 0.5rem);
+    color: var(--gray-400, #94a3b8);
+}
+
+.create-page-title {
+    font-size: var(--font-size-2xl, 1.5rem);
+    font-weight: 600;
+    color: var(--gray-900, #0f172a);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3, 0.75rem);
+}
+
+/* Cards de formulario */
+.create-form-card {
+    background: white;
+    border: 1px solid var(--gray-200, #e2e8f0);
+    border-radius: 8px;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    margin-bottom: var(--spacing-6, 1.5rem);
+}
+
+.create-form-card .card-header {
+    background: var(--gray-50, #f8fafc);
+    border-bottom: 1px solid var(--gray-200, #e2e8f0);
+    padding: var(--spacing-4, 1rem) var(--spacing-6, 1.5rem);
+    border-radius: 8px 8px 0 0;
+}
+
+.create-form-card .card-header h5 {
+    margin: 0;
+    font-size: var(--font-size-lg, 1.125rem);
+    font-weight: 600;
+    color: var(--gray-900, #0f172a);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2, 0.5rem);
+}
+
+.create-form-card .card-header h5 i {
+    color: var(--primary-color, #2563eb);
+}
+
+.create-form-card .card-body {
+    padding: var(--spacing-6, 1.5rem);
+}
+
+/* Campos de formulario estilo detalle */
+.create-form-group {
+    margin-bottom: var(--spacing-5, 1.25rem);
+}
+
+.create-form-group:last-child {
+    margin-bottom: 0;
+}
+
+.create-form-label {
+    display: block;
+    font-size: var(--font-size-sm, 0.875rem);
+    font-weight: 600;
+    color: var(--gray-700, #334155);
+    margin-bottom: var(--spacing-2, 0.5rem);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2, 0.5rem);
+}
+
+.create-form-label i {
+    color: var(--primary-color, #2563eb);
+    width: 16px;
+    text-align: center;
+}
+
+.create-form-label .required {
+    color: var(--danger-color, #ef4444);
+    margin-left: var(--spacing-1, 0.25rem);
+}
+
+/* Inputs y selects estilo detalle */
+.create-form-control {
+    width: 100%;
+    padding: var(--spacing-3, 0.75rem) var(--spacing-4, 1rem);
+    border: 1px solid var(--gray-300, #cbd5e1);
+    border-radius: 6px;
+    font-size: var(--font-size-sm, 0.875rem);
+    font-family: var(--font-family, 'Inter', sans-serif);
+    background-color: white;
+    transition: all 0.2s ease;
+}
+
+.create-form-control:focus {
+    outline: none;
+    border-color: var(--primary-color, #2563eb);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.create-form-control:disabled {
+    background-color: var(--gray-50, #f8fafc);
+    color: var(--gray-500, #64748b);
+    cursor: not-allowed;
+}
+
+/* Selects múltiples */
+.create-form-control[multiple] {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.create-form-control[multiple] option {
+    padding: var(--spacing-2, 0.5rem);
+    margin: var(--spacing-1, 0.25rem) 0;
+    border-radius: 4px;
+}
+
+.create-form-control[multiple] option:checked {
+    background-color: var(--primary-color, #2563eb);
+    color: white;
+}
+
+/* Textos de ayuda */
+.create-form-text {
+    font-size: var(--font-size-xs, 0.75rem);
+    color: var(--gray-500, #64748b);
+    margin-top: var(--spacing-1, 0.25rem);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-1, 0.25rem);
+}
+
+.create-form-text i {
+    color: var(--info-color, #06b6d4);
+}
+
+/* Validación */
+.create-form-control.is-invalid {
+    border-color: var(--danger-color, #ef4444);
+}
+
+.create-form-control.is-invalid:focus {
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.invalid-feedback {
+    display: block;
+    width: 100%;
+    margin-top: var(--spacing-1, 0.25rem);
+    font-size: var(--font-size-xs, 0.75rem);
+    color: var(--danger-color, #ef4444);
+}
+
+/* Botones de acción */
+.create-form-actions {
+    background: var(--gray-50, #f8fafc);
+    border-top: 1px solid var(--gray-200, #e2e8f0);
+    padding: var(--spacing-4, 1rem) var(--spacing-6, 1.5rem);
+    border-radius: 0 0 8px 8px;
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--spacing-3, 0.75rem);
+}
+
+.create-btn {
+    padding: var(--spacing-3, 0.75rem) var(--spacing-5, 1.25rem);
+    border-radius: 6px;
+    font-size: var(--font-size-sm, 0.875rem);
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-2, 0.5rem);
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.create-btn-primary {
+    background-color: var(--primary-color, #2563eb);
+    color: white;
+}
+
+.create-btn-primary:hover {
+    background-color: var(--primary-dark, #1d4ed8);
+    color: white;
+    text-decoration: none;
+}
+
+.create-btn-secondary {
+    background-color: transparent;
+    color: var(--gray-600, #475569);
+    border: 1px solid var(--gray-300, #cbd5e1);
+}
+
+.create-btn-secondary:hover {
+    background-color: var(--gray-50, #f8fafc);
+    color: var(--gray-700, #334155);
+    text-decoration: none;
+}
+
+/* Layout de dos columnas */
+.create-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-6, 1.5rem);
+}
+
+@media (max-width: 768px) {
+    .create-form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .create-page-header {
+        padding: var(--spacing-4, 1rem);
+    }
+    
+    .create-form-card .card-body {
+        padding: var(--spacing-4, 1rem);
+    }
+}
+
+/* Iconos en opciones de select */
+.create-form-control option {
+    font-family: var(--font-family, 'Inter', sans-serif);
+}
+
+/* Estados y badges */
+.create-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-1, 0.25rem);
+    padding: var(--spacing-1, 0.25rem) var(--spacing-3, 0.75rem);
+    border-radius: 9999px;
+    font-size: var(--font-size-xs, 0.75rem);
+    font-weight: 500;
+}
+
+.create-status-badge.status-planning {
+    background-color: rgba(245, 158, 11, 0.1);
+    color: var(--warning-color, #f59e0b);
+}
+
+.create-status-badge.status-progress {
+    background-color: rgba(6, 182, 212, 0.1);
+    color: var(--info-color, #06b6d4);
+}
+
+.create-status-badge.status-completed {
+    background-color: rgba(16, 185, 129, 0.1);
+    color: var(--success-color, #10b981);
+}
+
+.create-status-badge.status-paused {
+    background-color: rgba(100, 116, 139, 0.1);
+    color: var(--secondary-color, #64748b);
+}
+
+.create-status-badge.status-cancelled {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: var(--danger-color, #ef4444);
+}
+
+/* Animaciones sutiles */
+.create-form-card {
+    animation: createFadeIn 0.3s ease-out;
+}
+
+@keyframes createFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Efectos hover para interactividad */
+.create-form-card:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos específicos para formulario de proyectos */
+.proyecto-form-container .create-form-card .card-header h5 i.fa-info-circle {
+    color: var(--primary-color, #2563eb);
+}
+
+.proyecto-form-container .create-form-card .card-header h5 i.fa-users-cog {
+    color: var(--success-color, #10b981);
+}

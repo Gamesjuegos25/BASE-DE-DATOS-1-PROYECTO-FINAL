@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="dashboard-header">
+  <h1><i class="fas fa-eye"></i> Incidente #{{ incidente.id_incidente or incidente.id }}</h1>
+  <a href="{{ url_for('listar_incidentes') }}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Volver</a>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <p><strong>Fecha:</strong> {{ incidente.fecha_incidente }}</p>
+    <p><strong>Estado:</strong> {{ incidente.estado_incidente }}</p>
+    <p><strong>Obra:</strong> {{ incidente.nombre_obra or 'Sin obra' }}{% if incidente.id_obra %} (ID {{ incidente.id_obra }}){% endif %}</p>
+    <p><strong>Descripción:</strong><br>{{ incidente.descripcion_incidente }}</p>
+    <div class="form-actions">
+      <a class="btn btn-edit" href="{{ url_for('editar_incidente', id=incidente.id_incidente or incidente.id) }}"><i class="fas fa-edit"></i> Editar</a>
+      <form class="inline-form" method="post" action="{{ url_for('eliminar_incidente', id=incidente.id_incidente or incidente.id) }}" onsubmit="return confirm('¿Eliminar incidente?');">
+        <button class="btn btn-danger" type="submit"><i class="fas fa-trash"></i> Eliminar</button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

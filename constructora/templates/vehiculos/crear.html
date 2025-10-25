@@ -1,55 +1,159 @@
 {% extends "base.html" %}
 
+{% block head %}
+    <!-- CSS para formularios -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/form-pages.css') }}">{% endblock %}
+
+
 {% block title %}Nuevo Vehículo - Sistema Constructora{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="header-section">
-        <h1>🚛 Nuevo Vehículo</h1>
-        <a href="{{ url_for('listar_vehiculos') }}" class="btn-secondary">
-            ⬅️ Volver a Vehículos
-        </a>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/create-forms.css') }}">
+
+<div class="create-form-max-w-7xl mx-auto px-6">
+    <!-- Header de página estilo detalle -->
+    <div class="create-page-header">
+        <nav class="breadcrumb">
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <span class="breadcrumb-separator">/</span>
+            <a href="{{ url_for('listar_vehiculos') }}">Vehículos</a>
+            <span class="breadcrumb-separator">/</span>
+            <span>Nuevo</span>
+        </nav>
+        <h1 class="create-page-title">
+            <i class="fas fa-truck"></i>
+            Crear Nuevo Vehículo
+        </h1>
     </div>
-    
-    <div class="form-container">
-        <form method="POST" class="form-modern">
-            <div class="form-section">
-                <h3>🚗 Información del Vehículo</h3>
-                
-                <div class="form-group">
-                    <label for="placa">Placa *</label>
-                    <input type="text" id="placa" name="placa" required 
-                           placeholder="Ej: P123ABC" value="{{ request.form.placa if request.form else '' }}">
+
+    <div class="max-w-7xl mx-auto px-6-fluid">
+        <form method="POST" action="{{ url_for('crear_vehiculo') }}" id="create-vehiculo-form" class="needs-validation" novalidate>
+            <div class="create-form-flex flex-wrap -mx-2">
+                <!-- Información del Vehículo -->
+                <div class="form-card">
+                    <div class="stat-stat-header">
+                        <h5><i class="fas fa-car"></i> Información del Vehículo</h5>
+                    </div>
+                    <div class="stat-module-content">
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-id-badge"></i>Placa<span class="required">*</span>
+                            </label>
+                            <input class="form-input" id="placa_vehiculo" name="placa_vehiculo" 
+                                   placeholder="Ej: ABC123" 
+                                   value="{{ request.form.placa_vehiculo if request.form else '' }}" required>
+                            <div class="invalid-feedback">
+                                Por favor, ingrese la placa del vehículo.
+                            </div>
+                        </div>
+
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-list"></i>Tipo de Vehículo<span class="required">*</span>
+                            </label>
+                            <select class="form-select" id="tipo_vehiculo" name="tipo_vehiculo" required>
+                                <option value="">Seleccionar tipo...</option>
+                                <option value="CAMIONETA" {{ 'selected' if request.form and request.form.tipo_vehiculo == 'CAMIONETA' else '' }}>🚗 Camioneta</option>
+                                <option value="VOLQUETA" {{ 'selected' if request.form and request.form.tipo_vehiculo == 'VOLQUETA' else '' }}>🚛 Volqueta</option>
+                                <option value="MEZCLADORA" {{ 'selected' if request.form and request.form.tipo_vehiculo == 'MEZCLADORA' else '' }}>🚚 Mezcladora</option>
+                                <option value="GRUA" {{ 'selected' if request.form and request.form.tipo_vehiculo == 'GRUA' else '' }}>🏗️ Grúa</option>
+                                <option value="BULLDOZER" {{ 'selected' if request.form and request.form.tipo_vehiculo == 'BULLDOZER' else '' }}>🚜 Bulldozer</option>
+                                <option value="OTRO" {{ 'selected' if request.form and request.form.tipo_vehiculo == 'OTRO' else '' }}>❓ Otro</option>
+                            </select>
+                            <div class="invalid-feedback">
+                                Por favor, seleccione el tipo de vehículo.
+                            </div>
+                        </div>
+
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-check-circle text-xanthous-600"></i>Estado<span class="required">*</span>
+                            </label>
+                            <select class="form-select" id="estado_vehiculo" name="estado_vehiculo" required>
+                                <option value="">Seleccionar estado...</option>
+                                <option value="DISPONIBLE" {{ 'selected' if request.form and request.form.estado_vehiculo == 'DISPONIBLE' else '' }}>✅ Disponible</option>
+                                <option value="EN_USO" {{ 'selected' if request.form and request.form.estado_vehiculo == 'EN_USO' else '' }}>🔄 En Uso</option>
+                                <option value="MANTENIMIENTO" {{ 'selected' if request.form and request.form.estado_vehiculo == 'MANTENIMIENTO' else '' }}>🔧 Mantenimiento</option>
+                                <option value="FUERA_SERVICIO" {{ 'selected' if request.form and request.form.estado_vehiculo == 'FUERA_SERVICIO' else '' }}>❌ Fuera de Servicio</option>
+                            </select>
+                            <div class="invalid-feedback">
+                                Por favor, seleccione el estado del vehículo.
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                
-                <div class="form-group">
-                    <label for="tipo">Tipo de Vehículo</label>
-                    <select id="tipo" name="tipo">
-                        <option value="">Seleccionar tipo...</option>
-                        <option value="Camión">🚛 Camión</option>
-                        <option value="Volqueta">🚚 Volqueta</option>
-                        <option value="Pickup">🛻 Pickup</option>
-                        <option value="Mezcladora">🚛 Mezcladora</option>
-                        <option value="Grúa">🏗️ Grúa</option>
-                    </select>
+
+                <!-- Información Adicional -->
+                <div class="form-card">
+                    <div class="stat-stat-header">
+                        <h5><i class="fas fa-info-circle text-prussian-blue-700"></i> Información Adicional</h5>
+                    </div>
+                    <div class="stat-module-content">
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-tag"></i>Modelo
+                            </label>
+                            <input class="form-input" id="modelo" name="modelo" 
+                                   placeholder="Ej: 2020"
+                                   value="{{ request.form.modelo if request.form else '' }}">
+                        </div>
+
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-weight-hanging"></i>Capacidad
+                            </label>
+                            <input class="form-input" id="capacidad" name="capacidad" 
+                                   placeholder="Ej: 5 toneladas"
+                                   value="{{ request.form.capacidad if request.form else '' }}">
+                            <div class="create-form-text">
+                                <i class="fas fa-info-circle text-prussian-blue-700"></i>Capacidad de carga o pasajeros
+                            </div>
+                        </div>
+
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-sticky-note"></i>Observaciones
+                            </label>
+                            <textarea class="form-textarea" id="observaciones" name="observaciones" rows="3"
+                                      placeholder="Observaciones adicionales sobre el vehículo">{{ request.form.observaciones if request.form else '' }}</textarea>
+                        </div>
+                    </div>
                 </div>
-                
-                <div class="form-group">
-                    <label for="estado">Estado</label>
-                    <select id="estado" name="estado">
-                        <option value="Disponible">✅ Disponible</option>
-                        <option value="En Uso">🔄 En Uso</option>
-                        <option value="Mantenimiento">🔧 En Mantenimiento</option>
-                        <option value="Fuera de Servicio">❌ Fuera de Servicio</option>
-                    </select>
-                </div>
-            </div>
-            
-            <div class="form-actions">
-                <button type="submit" class="btn-primary">✅ Crear Vehículo</button>
-                <a href="{{ url_for('listar_vehiculos') }}" class="btn-secondary">❌ Cancelar</a>
             </div>
         </form>
     </div>
+
+    <!-- Botones de acción -->
+    <div class="max-w-7xl mx-auto px-6-fluid">
+        <div class="form-card">
+            <div class="create-form-actions">
+                <a href="{{ url_for('listar_vehiculos') }}" class="create-btn create-btn btn btn-warm-secondary">
+                    <i class="fas fa-times"></i>Cancelar
+                </a>
+                <button type="submit" form="create-vehiculo-form" class="create-btn create-btn btn btn-warm-primary">
+                    <i class="fas fa-truck"></i>Crear Vehículo
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
+
+<script>
+// Validación del formulario
+(function() {
+    'use strict';
+    window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        var validation = Array.prototype.filter.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+})();
+</script>
 {% endblock %}

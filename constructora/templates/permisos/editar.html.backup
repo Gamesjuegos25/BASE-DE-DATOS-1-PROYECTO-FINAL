@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Permiso{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h2><i class="bi bi-shield-exclamation"></i> Editar Permiso</h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Inicio</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('listar_permisos') }}">Permisos</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('ver_permiso', id=permiso.id_permiso) }}">Permiso #{{ permiso.id_permiso }}</a></li>
+                    <li class="breadcrumb-item active">Editar</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="bi bi-pencil-square"></i> Modificar Información del Permiso</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="modulo_permiso" class="form-label">
+                                <i class="bi bi-layers"></i> Módulo del Sistema *
+                            </label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="modulo_permiso" 
+                                   name="modulo_permiso" 
+                                   value="{{ permiso.modulo_permiso }}"
+                                   placeholder="Ej: Obras, Empleados, Reportes" 
+                                   required>
+                            <div class="form-text">
+                                Nombre del módulo o área del sistema que controla este permiso
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="nivel_acceso_permiso" class="form-label">
+                                <i class="bi bi-key"></i> Nivel de Acceso
+                            </label>
+                            <select class="form-select" id="nivel_acceso_permiso" name="nivel_acceso_permiso">
+                                <option value="" {% if not permiso.nivel_acceso_permiso %}selected{% endif %}>
+                                    Sin nivel específico
+                                </option>
+                                <option value="Lectura" {% if permiso.nivel_acceso_permiso == 'Lectura' %}selected{% endif %}>
+                                    Lectura
+                                </option>
+                                <option value="Escritura" {% if permiso.nivel_acceso_permiso == 'Escritura' %}selected{% endif %}>
+                                    Escritura
+                                </option>
+                                <option value="Admin" {% if permiso.nivel_acceso_permiso == 'Admin' %}selected{% endif %}>
+                                    Administrador
+                                </option>
+                                <option value="Completo" {% if permiso.nivel_acceso_permiso == 'Completo' %}selected{% endif %}>
+                                    Acceso Completo
+                                </option>
+                                <option value="Restringido" {% if permiso.nivel_acceso_permiso == 'Restringido' %}selected{% endif %}>
+                                    Restringido
+                                </option>
+                            </select>
+                            <div class="form-text">
+                                Define qué tipo de operaciones permite este permiso (opcional)
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i>
+                            <strong>Nota:</strong> Los cambios no afectarán las asignaciones existentes a usuarios. 
+                            Los usuarios que ya tienen este permiso lo mantendrán.
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a href="{{ url_for('ver_permiso', id=permiso.id_permiso) }}" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="bi bi-check-circle"></i> Guardar Cambios
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card bg-light border-0">
+                <div class="card-body">
+                    <h6 class="card-title"><i class="bi bi-shield"></i> Permiso Actual</h6>
+                    <ul class="small mb-0">
+                        <li><strong>ID:</strong> {{ permiso.id_permiso }}</li>
+                        <li><strong>Módulo:</strong> {{ permiso.modulo_permiso }}</li>
+                        <li><strong>Nivel:</strong> {{ permiso.nivel_acceso_permiso or 'Sin nivel' }}</li>
+                        <li><strong>Usuarios con permiso:</strong> {{ permiso.usuarios_asignados }}</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card bg-warning bg-opacity-10 border-warning mt-3">
+                <div class="card-body">
+                    <h6 class="card-title text-warning"><i class="bi bi-exclamation-triangle"></i> Importante</h6>
+                    <ul class="small mb-0">
+                        <li>Modificar el módulo o nivel puede afectar la lógica de permisos del sistema</li>
+                        <li>Asegúrate de que los nombres sean consistentes con el resto de permisos</li>
+                        <li>Las asignaciones a usuarios se mantienen automáticamente</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Detalle Requisición - Sistema Constructora{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+        <a href="{{ url_for('dashboard') }}">Dashboard</a> /
+        <a href="{{ url_for('listar_requisiciones') }}">Requisiciones</a> /
+        <span>Detalle</span>
+    </nav>
+
+    <div class="page-header">
+        <h1><i class="fas fa-clipboard-list"></i> Detalle de la Requisición</h1>
+        <p class="subtitle">Información completa de la requisición #{{ requisicion.id_requisicion }}</p>
+    </div>
+
+    <div class="detail-card">
+        <div class="detail-header">
+            <h2>Información de la Requisición</h2>
+        </div>
+        
+        <div class="detail-grid">
+            <div class="detail-item">
+                <span class="detail-label"><i class="fas fa-hashtag"></i> ID</span>
+                <span class="detail-value">{{ requisicion.id_requisicion }}</span>
+            </div>
+
+            <div class="detail-item">
+                <span class="detail-label"><i class="fas fa-calendar-alt"></i> Fecha</span>
+                <span class="detail-value">{{ requisicion.fecha_requisicion }}</span>
+            </div>
+
+            <div class="detail-item">
+                <span class="detail-label"><i class="fas fa-info-circle"></i> Estado</span>
+                <span class="detail-value">
+                    {% if requisicion.estado_requisicion == 'Pendiente' %}
+                        <span class="badge badge-warning">{{ requisicion.estado_requisicion }}</span>
+                    {% elif requisicion.estado_requisicion == 'Aprobada' %}
+                        <span class="badge badge-success">{{ requisicion.estado_requisicion }}</span>
+                    {% elif requisicion.estado_requisicion == 'Rechazada' %}
+                        <span class="badge badge-danger">{{ requisicion.estado_requisicion }}</span>
+                    {% else %}
+                        <span class="badge badge-secondary">{{ requisicion.estado_requisicion }}</span>
+                    {% endif %}
+                </span>
+            </div>
+
+            <div class="detail-item">
+                <span class="detail-label"><i class="fas fa-sitemap"></i> Área Solicitante</span>
+                <span class="detail-value">
+                    {% if requisicion.nombre_area %}
+                        <span class="badge badge-primary">{{ requisicion.nombre_area }}</span>
+                    {% else %}
+                        <span class="badge badge-secondary">Sin área asignada</span>
+                    {% endif %}
+                </span>
+            </div>
+
+            <div class="detail-item">
+                <span class="detail-label"><i class="fas fa-boxes"></i> Items Solicitados</span>
+                <span class="detail-value">{{ requisicion.items_solicitados or 0 }} items</span>
+            </div>
+        </div>
+
+        <div class="detail-actions">
+            <a href="{{ url_for('listar_requisiciones') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Volver
+            </a>
+            <a href="{{ url_for('editar_requisicion', id=requisicion.id_requisicion) }}" class="btn btn-primary">
+                <i class="fas fa-edit"></i> Editar
+            </a>
+            <form action="{{ url_for('eliminar_requisicion', id=requisicion.id_requisicion) }}" 
+                  method="POST" class="inline-form"
+                  onsubmit="return confirm('¿Estás seguro de eliminar esta requisición?');">
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Eliminar
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

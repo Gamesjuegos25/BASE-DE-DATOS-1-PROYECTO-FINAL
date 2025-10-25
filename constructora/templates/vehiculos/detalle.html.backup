@@ -1,0 +1,230 @@
+{% extends "base.html" %}
+{% block title %}Detalle Vehículo{% endblock %}
+{% block content %}
+<div class="page-header">
+  <nav class="breadcrumb">
+    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+    <span class="breadcrumb-separator">/</span>
+    <a href="{{ url_for('listar_vehiculos') }}">Vehículos</a>
+    <span class="breadcrumb-separator">/</span>
+    <span>Detalle</span>
+  </nav>
+  <h1 class="page-title">🚚 {{ vehiculo.placa or 'Vehículo' }} <small class="text-muted">ID: {{ vehiculo.id_vehiculo }}</small></h1>
+</div>
+
+<div class="row">
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-car"></i> Información del Vehículo</h5>
+      </div>
+      <div class="card-body">
+        <dl class="row">
+          <dt class="col-sm-4"><i class="fas fa-id-card"></i> Placa</dt>
+          <dd class="col-sm-8">
+            <strong class="text-primary">{{ vehiculo.placa or 'N/D' }}</strong>
+          </dd>
+          
+          <dt class="col-sm-4"><i class="fas fa-certificate"></i> Marca</dt>
+          <dd class="col-sm-8">
+            {{ vehiculo.marca or 'No especificada' }}
+          </dd>
+          
+          <dt class="col-sm-4"><i class="fas fa-car-side"></i> Modelo</dt>
+          <dd class="col-sm-8">
+            {{ vehiculo.modelo or 'No especificado' }}
+          </dd>
+          
+          <dt class="col-sm-4"><i class="fas fa-calendar"></i> Año</dt>
+          <dd class="col-sm-8">
+            {{ vehiculo.anio or 'No especificado' }}
+          </dd>
+          
+          <dt class="col-sm-4"><i class="fas fa-layer-group"></i> Tipo</dt>
+          <dd class="col-sm-8">
+            <span class="badge badge-info">{{ vehiculo.tipo or 'N/D' }}</span>
+          </dd>
+          
+          <dt class="col-sm-4"><i class="fas fa-palette"></i> Color</dt>
+          <dd class="col-sm-8">
+            {{ vehiculo.color or 'No especificado' }}
+          </dd>
+          
+          <dt class="col-sm-4"><i class="fas fa-info-circle"></i> Estado</dt>
+          <dd class="col-sm-8">
+            {% set estado_class = {
+              'Disponible': 'success',
+              'En Uso': 'warning',
+              'Mantenimiento': 'info',
+              'Fuera de Servicio': 'danger'
+            } %}
+            <span class="badge badge-{{ estado_class.get(vehiculo.estado, 'success') }}">
+              {{ vehiculo.estado or 'Disponible' }}
+            </span>
+          </dd>
+          
+          <dt class="col-sm-4"><i class="fas fa-tachometer-alt"></i> Kilometraje</dt>
+          <dd class="col-sm-8">
+            {% if vehiculo.kilometraje %}
+              {{ "{:,}".format(vehiculo.kilometraje) }} km
+            {% else %}
+              <span class="text-muted">No registrado</span>
+            {% endif %}
+          </dd>
+        </dl>
+      </div>
+    </div>
+    
+    <div class="card mt-3">
+      <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-cogs"></i> Detalles Técnicos</h5>
+      </div>
+      <div class="card-body">
+        <dl class="row">
+          <dt class="col-sm-4"><i class="fas fa-cog"></i> No. Motor</dt>
+          <dd class="col-sm-8">
+            <code>{{ vehiculo.numero_motor or 'N/D' }}</code>
+          </dd>
+          
+          <dt class="col-sm-4"><i class="fas fa-barcode"></i> No. Chasis</dt>
+          <dd class="col-sm-8">
+            <code>{{ vehiculo.numero_chasis or 'N/D' }}</code>
+          </dd>
+          
+          <dt class="col-sm-4"><i class="fas fa-weight"></i> Capacidad Carga</dt>
+          <dd class="col-sm-8">
+            {% if vehiculo.capacidad_carga %}
+              {{ vehiculo.capacidad_carga }}
+            {% else %}
+              <span class="text-muted">No especificada</span>
+            {% endif %}
+          </dd>
+          
+          <dt class="col-sm-4"><i class="fas fa-gas-pump"></i> Combustible</dt>
+          <dd class="col-sm-8">
+            {{ vehiculo.combustible or 'No especificado' }}
+          </dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-calendar-check"></i> Fechas Importantes</h5>
+      </div>
+      <div class="card-body">
+        <div class="mb-3">
+          <small class="text-muted">Fecha de Compra:</small><br>
+          {% if vehiculo.fecha_compra %}
+            <strong class="text-info">{{ vehiculo.fecha_compra.strftime('%d/%m/%Y') if vehiculo.fecha_compra is not string else vehiculo.fecha_compra }}</strong>
+          {% else %}
+            <span class="text-muted">No registrada</span>
+          {% endif %}
+        </div>
+        
+        <div class="mb-3">
+          <small class="text-muted">Último Mantenimiento:</small><br>
+          {% if vehiculo.fecha_ultimo_mantenimiento %}
+            <strong class="text-warning">{{ vehiculo.fecha_ultimo_mantenimiento.strftime('%d/%m/%Y') if vehiculo.fecha_ultimo_mantenimiento is not string else vehiculo.fecha_ultimo_mantenimiento }}</strong>
+          {% else %}
+            <span class="text-muted">Sin registros</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    
+    <div class="card mt-3">
+      <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-shield-alt"></i> Seguro</h5>
+      </div>
+      <div class="card-body text-center">
+        <div class="insurance-status">
+          {% if vehiculo.seguro_vigente %}
+            <div class="alert alert-success mb-2">
+              <i class="fas fa-shield-alt"></i> Seguro Vigente
+            </div>
+            {% if vehiculo.fecha_vencimiento_seguro %}
+              <small class="text-muted">Vence:</small><br>
+              <strong class="text-danger">{{ vehiculo.fecha_vencimiento_seguro.strftime('%d/%m/%Y') if vehiculo.fecha_vencimiento_seguro is not string else vehiculo.fecha_vencimiento_seguro }}</strong>
+            {% endif %}
+          {% else %}
+            <div class="alert alert-danger mb-2">
+              <i class="fas fa-exclamation-triangle"></i> Sin Seguro
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    
+    <div class="card mt-3">
+      <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-cogs"></i> Acciones</h5>
+      </div>
+      <div class="card-body">
+        <div class="d-flex flex-column gap-2">
+          <a class="btn btn-primary" href="{{ url_for('editar_vehiculo', id=vehiculo.id_vehiculo) }}">
+            <i class="fas fa-edit"></i> Editar Vehículo
+          </a>
+          <a class="btn btn-warning" href="#">
+            <i class="fas fa-wrench"></i> Programar Mantenimiento
+          </a>
+          <a class="btn btn-info" href="#">
+            <i class="fas fa-history"></i> Historial de Uso
+          </a>
+          <a class="btn btn-success" href="#">
+            <i class="fas fa-shield-alt"></i> Renovar Seguro
+          </a>
+          <a class="btn btn-secondary" href="{{ url_for('listar_vehiculos') }}">
+            <i class="fas fa-arrow-left"></i> Volver a Lista
+          </a>
+          <form action="{{ url_for('eliminar_vehiculo', id=vehiculo.id_vehiculo) }}" method="post" onsubmit="return confirm('¿Eliminar este vehículo?');" class="mt-2">
+            <button class="btn btn-danger w-100" type="submit">
+              <i class="fas fa-trash"></i> Eliminar
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if vehiculo.observaciones %}
+<div class="row mt-3">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-sticky-note"></i> Observaciones</h5>
+      </div>
+      <div class="card-body">
+        <p class="mb-0">{{ vehiculo.observaciones }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<style>
+.insurance-status .alert {
+  padding: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.card-header h5 {
+  color: #495057;
+}
+
+.badge {
+  font-size: 0.9rem;
+}
+
+.gap-2 > * + * {
+  margin-top: 0.5rem;
+}
+
+code {
+  font-size: 0.9rem;
+}
+</style>
+{% endblock %}

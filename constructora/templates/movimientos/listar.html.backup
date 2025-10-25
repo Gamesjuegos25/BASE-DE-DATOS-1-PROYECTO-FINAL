@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-header">
+    <div class="header-content">
+        <div class="header-left">
+            <h1 class="page-title">
+                <i class="fas fa-list"></i>
+                Gestión de Movimientos
+            </h1>
+            <p class="page-subtitle">Control y administración de movimientos</p>
+        </div>
+        <div class="header-actions">
+            <a href="{{ url_for('crear_movimiento_material') }}" class="btn btn-primary">
+                <i class="fas fa-plus"></i>
+                Nuevo Movimiento
+            </a>
+        </div>
+</div>
+
+<!-- Estadísticas del Módulo -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon bg-blue">
+            <i class="fas fa-list"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ datos|length or 0 }}</div>
+            <div class="stat-label">Total Registros</div>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon bg-green">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ datos|length or 0 }}</div>
+            <div class="stat-label">Activos</div>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon bg-orange">
+            <i class="fas fa-clock"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">0</div>
+            <div class="stat-label">Pendientes</div>
+        </div>
+    </div>
+</div>
+
+</div>
+
+
+<div class="dashboard-header">
+  <h1><i class="fas fa-exchange-alt"></i> Movimientos de Materiales</h1>
+  <a href="{{ url_for('crear_movimiento_material') }}" class="btn btn-primary"><i class="fas fa-plus"></i> Nuevo movimiento</a>
+</div>
+
+<div class="table-container">
+  {% if movimientos %}
+  <table class="table">
+    <thead>
+      <tr>
+        <th>ID</th><th>Fecha</th><th>Tipo</th><th>Material</th><th>Cantidad</th><th>Origen</th><th>Destino</th><th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for m in movimientos %}
+      <tr>
+        <td>{{ m.id_movimiento_material or m.id }}</td>
+        <td>{{ m.fecha_movimiento }}</td>
+        <td>
+          {% set tipo = m.tipo_movimiento %}
+          <span class="badge {% if tipo=='Entrada' %}badge-success{% elif tipo=='Salida' %}badge-warning{% else %}badge-info{% endif %}">{{ tipo }}</span>
+        </td>
+        <td>{{ m.nombre_material or 'Sin material' }}</td>
+        <td>{{ m.cantidad or 0 }}</td>
+        <td>{{ m.origen_movimiento or '-' }}</td>
+        <td>{{ m.destino_movimiento or '-' }}</td>
+        <td class="table-actions">
+          <a class="btn btn-sm btn-view" href="{{ url_for('ver_movimiento_material', id=m.id_movimiento_material or m.id) }}"><i class="fas fa-eye"></i> Ver</a>
+          <a class="btn btn-sm btn-edit" href="{{ url_for('editar_movimiento_material', id=m.id_movimiento_material or m.id) }}"><i class="fas fa-edit"></i> Editar</a>
+          <form class="inline-form" action="{{ url_for('eliminar_movimiento_material', id=m.id_movimiento_material or m.id) }}" method="post" onsubmit="return confirm('¿Eliminar movimiento?');">
+            <button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i> Eliminar</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty-state">
+    <i class="fas fa-inbox"></i>
+    <p>No hay movimientos registrados</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

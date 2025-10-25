@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <!-- CSS para formularios -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/form-pages.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/date-picker-enhanced.css') }}">
+{% endblock %}
+
+{% block title %}Crear Avance - Sistema Constructora{% endblock %}
+
+{% block content %}
+    <div class="create-form-max-w-7xl mx-auto px-6">
+        <!-- Header -->
+        <div class="create-page-header">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="{{ url_for('dashboard') }}">
+                            <i class="fas fa-home"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="{{ url_for('listar_avances') }}">
+                            <i class="fas fa-list"></i> Avances
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        <i class="fas fa-plus"></i> Crear Avance
+                    </li>
+                </ol>
+            </nav>
+            
+            <div class="create-title-section">
+                <h1 class="create-title">
+                    <i class="fas fa-plus-circle"></i>
+                    Crear Avance
+                </h1>
+                <p class="create-subtitle">Complete el formulario para registrar una nueva avance</p>
+            </div>
+        </div>
+
+        <!-- Formulario -->
+        <div class="form-card">
+            <form method="POST" action="{{ url_for('crear_avance') }}" class="needs-validation" novalidate>
+                <div class="create-form-flex flex-wrap -mx-2">
+                    <div class="create-form-group">
+                        <label class="form-label">
+                            Obra <span class="required">*</span>
+                        </label>
+                        <select class="form-select" id="obra_id" name="obra_id" required>
+                            <option value="">Seleccione una obra</option>
+                            {% for obra in obras %}
+                            <option value="{{ obra.id or obra.obra_id }}">{{ obra.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="invalid-feedback">
+                            Por favor ingrese obra.
+                        </div>
+                    </div>
+                    <!-- Fecha del avance estandarizada -->
+                    <div class="calendar-field-group" data-field-type="fecha_programada">
+                        <label for="fecha_avance" class="form-label">
+                            <i class="fas fa-calendar-alt text-xanthous-600"></i> Fecha del Avance
+                            <span class="required-mark text-red-500 ml-1">*</span>
+                        </label>
+                        <div class="input-wrapper date-input-wrapper">
+                            <input 
+                                type="date" 
+                                class="form-input date-picker-input standardized-calendar" 
+                                name="fecha_avance" 
+                                id="fecha_avance"
+                                value="{{ request.form.fecha_avance if request.form else '' }}"
+                                placeholder="Seleccionar fecha del avance"
+                                required
+                                max="{{ 'now'|strftime('%Y-%m-%d') }}"
+                                data-field-type="fecha_programada"
+                            />
+                            <i class="fas fa-calendar-alt input-icon"></i>
+                        </div>
+                        <small class="form-help text-vanilla-600">
+                            Fecha del registro de avance (no fechas futuras)
+                        </small>
+                    </div>
+                </div>
+                <div class="create-form-flex flex-wrap -mx-2">
+                    <div class="create-form-group">
+                        <label class="form-label">
+                            Avance Físico (%) <span class="required">*</span>
+                        </label>
+                        <input type="number" class="form-input" id="porcentaje_fisico" name="porcentaje_fisico" required step="0.1" min="0" max="100" placeholder="Ej: 75.5">
+                        <div class="invalid-feedback">
+                            Por favor ingrese el porcentaje de avance físico.
+                        </div>
+                    </div>
+                    <div class="create-form-group">
+                        <label class="form-label">
+                            Avance Financiero (%) <span class="required">*</span>
+                        </label>
+                        <input type="number" class="form-input" id="porcentaje_financiero" name="porcentaje_financiero" required step="0.1" min="0" max="100" placeholder="Ej: 68.2">
+                        <div class="invalid-feedback">
+                            Por favor ingrese el porcentaje de avance financiero.
+                        </div>
+                    </div>
+                </div>
+                <div class="create-form-flex flex-wrap -mx-2">
+                    <div class="create-form-group">
+                        <label class="form-label">
+                            Descripción del Avance
+                        </label>
+                        <textarea class="form-textarea" id="descripcion" name="descripcion" rows="4" placeholder="Describa los trabajos realizados y el progreso obtenido..."></textarea>
+                        <div class="form-text">
+                            Opcional: Describa brevemente los trabajos realizados en este período.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones de acción -->
+                <div class="create-form-actions">
+                    <div class="action-buttons">
+                        <a href="{{ url_for('listar_avances') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn btn btn-warm-primary">
+                            <i class="fas fa-save"></i> Guardar Avance
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+<script>
+    // Validación de formularios Bootstrap
+    (function() {
+        'use strict';
+        window.addEventListener('load', function() {
+            var forms = document.getElementsByClassName('needs-validation');
+            var validation = Array.prototype.filter.call(forms, function(form) {
+                form.addEventListener('submit', function(event) {
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        }, false);
+    })();
+</script>
+
+{% endblock %}

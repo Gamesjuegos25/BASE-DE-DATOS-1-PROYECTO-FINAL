@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <!-- CSS específico para páginas de detalle -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/detail-page.css') }}">
+    
+    <!-- CSS para páginas de detalle -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/detail-page.css') }}">{% endblock %}
+
+{% block title %}Detalle Empleado{% endblock %}
+{% block content %}
+<div class="page-header">
+  <nav class="breadcrumb">
+    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+    <span class="breadcrumb-separator">/</span>
+    <a href="{{ url_for('listar_empleados') }}">Empleados</a>
+    <span class="breadcrumb-separator">/</span>
+    <span>Detalle</span>
+  </nav>
+  <h1 class="page-title">👤 {{ empleado.nombre_empleado or 'Empleado' }} <small class="text-vanilla-600">ID: {{ empleado.id_empleado }}</small></h1>
+</div>
+
+<div class="flex flex-wrap -mx-2">
+  <div class="flex-1 px-2-md-8">
+    <div class="detail-card">
+      <div class="stat-stat-header">
+        <h4 style="color: var(--prussian-blue-600); margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: var(--spacing-sm);"><i class="fas fa-user text-xanthous"></i>Información Personal</h4>
+      </div>
+      <div class="stat-module-content">
+        <dl class="flex flex-wrap -mx-2">
+          <dt class="flex-1 px-2-sm-4"><i class="fas fa-user-tag"></i> Nombre</dt>
+          <dd class="flex-1 px-2-sm-8">
+            <strong>{{ empleado.nombre_empleado or 'N/D' }}</strong>
+          </dd>
+          
+          <dt class="flex-1 px-2-sm-4"><i class="fas fa-id-badge"></i> Apellidos</dt>
+          <dd class="flex-1 px-2-sm-8">
+            <strong>{{ empleado.apellido_empleado or 'N/D' }}</strong>
+          </dd>
+          
+          <dt class="flex-1 px-2-sm-4"><i class="fas fa-briefcase"></i> Cargo/Tipo</dt>
+          <dd class="flex-1 px-2-sm-8">
+            <span class="status-badge-detail">{{ empleado.tipo_empleado or 'N/D' }}</span>
+          </dd>
+          
+          <dt class="flex-1 px-2-sm-4"><i class="fas fa-phone"></i> Teléfono</dt>
+          <dd class="flex-1 px-2-sm-8">
+            {% if empleado.telefono %}
+              <a href="tel:{{ empleado.telefono }}" class="text-prussian-blue">{{ empleado.telefono }}</a>
+            {% else %}
+              <span class="text-vanilla-600">N/D</span>
+            {% endif %}
+          </dd>
+          
+          <dt class="flex-1 px-2-sm-4"><i class="fas fa-envelope"></i> Email</dt>
+          <dd class="flex-1 px-2-sm-8">
+            {% if empleado.email %}
+              <a href="mailto:{{ empleado.email }}" class="text-prussian-blue">{{ empleado.email }}</a>
+            {% else %}
+              <span class="text-vanilla-600">N/D</span>
+            {% endif %}
+          </dd>
+          
+          <dt class="flex-1 px-2-sm-4"><i class="fas fa-calendar-alt"></i> Fecha de Ingreso</dt>
+          <dd class="flex-1 px-2-sm-8">
+            {% if empleado.fecha_ingreso %}
+              <span class="status-badge-detail">
+                {{ empleado.fecha_ingreso.strftime('%d/%m/%Y') if empleado.fecha_ingreso is not string else empleado.fecha_ingreso }}
+              </span>
+            {% else %}
+              <span class="text-vanilla-600">N/D</span>
+            {% endif %}
+          </dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+  
+  <div class="flex-1 px-2-md-4">
+    <div class="detail-card">
+      <div class="stat-stat-header">
+        <h4 style="color: var(--prussian-blue-600); margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: var(--spacing-sm);"><i class="fas fa-coins text-xanthous"></i>Información Salarial</h4>
+      </div>
+      <div class="stat-module-content text-center">
+        <div class="salary-info">
+          <h3 class="text-xanthous-600 mb-2">
+            {% if empleado.salario_fijo_empleado is not none %}
+              Q{{ "{:,.2f}".format(empleado.salario_fijo_empleado) }}
+            {% else %}
+              <span class="text-vanilla-600">N/D</span>
+            {% endif %}
+          </h3>
+          <p class="text-vanilla-600 mb-3">Salario Mensual</p>
+          
+          {% if empleado.salario_fijo_empleado is not none %}
+            <div class="salary-breakdown">
+              <div class="mb-2">
+                <small class="text-vanilla-600">Salario Anual:</small><br>
+                <strong class="text-prussian-blue">Q{{ "{:,.2f}".format(empleado.salario_fijo_empleado * 12) }}</strong>
+              </div>
+              <div class="mb-2">
+                <small class="text-vanilla-600">Con Bono Constitucional:</small><br>
+                <strong class="text-prussian-blue-700">Q{{ "{:,.2f}".format(empleado.salario_fijo_empleado * 13) }}</strong>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    
+    <div class="detail-card">
+      <div class="stat-stat-header">
+        <h4 style="color: var(--prussian-blue-600); margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: var(--spacing-sm);"><i class="fas fa-cogs text-xanthous"></i>Acciones</h4>
+      </div>
+      <div class="stat-module-content">
+        <div class="flex flex-col gap-2">
+          <a class="btn btn btn btn-warm-primary" href="{{ url_for('editar_empleado', id=empleado.id_empleado) }}">
+            <i class="fas fa-edit"></i> Editar Empleado
+          </a>
+          <a class="btn btn btn btn-warm-secondary" href="{{ url_for('listar_empleados') }}">
+            <i class="fas fa-arrow-left"></i> Volver a Lista
+          </a>
+          <form action="{{ url_for('eliminar_empleado', id=empleado.id_empleado) }}" method="post" onsubmit="return confirm('¿Eliminar este empleado?');" class="mt-2">
+            <button class="btn btn btn btn-warm-danger w-100" type="submit">
+              <i class="fas fa-trash"></i> Eliminar
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.salary-info h3 {
+  font-size: 2.5rem;
+  font-weight: bold;
+}
+
+.salary-breakdown {
+  border-top: 1px solid #dee2e6;
+  padding-top: 1rem;
+}
+
+.card-header h5 {
+  color: #495057;
+}
+
+.badge {
+  font-size: 0.9rem;
+}
+
+.gap-2 > * + * {
+  margin-top: 0.5rem;
+}
+</style>
+{% endblock %}

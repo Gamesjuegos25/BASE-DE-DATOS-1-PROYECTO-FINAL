@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Nueva Factura - Sistema Constructora{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/create-forms.css') }}">
+
+<div class="create-form-container">
+    <div class="create-page-header">
+        <nav class="breadcrumb">
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <span class="breadcrumb-separator">/</span>
+            <a href="{{ url_for('listar_facturas') }}">Facturas</a>
+            <span class="breadcrumb-separator">/</span>
+            <span>Nueva</span>
+        </nav>
+        <h1 class="create-page-title">
+            <i class="fas fa-file-invoice"></i>
+            Crear Nueva Factura
+        </h1>
+    </div>
+
+    <div class="container-fluid">
+        <form method="POST" action="{{ url_for('crear_factura') }}" id="create-factura-form" class="needs-validation" novalidate>
+            <div class="create-form-row">
+                <div class="create-form-card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-file-alt"></i> Información de la Factura</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="create-form-group">
+                            <label for="numero_factura" class="create-form-label">
+                                <i class="fas fa-hashtag"></i>Número de Factura<span class="required">*</span>
+                            </label>
+                            <input type="text" class="create-form-control" id="numero_factura" name="numero_factura" 
+                                   placeholder="Ej: FAC-2025-001" required>
+                        </div>
+
+                        <div class="create-form-group">
+                            <label for="fecha_factura" class="create-form-label">
+                                <i class="fas fa-calendar"></i>Fecha de Facturación<span class="required">*</span>
+                            </label>
+                            <input type="date" class="create-form-control" id="fecha_factura" name="fecha_factura" required>
+                        </div>
+
+                        <div class="create-form-group">
+                            <label for="fecha_vencimiento" class="create-form-label">
+                                <i class="fas fa-calendar-times"></i>Fecha de Vencimiento
+                            </label>
+                            <input type="date" class="create-form-control" id="fecha_vencimiento" name="fecha_vencimiento">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="create-form-card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-dollar-sign"></i> Información Financiera</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="create-form-group">
+                            <label for="valor_bruto" class="create-form-label">
+                                <i class="fas fa-calculator"></i>Valor Bruto<span class="required">*</span>
+                            </label>
+                            <input type="number" class="create-form-control" id="valor_bruto" name="valor_bruto" 
+                                   placeholder="0.00" step="0.01" min="0" required>
+                        </div>
+
+                        <div class="create-form-group">
+                            <label for="iva" class="create-form-label">
+                                <i class="fas fa-percentage"></i>IVA (%)
+                            </label>
+                            <input type="number" class="create-form-control" id="iva" name="iva" 
+                                   placeholder="19" step="0.01" min="0" max="100">
+                        </div>
+
+                        <div class="create-form-group">
+                            <label for="estado_factura" class="create-form-label">
+                                <i class="fas fa-check-circle"></i>Estado<span class="required">*</span>
+                            </label>
+                            <select class="create-form-control" id="estado_factura" name="estado_factura" required>
+                                <option value="">Seleccionar estado...</option>
+                                <option value="PENDIENTE">⏳ Pendiente</option>
+                                <option value="PAGADA">✅ Pagada</option>
+                                <option value="VENCIDA">❌ Vencida</option>
+                                <option value="ANULADA">🚫 Anulada</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="container-fluid">
+        <div class="create-form-card">
+            <div class="create-form-actions">
+                <a href="{{ url_for('listar_facturas') }}" class="create-btn create-btn-secondary">
+                    <i class="fas fa-times"></i>Cancelar
+                </a>
+                <button type="submit" form="create-factura-form" class="create-btn create-btn-primary">
+                    <i class="fas fa-file-invoice"></i>Crear Factura
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    'use strict';
+    window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        var validation = Array.prototype.filter.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block title %}Nuevo Proyecto - Sistema Constructora{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/create-forms.css') }}">
+
+<div class="create-form-container">
+    <!-- Header de página estilo detalle -->
+    <div class="create-page-header">
+        <nav class="breadcrumb">
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <span class="breadcrumb-separator">/</span>
+            <a href="{{ url_for('listar_proyectos') }}">Proyectos</a>
+            <span class="breadcrumb-separator">/</span>
+            <span>Nuevo</span>
+        </nav>
+        <h1 class="create-page-title">
+            <i class="fas fa-plus-circle"></i>
+            Crear Nuevo Proyecto
+        </h1>
+    </div>
+
+    <div class="container-fluid">
+        <div class="proyecto-form-container">
+            <form method="POST" action="{{ url_for('crear_proyecto') }}" class="needs-validation" novalidate id="create-proyecto-form">
+                <div class="create-form-row">
+                    <!-- Información General -->
+                    <div class="create-form-card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-info-circle"></i> Información del Proyecto</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="create-form-group">
+                                <label for="nombre" class="create-form-label">
+                                    <i class="fas fa-project-diagram"></i>Nombre del Proyecto<span class="required">*</span>
+                                </label>
+                                <input type="text" class="create-form-control" id="nombre" name="nombre" 
+                                       placeholder="Ej: Construcción Complejo Residencial Torre Norte"
+                                       value="{{ request.form.nombre if request.form else '' }}" required>
+                                <div class="invalid-feedback">
+                                    Por favor, ingrese el nombre del proyecto.
+                                </div>
+                            </div>
+
+                            <div class="create-form-group">
+                                <label for="fecha_inicio" class="create-form-label">
+                                    <i class="fas fa-calendar-plus"></i>Fecha de Inicio
+                                </label>
+                                <input type="date" class="create-form-control" id="fecha_inicio" name="fecha_inicio"
+                                       value="{{ request.form.fecha_inicio if request.form else '' }}">
+                            </div>
+
+                            <div class="create-form-group">
+                                <label for="fecha_fin" class="create-form-label">
+                                    <i class="fas fa-calendar-check"></i>Fecha Estimada de Finalización
+                                </label>
+                                <input type="date" class="create-form-control" id="fecha_fin" name="fecha_fin"
+                                       value="{{ request.form.fecha_fin if request.form else '' }}">
+                            </div>
+
+                            <div class="create-form-group">
+                                <label for="estado" class="create-form-label">
+                                    <i class="fas fa-tasks"></i>Estado del Proyecto<span class="required">*</span>
+                                </label>
+                                <select class="create-form-control" id="estado" name="estado" required>
+                                    <option value="">Seleccionar estado...</option>
+                                    <option value="Planeación" {{ 'selected' if request.form and request.form.estado == 'Planeación' else '' }}>📝 Planeación</option>
+                                    <option value="En Progreso" {{ 'selected' if request.form and request.form.estado == 'En Progreso' else '' }}>🔄 En Progreso</option>
+                                    <option value="Pausado" {{ 'selected' if request.form and request.form.estado == 'Pausado' else '' }}>⏸️ Pausado</option>
+                                    <option value="Completado" {{ 'selected' if request.form and request.form.estado == 'Completado' else '' }}>✅ Completado</option>
+                                    <option value="Cancelado" {{ 'selected' if request.form and request.form.estado == 'Cancelado' else '' }}>❌ Cancelado</option>
+                                </select>
+                                <div class="invalid-feedback">
+                                    Por favor, seleccione el estado del proyecto.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Asignaciones -->
+                    <div class="create-form-card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-users-cog"></i> Asignación de Recursos</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="create-form-group">
+                                <label for="obra_id" class="create-form-label">
+                                    <i class="fas fa-building"></i>Obra Asignada
+                                </label>
+                                <select class="create-form-control" id="obra_id" name="obra_id">
+                                    <option value="">Sin obra asignada...</option>
+                                    {% for obra in obras %}
+                                    <option value="{{ obra[0] }}" {{ 'selected' if request.form and request.form.obra_id == obra[0]|string else '' }}>{{ obra[1] }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="create-form-group">
+                                <label for="arquitecto_id" class="create-form-label">
+                                    <i class="fas fa-drafting-compass"></i>Arquitecto Responsable
+                                </label>
+                                <select class="create-form-control" id="arquitecto_id" name="arquitecto_id">
+                                    <option value="">Sin arquitecto asignado...</option>
+                                    {% for empleado in arquitectos %}
+                                    <option value="{{ empleado[0] }}" {{ 'selected' if request.form and request.form.arquitecto_id == empleado[0]|string else '' }}>{{ empleado[1] }} {{ empleado[2] }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="create-form-group">
+                                <label for="ingeniero_id" class="create-form-label">
+                                    <i class="fas fa-hard-hat"></i>Ingeniero Responsable
+                                </label>
+                                <select class="create-form-control" id="ingeniero_id" name="ingeniero_id">
+                                    <option value="">Sin ingeniero asignado...</option>
+                                    {% for empleado in ingenieros %}
+                                    <option value="{{ empleado[0] }}" {{ 'selected' if request.form and request.form.ingeniero_id == empleado[0]|string else '' }}>{{ empleado[1] }} {{ empleado[2] }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="create-form-group">
+                                <label for="vehiculos_ids" class="create-form-label">
+                                    <i class="fas fa-truck"></i>Vehículos Asignados
+                                </label>
+                                <select class="create-form-control" id="vehiculos_ids" name="vehiculos_ids" multiple size="4">
+                                    {% for vehiculo in vehiculos %}
+                                    <option value="{{ vehiculo[0] }}" {{ 'selected' if request.form and vehiculo[0]|string in request.form.getlist('vehiculos_ids') else '' }}>{{ vehiculo[1] }} ({{ vehiculo[2] }})</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="create-form-text">
+                                    <i class="fas fa-info-circle"></i>Mantén Ctrl presionado para seleccionar múltiples vehículos
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="container-fluid">
+        <div class="create-form-card">
+            <div class="create-form-actions">
+                <a href="{{ url_for('listar_proyectos') }}" class="create-btn create-btn-secondary">
+                    <i class="fas fa-times"></i>Cancelar
+                </a>
+                <button type="submit" form="create-proyecto-form" class="create-btn create-btn-primary">
+                    <i class="fas fa-plus"></i>Crear Proyecto
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Validación del formulario
+(function() {
+    'use strict';
+    window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        var validation = Array.prototype.filter.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+})();
+</script>
+{% endblock %}

@@ -1,296 +1,1849 @@
 {% extends "base.html" %}
 
-{% block title %}Lista de Obras - Sistema Constructora{% endblock %}
+{% block head %}
+    <!-- CSS para páginas de listado -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/list-pages.css') }}">
+    <style>
+        /* Container principal optimizado */
+        .obras-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0.75rem;
+            background: linear-gradient(135deg, var(--vanilla-50), var(--vanilla-100));
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .obras-header {
+            background: linear-gradient(135deg, var(--prussian-blue-600), var(--prussian-blue-700));
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 6px 24px rgba(0, 48, 73, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .obras-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 120px;
+            height: 120px;
+            background: rgba(247, 127, 0, 0.1);
+            border-radius: 50%;
+            transform: translate(40%, -40%);
+        }
+
+        .header-title {
+            font-size: 1.875rem;
+            font-weight: 700;
+            margin-bottom: 0.375rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .header-title i {
+            font-size: 1.5rem;
+        }
+
+        .header-subtitle {
+            font-size: 0.95rem;
+            opacity: 0.9;
+            margin-bottom: 1.25rem;
+            line-height: 1.4;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .btn-obras {
+            padding: 0.625rem 1.25rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .btn-primary-obras {
+            background: var(--orange-wheel-500);
+            color: white;
+        }
+
+        .btn-primary-obras:hover {
+            background: var(--orange-wheel-600);
+            transform: translateY(-1px);
+            box-shadow: 0 3px 12px rgba(247, 127, 0, 0.3);
+        }
+
+        .btn-secondary-obras {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-secondary-obras:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 768px) {
+            .obras-container {
+                padding: 0.5rem;
+            }
+            
+            .obras-header {
+                padding: 1rem;
+                margin-bottom: 1rem;
+            }
+            
+            .header-title {
+                font-size: 1.5rem;
+                gap: 0.5rem;
+            }
+            
+            .header-subtitle {
+                font-size: 0.875rem;
+                margin-bottom: 1rem;
+            }
+            
+            .header-actions {
+                gap: 0.5rem;
+            }
+            
+            .btn-obras {
+                padding: 0.5rem 1rem;
+                font-size: 0.8rem;
+                flex: 1;
+                justify-content: center;
+                min-width: 140px;
+            }
+        }
+    </style>
+</div>
+{% endblock %}
+
+{% block title %}Lista de Obras - Sistema Constructora</div>
+{% endblock %}
 
 {% block content %}
-<div class="page-header">
-    <div class="header-content">
-        <div>
-            <h1>Lista de Obras</h1>
-            <p>Gestión y administración de todas las obras</p>
-        </div>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/enhanced-tables.css') }}">
+
+<div class="obras-container">
+    <!-- Header Principal Renovado -->
+    <div class="obras-header">
+        <h1 class="header-title">
+            <i class="fas fa-building"></i>
+            Gestión de Obras
+        </h1>
+        <p class="header-subtitle">
+            Administra y supervisa todos los proyectos de construcción de manera eficiente
+        </p>
         <div class="header-actions">
-            <a href="{{ url_for('crear_obra') }}" class="btn btn-primary">
+            <a href="{{ url_for('crear_obra') }}" class="btn-obras btn-primary-obras">
                 <i class="fas fa-plus"></i>
                 Nueva Obra
             </a>
+            <a href="{{ url_for('tipos_obra_listar') }}" class="btn-obras btn-secondary-obras">
+                <i class="fas fa-list"></i>
+                Tipos de Obra
+            </a>
         </div>
     </div>
-</div>
 
-<!-- Filtros de búsqueda -->
-<div class="card mb-4">
-    <div class="card-header">
-        <h3 class="card-title">Filtros de Búsqueda</h3>
+    <!-- Dashboard de Estadísticas Renovado -->
+    <div class="stats-dashboard">
+        <div class="stat-card stat-total">
+            <div class="stat-icon">
+                <i class="fas fa-building"></i>
+            </div>
+            <div class="stat-info">
+                <div class="stat-number">{{ obras|length or 0 }}</div>
+                <div class="stat-label">Total de Obras</div>
+            </div>
+            <div class="stat-trend up">
+                <i class="fas fa-arrow-up"></i>
+            </div>
+        </div>
+        
+        <div class="stat-card stat-progress">
+            <div class="stat-icon">
+                <i class="fas fa-cogs"></i>
+            </div>
+            <div class="stat-info">
+                <div class="stat-number">{{ obras|selectattr("estado", "equalto", "En Progreso")|list|length }}</div>
+                <div class="stat-label">En Progreso</div>
+            </div>
+            <div class="stat-trend stable">
+                <i class="fas fa-minus"></i>
+            </div>
+        </div>
+        
+        <div class="stat-card stat-planning">
+            <div class="stat-icon">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-info">
+                <div class="stat-number">{{ obras|selectattr("estado", "equalto", "Planeación")|list|length }}</div>
+                <div class="stat-label">En Planeación</div>
+            </div>
+            <div class="stat-trend down">
+                <i class="fas fa-arrow-down"></i>
+            </div>
+        </div>
+        
+        <div class="stat-card stat-completed">
+            <div class="stat-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="stat-info">
+                <div class="stat-number">{{ obras|selectattr("estado", "equalto", "Completado")|list|length }}</div>
+                <div class="stat-label">Completadas</div>
+            </div>
+            <div class="stat-trend up">
+                <i class="fas fa-arrow-up"></i>
+            </div>
+        </div>
     </div>
-    
-    <form method="GET" class="search-form">
-        <div class="form-row">
-            <div class="form-group">
-                <label for="search" class="form-label">Buscar por nombre</label>
-                <input type="text" id="search" name="search" class="form-control" 
-                       value="{{ request.args.get('search', '') }}" 
-                       placeholder="Nombre de la obra...">
-            </div>
+
+    <style>
+        .stats-dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.25rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            border: 1px solid var(--vanilla-200);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+        }
+
+        .stat-total::before { background: var(--prussian-blue-500); }
+        .stat-progress::before { background: var(--orange-wheel-500); }
+        .stat-planning::before { background: var(--xanthous-500); }
+        .stat-completed::before { background: var(--fire-engine-red-500); }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+        }
+
+        .stat-total .stat-icon { 
+            background: linear-gradient(135deg, var(--prussian-blue-100), var(--prussian-blue-200));
+            color: var(--prussian-blue-600);
+        }
+        .stat-progress .stat-icon { 
+            background: linear-gradient(135deg, var(--orange-wheel-100), var(--orange-wheel-200));
+            color: var(--orange-wheel-600);
+        }
+        .stat-planning .stat-icon { 
+            background: linear-gradient(135deg, var(--xanthous-100), var(--xanthous-200));
+            color: var(--xanthous-700);
+        }
+        .stat-completed .stat-icon { 
+            background: linear-gradient(135deg, var(--fire-engine-red-100), var(--fire-engine-red-200));
+            color: var(--fire-engine-red-600);
+        }
+
+        .stat-info {
+            flex-grow: 1;
+            min-width: 0;
+        }
+
+        .stat-number {
+            font-size: 1.875rem;
+            font-weight: 800;
+            color: var(--prussian-blue-700);
+            line-height: 1;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--prussian-blue-400);
+            text-transform: uppercase;
+            letter-spacing: 0.25px;
+        }
+
+        .stat-trend {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .stat-trend.up {
+            background: rgba(34, 197, 94, 0.1);
+            color: #22c55e;
+        }
+
+        .stat-trend.down {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+
+        .stat-trend.stable {
+            background: rgba(107, 114, 128, 0.1);
+            color: #6b7280;
+        }
+
+        @media (max-width: 1024px) {
+            .stats-dashboard {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.875rem;
+            }
             
-            <div class="form-group">
-                <label for="estado" class="form-label">Estado</label>
-                <select id="estado" name="estado" class="form-control">
-                    <option value="">Todos los estados</option>
-                    <option value="Planeación" {{ 'selected' if request.args.get('estado') == 'Planeación' }}>Planeación</option>
-                    <option value="En Progreso" {{ 'selected' if request.args.get('estado') == 'En Progreso' }}>En Progreso</option>
-                    <option value="Pausado" {{ 'selected' if request.args.get('estado') == 'Pausado' }}>Pausado</option>
-                    <option value="Completado" {{ 'selected' if request.args.get('estado') == 'Completado' }}>Completado</option>
-                    <option value="Cancelado" {{ 'selected' if request.args.get('estado') == 'Cancelado' }}>Cancelado</option>
-                </select>
-            </div>
+            .stat-card {
+                padding: 1rem;
+            }
             
-            <div class="form-group">
-                <label class="form-label">&nbsp;</label>
-                <div class="filter-buttons">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-search"></i>
-                        Buscar
-                    </button>
-                    <a href="{{ url_for('listar_obras') }}" class="btn btn-secondary">
-                        <i class="fas fa-times"></i>
-                        Limpiar
+            .stat-number {
+                font-size: 1.625rem;
+            }
+            
+            .stat-label {
+                font-size: 0.75rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-dashboard {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+                margin-bottom: 1.25rem;
+            }
+            
+            .stat-card {
+                padding: 1rem;
+                gap: 0.875rem;
+            }
+            
+            .stat-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+            
+            .stat-number {
+                font-size: 1.5rem;
+            }
+            
+            .stat-label {
+                font-size: 0.7rem;
+            }
+            
+            .stat-trend {
+                width: 28px;
+                height: 28px;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stat-card {
+                flex-direction: column;
+                text-align: center;
+                gap: 0.75rem;
+                padding: 1rem 0.75rem;
+            }
+            
+            .stat-info {
+                order: 2;
+            }
+            
+            .stat-trend {
+                order: 3;
+            }
+        }
+    </style>
+
+    <!-- Panel de Filtros Elegante -->
+    <div class="filters-panel">
+        <div class="filters-header">
+            <div class="filters-title">
+                <i class="fas fa-filter"></i>
+                <span>Filtros de Búsqueda</span>
+            </div>
+            <button class="filters-toggle" id="filtersToggle">
+                <i class="fas fa-chevron-down"></i>
+            </button>
+        </div>
+        
+        <div class="filters-content" id="filtersContent">
+            <form method="GET" class="filters-form">
+                <div class="filters-grid">
+                    <div class="filters-row">
+                        <div class="filter-group">
+                            <label class="filter-label">
+                                <i class="fas fa-search"></i>
+                                Buscar Obra
+                            </label>
+                            <input type="text" 
+                                   name="search" 
+                                   class="filter-input"
+                                   value="{{ request.args.get('search', '') }}" 
+                                   placeholder="Nombre o descripción...">
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label class="filter-label">
+                                <i class="fas fa-list"></i>
+                                Estado
+                            </label>
+                            <select name="estado" class="filter-select">
+                                <option value="">Todos</option>
+                                <option value="Planeación" {{ 'selected' if request.args.get('estado') == 'Planeación' }}>
+                                    Planeación
+                                </option>
+                                <option value="En Progreso" {{ 'selected' if request.args.get('estado') == 'En Progreso' }}>
+                                    En Progreso
+                                </option>
+                                <option value="Pausado" {{ 'selected' if request.args.get('estado') == 'Pausado' }}>
+                                    Pausado
+                                </option>
+                                <option value="Completado" {{ 'selected' if request.args.get('estado') == 'Completado' }}>
+                                    Completado
+                                </option>
+                                <option value="Cancelado" {{ 'selected' if request.args.get('estado') == 'Cancelado' }}>
+                                    Cancelado
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="filter-actions">
+                        <button type="submit" class="btn-filter btn-search">
+                            <i class="fas fa-search"></i>
+                            Buscar
+                        </button>
+                        <a href="{{ url_for('listar_obras') }}" class="btn-filter btn-clear">
+                            <i class="fas fa-times"></i>
+                            Limpiar
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <style>
+        .filters-panel {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+            border: 1px solid var(--vanilla-200);
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        .filters-header {
+            background: linear-gradient(135deg, var(--vanilla-50), var(--vanilla-100));
+            padding: 1rem 1.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--vanilla-200);
+        }
+
+        .filters-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: var(--prussian-blue-700);
+            font-size: 1rem;
+        }
+
+        .filters-title i {
+            color: var(--orange-wheel-500);
+            font-size: 0.9rem;
+        }
+
+        .filters-toggle {
+            background: none;
+            border: none;
+            color: var(--prussian-blue-500);
+            font-size: 1rem;
+            cursor: pointer;
+            padding: 0.375rem;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .filters-toggle:hover {
+            background: var(--vanilla-200);
+            color: var(--orange-wheel-600);
+        }
+
+        .filters-content {
+            padding: 1.25rem;
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 1rem;
+            align-items: end;
+            max-width: 100%;
+        }
+
+        .filters-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1rem;
+            align-items: end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.375rem;
+            min-width: 0;
+        }
+
+        .filter-label {
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            font-weight: 600;
+            color: var(--prussian-blue-600);
+            font-size: 0.8rem;
+        }
+
+        .filter-input, .filter-select {
+            padding: 0.75rem 0.875rem;
+            border: 1px solid var(--vanilla-300);
+            border-radius: 6px;
+            font-size: 0.875rem;
+            background: white;
+            transition: all 0.2s ease;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .filter-input:focus, .filter-select:focus {
+            outline: none;
+            border-color: var(--orange-wheel-400);
+            box-shadow: 0 0 0 2px rgba(247, 127, 0, 0.1);
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-shrink: 0;
+        }
+
+        .btn-filter {
+            padding: 0.75rem 1rem;
+            border-radius: 6px;
+            font-weight: 600;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 0.8rem;
+            white-space: nowrap;
+        }
+
+        .btn-search {
+            background: var(--orange-wheel-500);
+            color: white;
+            min-width: 90px;
+        }
+
+        .btn-search:hover {
+            background: var(--orange-wheel-600);
+            transform: translateY(-1px);
+        }
+
+        .btn-clear {
+            background: var(--vanilla-200);
+            color: var(--prussian-blue-600);
+            min-width: 90px;
+        }
+
+        .btn-clear:hover {
+            background: var(--vanilla-300);
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 1024px) {
+            .filters-grid {
+                grid-template-columns: 1fr;
+                gap: 1.25rem;
+            }
+            
+            .filters-row {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .filter-actions {
+                justify-content: center;
+                width: 100%;
+            }
+            
+            .btn-filter {
+                flex: 1;
+                justify-content: center;
+                max-width: 120px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .filters-header {
+                padding: 0.875rem 1rem;
+            }
+            
+            .filters-content {
+                padding: 1rem;
+            }
+            
+            .filters-title {
+                font-size: 0.9rem;
+            }
+            
+            .filter-actions {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+            
+            .btn-filter {
+                max-width: none;
+                justify-content: center;
+            }
+            
+            .filter-input, .filter-select {
+                padding: 0.875rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .obras-container {
+                padding: 0.25rem;
+            }
+            
+            .filters-panel {
+                margin-bottom: 1rem;
+            }
+            
+            .filters-grid {
+                gap: 1rem;
+            }
+        }
+    </style>
+
+    <!-- Lista de Obras Moderna y Responsiva -->
+    {% if obras %}
+    <div class="obras-section">
+        <div class="section-header">
+            <div class="section-info">
+                <h2 class="section-title">
+                    <i class="fas fa-list"></i>
+                    Obras Registradas
+                </h2>
+                <p class="section-subtitle">{{ obras|length }} obra{{ 's' if obras|length != 1 else '' }} encontrada{{ 's' if obras|length != 1 else '' }}</p>
+            </div>
+            <div class="view-options">
+                <button class="view-btn active" id="cardView">
+                    <i class="fas fa-th-large"></i>
+                    Cards
+                </button>
+                <button class="view-btn" id="tableView">
+                    <i class="fas fa-table"></i>
+                    Tabla
+                </button>
+            </div>
+        </div>
+
+        <!-- Vista de Cards (Por defecto) -->
+        <div id="cardViewContent" class="obras-grid">
+            {% for obra in obras %}
+            <div class="obra-card">
+                <div class="obra-card-header">
+                    <div class="obra-info-main">
+                        <h3 class="obra-title">{{ obra.nombre }}</h3>
+                        <p class="obra-description">{{ obra.descripcion[:80] if obra.descripcion else 'Sin descripción' }}{{ '...' if obra.descripcion and obra.descripcion|length > 80 else '' }}</p>
+                    </div>
+                    <div class="obra-status">
+                        {% if obra.estado == 'Planeación' %}
+                        <span class="status-badge planning">📋 {{ obra.estado }}</span>
+                        {% elif obra.estado == 'En Progreso' %}
+                        <span class="status-badge progress">⚡ {{ obra.estado }}</span>
+                        {% elif obra.estado == 'Completado' %}
+                        <span class="status-badge completed">✅ {{ obra.estado }}</span>
+                        {% elif obra.estado == 'Pausado' %}
+                        <span class="status-badge paused">⏸️ {{ obra.estado }}</span>
+                        {% elif obra.estado == 'Cancelado' %}
+                        <span class="status-badge canceled">❌ {{ obra.estado }}</span>
+                        {% else %}
+                        <span class="status-badge unknown">❓ Sin estado</span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="obra-details">
+                    <div class="detail-item">
+                        <i class="fas fa-user"></i>
+                        <span>{{ obra.cliente or 'Cliente no asignado' }}</span>
+                    </div>
+                    {% if obra.tipo_obra %}
+                    <div class="detail-item">
+                        <i class="fas fa-tag"></i>
+                        <span>{{ obra.tipo_obra }}</span>
+                    </div>
+                    {% endif %}
+                    <div class="detail-item">
+                        <i class="fas fa-calendar"></i>
+                        <span>
+                            {% if obra.fecha_inicio %}
+                                {{ obra.fecha_inicio.strftime('%d/%m/%Y') }}
+                            {% else %}
+                                Fecha no definida
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-coins"></i>
+                        <span class="obra-value">Q{{ "{:,.0f}".format(obra.valor) if obra.valor else '0' }}</span>
+                    </div>
+                </div>
+                
+                <div class="obra-actions">
+                    <a href="{{ url_for('ver_obra', id=(obra.id or obra.obra_id)) }}" class="action-btn view">
+                        <i class="fas fa-eye"></i>
+                        Ver
                     </a>
+                    <a href="{{ url_for('editar_obra', id=(obra.id or obra.obra_id)) }}" class="action-btn edit">
+                        <i class="fas fa-edit"></i>
+                        Editar
+                    </a>
+                    <button class="action-btn delete" 
+                            onclick="confirmarEliminar('{{ obra.nombre }}', '{{ url_for('eliminar_obra', id=(obra.id or obra.obra_id)) }}')">
+                        <i class="fas fa-trash"></i>
+                        Eliminar
+                    </button>
                 </div>
             </div>
+            {% endfor %}
         </div>
-    </form>
-</div>
 
-<!-- Tabla de obras -->
-{% if obras %}
-<div class="card">
-    <div class="card-header">
-        <h3 class="card-title">
-            Obras Encontradas 
-            <span class="badge">{{ obras|length }}</span>
-        </h3>
+        <!-- Vista de Tabla (Oculta inicialmente) -->
+        <div id="tableViewContent" class="table-container" style="display: none;">
+            <div class="responsive-table">
+                <table class="obras-table">
+                    <thead><tr>
+                            <th>Obra</th>
+                            <th class="hidden-sm"><i class="fas fa-user"></i> Cliente</th>
+                            <th><i class="fas fa-tasks"></i> Estado</th>
+                            <th class="hidden-md"><i class="fas fa-calendar-alt"></i> Fechas</th>
+                            <th class="hidden-sm"><i class="fas fa-coins"></i> Valor</th>
+                            <th class="text-center"><i class="fas fa-cogs"></i> Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for obra in obras %}
+                        <tr>
+                            <td>
+                                <div class="table-obra-info">
+                                    <strong>{{ obra.nombre }}</strong>
+                                    {% if obra.tipo_obra %}<br><small>{{ obra.tipo_obra }}</small>{% endif %}
+                                </div>
+                            </td>
+                            <td>{{ obra.cliente or 'No asignado' }}</td>
+                            <td>
+                                {% if obra.estado == 'Planeación' %}
+                                <span class="table-status planning">{{ obra.estado }}</span>
+                                {% elif obra.estado == 'En Progreso' %}
+                                <span class="table-status progress">{{ obra.estado }}</span>
+                                {% elif obra.estado == 'Completado' %}
+                                <span class="table-status completed">{{ obra.estado }}</span>
+                                {% elif obra.estado == 'Pausado' %}
+                                <span class="table-status paused">{{ obra.estado }}</span>
+                                {% elif obra.estado == 'Cancelado' %}
+                                <span class="table-status canceled">{{ obra.estado }}</span>
+                                {% else %}
+                                <span class="table-status unknown">Sin estado</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if obra.fecha_inicio %}
+                                    <small>Inicio: {{ obra.fecha_inicio.strftime('%d/%m/%Y') }}</small>
+                                {% endif %}
+                                {% if obra.fecha_fin %}
+                                    <br><small>Fin: {{ obra.fecha_fin.strftime('%d/%m/%Y') }}</small>
+                                {% endif %}
+                            </td>
+                            <td class="table-value">Q{{ "{:,.0f}".format(obra.valor) if obra.valor else '0' }}</td>
+                            <td>
+                                <div class="table-actions">
+                                    <a href="{{ url_for('ver_obra', id=(obra.id or obra.obra_id)) }}" class="table-action-btn view" title="Ver">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{{ url_for('editar_obra', id=(obra.id or obra.obra_id)) }}" class="table-action-btn edit" title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button class="table-action-btn delete" title="Eliminar"
+                                            onclick="confirmarEliminar('{{ obra.nombre }}', '{{ url_for('eliminar_obra', id=(obra.id or obra.obra_id)) }}')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table></div></div>
+        </div>
     </div>
-    
-    <div class="table-container">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Nombre</th>
-                    <th>Cliente</th>
-                    <th>Estado</th>
-                    <th>Fecha Inicio</th>
-                    <th>Fecha Fin</th>
-                    <th>Valor</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for obra in obras %}
-                <tr>
-                    <td>
-                        <div class="obra-name">{{ obra.nombre }}</div>
-                        {% if obra.descripcion %}
-                        <div class="obra-desc">{{ obra.descripcion[:60] }}{% if obra.descripcion|length > 60 %}...{% endif %}</div>
-                        {% endif %}
-                    </td>
-                    <td>{{ obra.cliente or 'No asignado' }}</td>
-                    <td>
-                        <span class="status-badge status-{{ obra.estado.lower().replace(' ', '-') if obra.estado else 'unknown' }}">
-                            {{ obra.estado or 'Sin estado' }}
-                        </span>
-                    </td>
-                    <td>{{ obra.fecha_inicio.strftime('%d/%m/%Y') if obra.fecha_inicio else 'No definida' }}</td>
-                    <td>{{ obra.fecha_fin.strftime('%d/%m/%Y') if obra.fecha_fin else 'No definida' }}</td>
-                    <td class="valor">${{ "{:,.0f}".format(obra.valor) if obra.valor else '0' }}</td>
-                    <td>
-                        <div class="action-buttons">
-                            <button class="btn btn-sm btn-primary" title="Ver detalles">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                            <button class="btn btn-sm btn-secondary" title="Editar">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn btn-sm btn-danger" title="Eliminar" 
-                                    onclick="return confirm('¿Está seguro de eliminar esta obra?')">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
-{% else %}
-<div class="card">
+    {% else %}
+    <!-- Estado Vacío Elegante -->
     <div class="empty-state">
-        <div class="empty-icon">
-            <i class="fas fa-building"></i>
+        <div class="empty-illustration">
+            <div class="empty-icon">
+                <i class="fas fa-building"></i>
+            </div>
+            <div class="empty-circles">
+                <div class="circle circle-1"></div>
+                <div class="circle circle-2"></div>
+                <div class="circle circle-3"></div>
+            </div>
         </div>
-        <h3>No se encontraron obras</h3>
-        <p>No hay obras que coincidan con los criterios de búsqueda.</p>
-        <a href="{{ url_for('crear_obra') }}" class="btn btn-primary">
-            <i class="fas fa-plus"></i>
-            Crear Nueva Obra
-        </a>
+        <div class="empty-content">
+            <h3 class="empty-title">¡Comienza tu primer proyecto!</h3>
+            <p class="empty-description">
+                No tienes obras registradas aún. Crea tu primera obra y comienza a gestionar tus proyectos de construcción de manera profesional.
+            </p>
+            <div class="empty-actions">
+                <a href="{{ url_for('crear_obra') }}" class="btn-empty primary">
+                    <i class="fas fa-plus"></i>
+                    Crear Mi Primera Obra
+                </a>
+                <a href="{{ url_for('tipos_obra_listar') }}" class="btn-empty secondary">
+                    <i class="fas fa-list"></i>
+                    Ver Tipos de Obra
+                </a>
+            </div>
+        </div>
     </div>
+    {% endif %}
 </div>
-{% endif %}
 
+<!-- Estilos CSS para la nueva vista -->
 <style>
-.page-header {
-    margin-bottom: 30px;
+/* Sección de obras */
+.obras-section {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+    border: 1px solid var(--vanilla-200);
 }
 
-.header-content {
+.section-header {
+    background: linear-gradient(135deg, var(--vanilla-50), var(--vanilla-100));
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--vanilla-200);
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
 }
 
-.page-header h1 {
-    font-size: 28px;
+.section-info {
+    flex: 1;
+    min-width: 200px;
+}
+
+.section-title {
+    font-size: 1.375rem;
     font-weight: 700;
-    color: #2c3e50;
-    margin-bottom: 8px;
-}
-
-.page-header p {
-    color: #6c757d;
-    font-size: 16px;
-}
-
-.search-form {
-    padding: 20px;
-}
-
-.filter-buttons {
+    color: var(--prussian-blue-700);
+    margin-bottom: 0.375rem;
     display: flex;
-    gap: 10px;
+    align-items: center;
+    gap: 0.5rem;
 }
 
-.badge {
-    background-color: #6c757d;
+.section-title i {
+    color: var(--orange-wheel-500);
+    font-size: 1.25rem;
+}
+
+.section-subtitle {
+    color: var(--prussian-blue-400);
+    font-size: 0.875rem;
+}
+
+.view-options {
+    display: flex;
+    gap: 0.25rem;
+    background: white;
+    padding: 0.25rem;
+    border-radius: 8px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    flex-shrink: 0;
+}
+
+.view-btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    background: transparent;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    color: var(--prussian-blue-500);
+    font-size: 0.8rem;
+    white-space: nowrap;
+}
+
+.view-btn.active, .view-btn:hover {
+    background: var(--orange-wheel-500);
     color: white;
-    padding: 4px 8px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 500;
-}
-
-.obra-name {
-    font-weight: 600;
-    color: #2c3e50;
-    margin-bottom: 4px;
-}
-
-.obra-desc {
-    font-size: 12px;
-    color: #6c757d;
-    font-style: italic;
-}
-
-.status-badge {
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 12px;
-    font-weight: 500;
-    text-transform: uppercase;
-}
-
-.status-planeación {
-    background-color: #fff3cd;
-    color: #856404;
-    border: 1px solid #ffeaa7;
-}
-
-.status-en-progreso {
-    background-color: #d1ecf1;
-    color: #0c5460;
-    border: 1px solid #bee5eb;
-}
-
-.status-pausado {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-}
-
-.status-completado {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-}
-
-.status-cancelado {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-}
-
-.status-unknown {
-    background-color: #e9ecef;
-    color: #6c757d;
-    border: 1px solid #ced4da;
-}
-
-.valor {
-    font-family: monospace;
-    font-weight: 600;
-    color: #28a745;
-}
-
-.action-buttons {
-    display: flex;
-    gap: 5px;
-}
-
-.btn-sm {
-    padding: 6px 10px;
-    font-size: 12px;
-}
-
-.empty-state {
-    text-align: center;
-    padding: 60px 20px;
-}
-
-.empty-icon {
-    font-size: 64px;
-    color: #e9ecef;
-    margin-bottom: 20px;
-}
-
-.empty-state h3 {
-    color: #2c3e50;
-    margin-bottom: 10px;
-}
-
-.empty-state p {
-    color: #6c757d;
-    margin-bottom: 30px;
 }
 
 @media (max-width: 768px) {
-    .header-content {
+    .section-header {
         flex-direction: column;
         align-items: stretch;
-        gap: 15px;
+        padding: 1rem;
+        gap: 1rem;
     }
     
-    .filter-buttons {
+    .section-title {
+        font-size: 1.25rem;
+        justify-content: center;
+    }
+    
+    .section-subtitle {
+        text-align: center;
+    }
+    
+    .view-options {
+        align-self: center;
+    }
+}
+
+/* Grid de obras (Vista de cards) */
+.obras-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+    padding: 1.25rem;
+}
+
+.obra-card {
+    background: white;
+    border: 1px solid var(--vanilla-200);
+    border-radius: 10px;
+    padding: 1.25rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.obra-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    border-color: var(--orange-wheel-300);
+}
+
+.obra-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    gap: 0.875rem;
+}
+
+.obra-info-main {
+    flex: 1;
+    min-width: 0;
+}
+
+.obra-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--prussian-blue-700);
+    margin-bottom: 0.375rem;
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.obra-description {
+    color: var(--prussian-blue-400);
+    line-height: 1.4;
+    font-size: 0.8rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.obra-status {
+    flex-shrink: 0;
+}
+
+.status-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.status-badge.planning {
+    background: rgba(252, 191, 73, 0.1);
+    color: var(--xanthous-700);
+    border: 1px solid var(--xanthous-300);
+}
+
+.status-badge.progress {
+    background: rgba(247, 127, 0, 0.1);
+    color: var(--orange-wheel-700);
+    border: 1px solid var(--orange-wheel-300);
+}
+
+.status-badge.completed {
+    background: rgba(34, 197, 94, 0.1);
+    color: #15803d;
+    border: 1px solid #86efac;
+}
+
+.status-badge.paused {
+    background: rgba(107, 114, 128, 0.1);
+    color: #374151;
+    border: 1px solid #d1d5db;
+}
+
+.status-badge.canceled {
+    background: rgba(214, 40, 40, 0.1);
+    color: var(--fire-engine-red-700);
+    border: 1px solid var(--fire-engine-red-300);
+}
+
+.status-badge.unknown {
+    background: rgba(156, 163, 175, 0.1);
+    color: #6b7280;
+    border: 1px solid #d1d5db;
+}
+
+.obra-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.detail-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--prussian-blue-600);
+}
+
+.detail-item i {
+    width: 14px;
+    color: var(--orange-wheel-500);
+    flex-shrink: 0;
+    font-size: 0.75rem;
+}
+
+.obra-value {
+    font-weight: 700;
+    color: var(--fire-engine-red-600);
+}
+
+.obra-actions {
+    display: flex;
+    gap: 0.375rem;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+}
+
+.action-btn {
+    padding: 0.375rem 0.75rem;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    white-space: nowrap;
+}
+
+.action-btn.view {
+    background: var(--prussian-blue-50);
+    color: var(--prussian-blue-600);
+    border-color: var(--prussian-blue-200);
+}
+
+.action-btn.view:hover {
+    background: var(--prussian-blue-100);
+}
+
+.action-btn.edit {
+    background: var(--orange-wheel-50);
+    color: var(--orange-wheel-600);
+    border-color: var(--orange-wheel-200);
+}
+
+.action-btn.edit:hover {
+    background: var(--orange-wheel-100);
+}
+
+.action-btn.delete {
+    background: var(--fire-engine-red-50);
+    color: var(--fire-engine-red-600);
+    border-color: var(--fire-engine-red-200);
+}
+
+.action-btn.delete:hover {
+    background: var(--fire-engine-red-100);
+}
+
+/* Vista de tabla */
+.table-container {
+    padding: 2rem;
+}
+
+.responsive-table {
+    overflow-x: auto;
+    border-radius: 12px;
+    border: 1px solid var(--vanilla-200);
+}
+
+.obras-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+.obras-table th {
+    background: linear-gradient(135deg, var(--prussian-blue-50), var(--prussian-blue-100));
+    color: var(--prussian-blue-700);
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    border-bottom: 2px solid var(--prussian-blue-200);
+}
+
+.obras-table td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--vanilla-200);
+    vertical-align: top;
+}
+
+.obras-table tbody tr:hover {
+    background: var(--vanilla-50);
+}
+
+.table-obra-info strong {
+    color: var(--prussian-blue-700);
+}
+
+.table-obra-info small {
+    color: var(--prussian-blue-400);
+}
+
+.table-status {
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.table-status.planning { background: var(--xanthous-100); color: var(--xanthous-700); }
+.table-status.progress { background: var(--orange-wheel-100); color: var(--orange-wheel-700); }
+.table-status.completed { background: #dcfce7; color: #15803d; }
+.table-status.paused { background: #f3f4f6; color: #374151; }
+.table-status.canceled { background: var(--fire-engine-red-100); color: var(--fire-engine-red-700); }
+.table-status.unknown { background: #f9fafb; color: #6b7280; }
+
+.table-value {
+    font-weight: 700;
+    color: var(--fire-engine-red-600);
+}
+
+.table-actions {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.table-action-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    font-size: 0.8rem;
+}
+
+.table-action-btn.view {
+    background: var(--prussian-blue-100);
+    color: var(--prussian-blue-600);
+}
+
+.table-action-btn.edit {
+    background: var(--orange-wheel-100);
+    color: var(--orange-wheel-600);
+}
+
+.table-action-btn.delete {
+    background: var(--fire-engine-red-100);
+    color: var(--fire-engine-red-600);
+}
+
+.table-action-btn:hover {
+    transform: scale(1.1);
+}
+
+/* Estado vacío - Optimizado */
+.empty-state {
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.empty-illustration {
+    position: relative;
+    width: 160px;
+    height: 160px;
+    margin: 0 auto;
+}
+
+.empty-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, var(--orange-wheel-100), var(--orange-wheel-200));
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: var(--orange-wheel-600);
+    z-index: 2;
+}
+
+.empty-circles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.circle {
+    position: absolute;
+    border: 2px solid;
+    border-radius: 50%;
+    opacity: 0.25;
+}
+
+.circle-1 {
+    width: 100px;
+    height: 100px;
+    top: 30px;
+    left: 30px;
+    border-color: var(--prussian-blue-300);
+    animation: rotate 10s linear infinite;
+}
+
+.circle-2 {
+    width: 130px;
+    height: 130px;
+    top: 15px;
+    left: 15px;
+    border-color: var(--orange-wheel-300);
+    animation: rotate 15s linear infinite reverse;
+}
+
+.circle-3 {
+    width: 160px;
+    height: 160px;
+    top: 0;
+    left: 0;
+    border-color: var(--xanthous-300);
+    animation: rotate 20s linear infinite;
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.empty-content {
+    max-width: 420px;
+}
+
+.empty-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--prussian-blue-700);
+    margin-bottom: 0.75rem;
+}
+
+.empty-description {
+    font-size: 0.95rem;
+    color: var(--prussian-blue-400);
+    line-height: 1.5;
+    margin-bottom: 1.5rem;
+}
+
+.empty-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn-empty {
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    font-size: 0.875rem;
+    white-space: nowrap;
+}
+
+.btn-empty.primary {
+    background: var(--orange-wheel-500);
+    color: white;
+}
+
+.btn-empty.primary:hover {
+    background: var(--orange-wheel-600);
+    transform: translateY(-1px);
+}
+
+.btn-empty.secondary {
+    background: var(--vanilla-200);
+    color: var(--prussian-blue-600);
+}
+
+.btn-empty.secondary:hover {
+    background: var(--vanilla-300);
+    transform: translateY(-1px);
+}
+
+/* Responsive - Optimizado */
+@media (max-width: 1200px) {
+    .obras-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 0.875rem;
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 1024px) {
+    .obras-grid {
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        padding: 1rem;
+        gap: 0.875rem;
+    }
+    
+    .obra-card {
+        padding: 1rem;
+    }
+    
+    .obra-title {
+        font-size: 1rem;
+    }
+    
+    .obra-description {
+        font-size: 0.75rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .obras-grid {
+        grid-template-columns: 1fr;
+        padding: 0.875rem;
+        gap: 0.75rem;
+    }
+    
+    .obra-card {
+        padding: 1rem;
+        margin-bottom: 0;
+    }
+    
+    .obra-card-header {
         flex-direction: column;
+        align-items: stretch;
+        gap: 0.75rem;
+        margin-bottom: 0.875rem;
     }
     
-    .table-container {
-        overflow-x: auto;
+    .obra-status {
+        align-self: flex-start;
     }
     
-    .action-buttons {
+    .obra-details {
+        margin-bottom: 1rem;
+    }
+    
+    .obra-actions {
+        justify-content: stretch;
+        gap: 0.5rem;
+    }
+    
+    .action-btn {
+        flex: 1;
+        justify-content: center;
+        padding: 0.5rem 0.875rem;
+    }
+    
+    .responsive-table {
+        font-size: 0.8rem;
+    }
+    
+    .obras-table th,
+    .obras-table td {
+        padding: 0.625rem 0.375rem;
+    }
+    
+    .table-action-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 0.75rem;
+    }
+    
+    .empty-actions {
         flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .empty-illustration {
+        width: 120px;
+        height: 120px;
+    }
+    
+    .circle-1 { width: 70px; height: 70px; top: 25px; left: 25px; }
+    .circle-2 { width: 95px; height: 95px; top: 12px; left: 12px; }
+    .circle-3 { width: 120px; height: 120px; top: 0; left: 0; }
+}
+
+@media (max-width: 480px) {
+    .obras-container {
+        padding: 0.375rem;
+    }
+    
+    .obras-grid {
+        padding: 0.75rem;
+        gap: 0.625rem;
+    }
+    
+    .obra-card {
+        padding: 0.875rem;
+    }
+    
+    .obra-title {
+        font-size: 0.95rem;
+    }
+    
+    .obra-description {
+        font-size: 0.7rem;
+    }
+    
+    .detail-item {
+        font-size: 0.75rem;
+    }
+    
+    .action-btn {
+        padding: 0.5rem;
+        font-size: 0.7rem;
+        gap: 0.25rem;
+    }
+    
+    .status-badge {
+        padding: 0.375rem 0.75rem;
+        font-size: 0.7rem;
+    }
+    
+    .empty-illustration {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .empty-icon {
+        width: 60px;
+        height: 60px;
+        font-size: 2rem;
     }
 }
 </style>
+
+<script>
+// JavaScript mejorado para la nueva interfaz
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // Toggle de filtros
+    const filtersToggle = document.getElementById('filtersToggle');
+    const filtersContent = document.getElementById('filtersContent');
+    
+    if (filtersToggle && filtersContent) {
+        filtersToggle.addEventListener('click', function() {
+            const isOpen = filtersContent.style.display !== 'none';
+            filtersContent.style.display = isOpen ? 'none' : 'block';
+            filtersToggle.innerHTML = isOpen ? '<i class="fas fa-chevron-down"></i>' : '<i class="fas fa-chevron-up"></i>';
+        });
+    }
+    
+    // Cambio entre vista de cards y tabla
+    const cardViewBtn = document.getElementById('cardView');
+    const tableViewBtn = document.getElementById('tableView');
+    const cardViewContent = document.getElementById('cardViewContent');
+    const tableViewContent = document.getElementById('tableViewContent');
+    
+    if (cardViewBtn && tableViewBtn) {
+        cardViewBtn.addEventListener('click', function() {
+            cardViewBtn.classList.add('active');
+            tableViewBtn.classList.remove('active');
+            cardViewContent.style.display = 'grid';
+            tableViewContent.style.display = 'none';
+            
+            // Guardar preferencia
+            localStorage.setItem('obrasView', 'cards');
+        });
+        
+        tableViewBtn.addEventListener('click', function() {
+            tableViewBtn.classList.add('active');
+            cardViewBtn.classList.remove('active');
+            cardViewContent.style.display = 'none';
+            tableViewContent.style.display = 'block';
+            
+            // Guardar preferencia
+            localStorage.setItem('obrasView', 'table');
+        });
+        
+        // Cargar preferencia guardada
+        const savedView = localStorage.getItem('obrasView');
+        if (savedView === 'table') {
+            tableViewBtn.click();
+        }
+    }
+    
+    // Animaciones escalonadas para las cards
+    const obraCards = document.querySelectorAll('.obra-card');
+    obraCards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        
+        setTimeout(() => {
+            card.style.transition = 'all 0.4s ease';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, index * 100);
+    });
+    
+    // Contador animado para estadísticas
+    const statNumbers = document.querySelectorAll('.stat-number');
+    const animateCounter = (element) => {
+        const target = parseInt(element.textContent);
+        let current = 0;
+        const increment = target / 30;
+        const timer = setInterval(() => {
+            current += increment;
+            if (current >= target) {
+                current = target;
+                clearInterval(timer);
+            }
+            element.textContent = Math.floor(current);
+        }, 50);
+    };
+    
+    // Usar Intersection Observer para animar cuando sea visible
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const statNumber = entry.target.querySelector('.stat-number');
+                if (statNumber && !statNumber.hasAttribute('data-animated')) {
+                    statNumber.setAttribute('data-animated', 'true');
+                    animateCounter(statNumber);
+                }
+            }
+        });
+    });
+    
+    document.querySelectorAll('.stat-card').forEach(card => {
+        observer.observe(card);
+    });
+    
+    // Búsqueda en tiempo real
+    const searchInput = document.querySelector('input[name="search"]');
+    if (searchInput) {
+        let searchTimeout;
+        
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            const query = this.value.toLowerCase().trim();
+            
+            searchTimeout = setTimeout(() => {
+                filterObras(query);
+            }, 300);
+        });
+    }
+    
+    function filterObras(query) {
+        const cards = document.querySelectorAll('.obra-card');
+        const tableRows = document.querySelectorAll('.obras-table tbody tr');
+        
+        // Filtrar cards
+        cards.forEach(card => {
+            const title = card.querySelector('.obra-title').textContent.toLowerCase();
+            const description = card.querySelector('.obra-description').textContent.toLowerCase();
+            const client = card.querySelector('.detail-item span').textContent.toLowerCase();
+            
+            const matches = title.includes(query) || 
+                          description.includes(query) || 
+                          client.includes(query);
+            
+            if (query === '' || matches) {
+                card.style.display = 'block';
+                card.style.animation = 'slideInUp 0.3s ease-out';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+        
+        // Filtrar filas de tabla
+        tableRows.forEach(row => {
+            const cells = Array.from(row.cells);
+            const matches = cells.some(cell => 
+                cell.textContent.toLowerCase().includes(query)
+            );
+            
+            if (query === '' || matches) {
+                row.style.display = '';
+                row.style.animation = 'slideInUp 0.3s ease-out';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+    
+    // Efectos de hover mejorados
+    document.querySelectorAll('.obra-card').forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-6px) scale(1.02)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+        });
+    });
+    
+    // Tooltips para botones de acción
+    document.querySelectorAll('[title]').forEach(element => {
+        element.addEventListener('mouseenter', function() {
+            if (this.getAttribute('title')) {
+                const tooltip = document.createElement('div');
+                tooltip.className = 'custom-tooltip';
+                tooltip.textContent = this.getAttribute('title');
+                tooltip.style.cssText = `
+                    position: absolute;
+                    bottom: 120%;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: var(--prussian-blue-800);
+                    color: white;
+                    padding: 6px 12px;
+                    border-radius: 6px;
+                    font-size: 0.75rem;
+                    white-space: nowrap;
+                    z-index: 1000;
+                    opacity: 0;
+                    transition: opacity 0.2s ease;
+                    pointer-events: none;
+                `;
+                
+                // Flecha del tooltip
+                const arrow = document.createElement('div');
+                arrow.style.cssText = `
+                    position: absolute;
+                    top: 100%;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    width: 0;
+                    height: 0;
+                    border-left: 4px solid transparent;
+                    border-right: 4px solid transparent;
+                    border-top: 4px solid var(--prussian-blue-800);
+                `;
+                tooltip.appendChild(arrow);
+                
+                this.style.position = 'relative';
+                this.appendChild(tooltip);
+                
+                // Animar entrada
+                setTimeout(() => {
+                    tooltip.style.opacity = '1';
+                }, 50);
+            }
+        });
+        
+        element.addEventListener('mouseleave', function() {
+            const tooltip = this.querySelector('.custom-tooltip');
+            if (tooltip) {
+                tooltip.style.opacity = '0';
+                setTimeout(() => {
+                    if (tooltip.parentNode) {
+                        tooltip.remove();
+                    }
+                }, 200);
+            }
+        });
+    });
+});
+
+// Función para confirmar eliminación
+function confirmarEliminar(nombreObra, url) {
+    if (confirm(`¿Estás seguro de que deseas eliminar la obra "${nombreObra}"?\n\nEsta acción no se puede deshacer.`)) {
+        // Crear y enviar formulario
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = url;
+        form.style.display = 'none';
+        
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+// Animaciones CSS adicionales
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    
+    @keyframes bounce {
+        0%, 20%, 53%, 80%, 100% {
+            transform: translate3d(0,0,0);
+        }
+        40%, 43% {
+            transform: translate3d(0, -15px, 0);
+        }
+        70% {
+            transform: translate3d(0, -8px, 0);
+        }
+        90% {
+            transform: translate3d(0, -2px, 0);
+        }
+    }
+    
+    .fade-in {
+        animation: fadeIn 0.6s ease-out;
+    }
+    
+    .slide-in-up {
+        animation: slideInUp 0.6s ease-out;
+    }
+    
+    .bounce {
+        animation: bounce 1s;
+    }
+`;
+document.head.appendChild(style);
+</script>
+
+
+</div>
 {% endblock %}

@@ -1,0 +1,572 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <!-- CSS para páginas de detalle -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/detail-page.css') }}">{% endblock %}
+
+{% block title %}{{ obra.nombre or 'Detalle de Obra' }} - Sistema Constructora{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/detail-page.css') }}">
+
+<div class="detail-container">
+  <!-- Header Principal Estético -->
+  <div class="detail-header fade-in-up">
+    <nav class="detail-breadcrumb">
+      <a href="{{ url_for('dashboard') }}"><i class="fas fa-home"></i> Dashboard</a>
+      <span class="detail-breadcrumb-separator">›</span>
+      <a href="{{ url_for('listar_obras') }}"><i class="fas fa-building"></i> Obras</a>
+      <span class="detail-breadcrumb-separator">›</span>
+      <span><i class="fas fa-eye"></i> Detalle</span>
+    </nav>
+    
+    <h1 class="detail-title">
+      <i class="fas fa-building"></i>
+      {{ obra.nombre or 'Obra Sin Nombre' }}
+      <span class="detail-id-badge">ID: {{ obra.id_obra or obra.id }}</span>
+    </h1>
+    
+    <p class="detail-subtitle">
+      <i class="fas fa-info-circle"></i>
+      Información completa del proyecto de construcción
+    </p>
+  </div>
+
+  <!-- Grid Principal de Información -->
+  <div class="detail-grid">
+    <!-- Columna Principal - Información de la Obra -->
+    <div class="detail-main-content">
+      
+      <!-- Información Básica de la Obra -->
+      <div class="detail-card">
+        <div class="detail-card">
+          <h3 class="info-card-title">
+            <i class="fas fa-building"></i>
+            Información General de la Obra
+          </h3>
+        </div>
+        <div class="detail-card">
+          <div class="detail-list">
+            <div class="detail-item">
+              <div class="detail-label">
+                <i class="fas fa-tag"></i>
+                Nombre del Proyecto
+              </div>
+              <div class="detail-value">{{ obra.nombre or 'No especificado' }}</div>
+            </div>
+            
+            <div class="detail-item">
+              <div class="detail-label">
+                <i class="fas fa-hammer"></i>
+                Tipo de Obra
+              </div>
+              <div class="detail-value">
+                <span class="status-badge-detail info">{{ obra.tipo_obra or 'No definido' }}</span>
+                {% if obra.es_precio_fijo %}
+                <span class="status-badge-detail success">Precio Fijo</span>
+                {% endif %}
+              </div>
+            </div>
+            
+            <div class="detail-item">
+              <div class="detail-label">
+                <i class="fas fa-map-marker-alt"></i>
+                Ubicación
+              </div>
+              <div class="detail-value">
+                {% if obra.ubicacion %}
+                <i class="fas fa-location-arrow text-orange-wheel"></i> {{ obra.ubicacion }}
+                {% else %}
+                <span class="text-prussian-blue-400">No especificada</span>
+                {% endif %}
+              </div>
+            </div>
+            
+            <div class="detail-item">
+              <div class="detail-label">
+                <i class="fas fa-info-circle"></i>
+                Estado Actual
+              </div>
+              <div class="detail-value">
+                {% if obra.estado == 'Planeación' %}
+                <span class="status-badge-detail warning">
+                {% elif obra.estado == 'En Progreso' %}
+                <span class="status-badge-detail info">
+                {% elif obra.estado == 'Completada' or obra.estado == 'Completado' %}
+                <span class="status-badge-detail success">
+                {% elif obra.estado == 'Suspendida' or obra.estado == 'Cancelado' %}
+                <span class="status-badge-detail danger">
+                {% else %}
+                <span class="status-badge-detail info">
+                {% endif %}
+                  <i class="fas fa-circle"></i>
+                  {{ obra.estado or 'En Planeación' }}
+                </span>
+              </div>
+            </div>
+          </div>
+          
+          {% if obra.descripcion %}
+          <div class="detail-item" style="grid-column: 1 / -1; margin-top: var(--spacing-md);">
+            <div class="detail-label">
+              <i class="fas fa-align-left"></i>
+              Descripción del Proyecto
+            </div>
+            <div class="detail-value" style="line-height: 1.6;">{{ obra.descripcion }}</div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    
+      <!-- Especificaciones Técnicas -->
+      {% if obra.area_m2 or obra.cantidad_estimada %}
+      <div class="detail-card">
+        <div class="detail-card">
+          <h3 class="info-card-title">
+            <i class="fas fa-ruler-combined"></i>
+            Especificaciones Técnicas
+          </h3>
+        </div>
+        <div class="detail-card">
+          <div class="detail-list">
+            {% if obra.area_m2 %}
+            <div class="detail-item">
+              <div class="detail-label">
+                <i class="fas fa-expand-arrows-alt"></i>
+                Área Total
+              </div>
+              <div class="detail-value">
+                <strong>{{ "{:,.2f}".format(obra.area_m2) }} m²</strong>
+              </div>
+            </div>
+            {% endif %}
+            
+            {% if obra.cantidad_estimada %}
+            <div class="detail-item">
+              <div class="detail-label">
+                <i class="fas fa-calculator"></i>
+                Cantidad Estimada
+              </div>
+              <div class="detail-value">
+                <strong>{{ "{:,.0f}".format(obra.cantidad_estimada) }}</strong>
+                <small>{{ obra.unidad_estimacion or 'unidades' }}</small>
+              </div>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    
+      <!-- Recursos Asignados -->
+      <div class="detail-card">
+        <div class="detail-card">
+          <h3 class="info-card-title">
+            <i class="fas fa-users-cog"></i>
+            Recursos Asignados al Proyecto
+          </h3>
+        </div>
+        <div class="detail-card">
+          
+          <!-- Equipo de Trabajo -->
+          <div style="margin-bottom: var(--spacing-xl);">
+            <h4 style="color: var(--prussian-blue-600); margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: var(--spacing-sm);">
+              <i class="fas fa-users text-orange-wheel"></i>
+              Equipo de Trabajo
+            </h4>
+            
+            {% if asignaciones and asignaciones.empleados %}
+            <div class="table-container-responsive">
+              <table class="assignment-table">
+                <thead>
+                  <tr>
+                    <th><i class="fas fa-user"></i> Empleado</th>
+                    <th><i class="fas fa-hard-hat"></i> Rol en Obra</th>
+                    <th><i class="fas fa-tools"></i> Especialidad</th>
+                    <th><i class="fas fa-contact-card"></i> Contacto</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for emp in asignaciones.empleados %}
+                  <tr>
+                    <td>
+                      <div style="font-weight: 600; color: var(--detail-text);">
+                        {{ emp.nombre_empleado }} {{ emp.apellido_empleado }}
+                      </div>
+                    </td>
+                    <td>
+                      {% if emp.tipo_asignacion == 'ARQUITECTO' %}
+                      <span class="status-badge-detail success">
+                      {% elif emp.tipo_asignacion == 'INGENIERO' %}
+                      <span class="status-badge-detail info">
+                      {% elif emp.tipo_asignacion == 'OBRERO' %}
+                      <span class="status-badge-detail warning">
+                      {% else %}
+                      <span class="status-badge-detail info">
+                      {% endif %}
+                        {{ emp.tipo_asignacion }}
+                      </span>
+                    </td>
+                    <td>
+                      <small style="color: var(--prussian-blue-500);">{{ emp.tipo_empleado }}</small>
+                    </td>
+                    <td>
+                      <div style="font-size: 0.85rem;">
+                        {% if emp.telefono %}
+                        <div><i class="fas fa-phone text-orange-wheel"></i> {{ emp.telefono }}</div>
+                        {% endif %}
+                        {% if emp.email %}
+                        <div><i class="fas fa-envelope text-prussian-blue"></i> {{ emp.email }}</div>
+                        {% endif %}
+                      </div>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% else %}
+            <div class="detail-card">
+              <div class="resource-icon">
+                <i class="fas fa-user-slash"></i>
+              </div>
+              <div class="resource-title">Sin Empleados Asignados</div>
+              <div class="resource-subtitle">No hay personal asignado a este proyecto</div>
+            </div>
+            {% endif %}
+          </div>
+          
+          <!-- Materiales Asignados -->
+          <div style="margin-bottom: var(--spacing-xl);">
+            <h4 style="color: var(--prussian-blue-600); margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: var(--spacing-sm);">
+              <i class="fas fa-boxes text-xanthous"></i>
+              Materiales Asignados
+            </h4>
+            
+            {% if asignaciones and asignaciones.materiales %}
+            <div class="table-container-responsive">
+              <table class="assignment-table">
+                <thead>
+                  <tr>
+                    <th><i class="fas fa-box"></i> Material</th>
+                    <th><i class="fas fa-plus"></i> Asignado</th>
+                    <th><i class="fas fa-minus"></i> Utilizado</th>
+                    <th><i class="fas fa-warehouse"></i> Restante</th>
+                    <th><i class="fas fa-coins"></i> Valor Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for mat in asignaciones.materiales %}
+                  <tr>
+                    <td>
+                      <strong style="color: var(--detail-text);">{{ mat.nombre_material }}</strong>
+                    </td>
+                    <td>{{ "{:,.1f}".format(mat.cantidad_asignada) }} {{ mat.unidad_material }}</td>
+                    <td>{{ "{:,.1f}".format(mat.cantidad_utilizada or 0) }} {{ mat.unidad_material }}</td>
+                    <td>
+                      {% if mat.cantidad_restante > 0 %}
+                      <span class="status-badge-detail success">
+                      {% else %}
+                      <span class="status-badge-detail warning">
+                      {% endif %}
+                        {{ "{:,.1f}".format(mat.cantidad_restante) }} {{ mat.unidad_material }}
+                      </span>
+                    </td>
+                    <td style="text-align: right; font-weight: 600; color: var(--xanthous-700);">
+                      Q{{ "{:,.2f}".format(mat.valor_total) }}
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+                <tfoot>
+                  <tr style="background: var(--xanthous-100); font-weight: 600;">
+                    <th colspan="4" style="text-align: right; color: var(--xanthous-800);">
+                      Total Valor Materiales:
+                    </th>
+                    <th style="text-align: right; color: var(--xanthous-800);">
+                      Q{{ "{:,.2f}".format(asignaciones.estadisticas.valor_total_materiales if asignaciones.estadisticas else 0) }}
+                    </th>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+            {% else %}
+            <div class="detail-card">
+              <div class="resource-icon">
+                <i class="fas fa-box-open"></i>
+              </div>
+              <div class="resource-title">Sin Materiales Asignados</div>
+              <div class="resource-subtitle">No hay materiales asignados a este proyecto</div>
+            </div>
+            {% endif %}
+          </div>
+          
+          <!-- Vehículos y Equipos -->
+          <div>
+            <h4 style="color: var(--prussian-blue-600); margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: var(--spacing-sm);">
+              <i class="fas fa-truck text-fire-engine-red"></i>
+              Vehículos y Equipos
+            </h4>
+            
+            {% if asignaciones and asignaciones.vehiculos %}
+            <div class="resource-grid">
+              {% for veh in asignaciones.vehiculos %}
+              <div class="detail-card">
+                <div class="resource-icon">
+                  <i class="fas fa-truck"></i>
+                </div>
+                <div class="resource-title">{{ veh.placa_vehiculo }}</div>
+                <div class="resource-subtitle">{{ veh.tipo_vehiculo }}</div>
+                {% if veh.estado_vehiculo == 'DISPONIBLE' %}
+                <span class="status-badge-detail success">{{ veh.estado_vehiculo }}</span>
+                {% else %}
+                <span class="status-badge-detail warning">{{ veh.estado_vehiculo }}</span>
+                {% endif %}
+              </div>
+              {% endfor %}
+            </div>
+            {% else %}
+            <div class="detail-card">
+              <div class="resource-icon">
+                <i class="fas fa-truck-loading"></i>
+              </div>
+              <div class="resource-title">Sin Vehículos Asignados</div>
+              <div class="resource-subtitle">No hay vehículos asignados a este proyecto</div>
+            </div>
+            {% endif %}
+          </div>
+          
+        </div>
+      </div>
+    
+    <!-- Información del Cliente -->
+    {% if obra.nombre_cliente %}
+    <section class="detail-section" style="margin: var(--spacing-xl) 0;">
+      <h4 style="color: var(--prussian-blue-600); margin-bottom: var(--spacing-lg); display: flex; align-items: center; gap: var(--spacing-sm);">
+        <i class="fas fa-user-tie text-fire-engine-red"></i>
+        Información del Cliente
+      </h4>
+      
+      <div class="client-info-container">
+        <div class="detail-card">
+          <div class="client-avatar">
+            <i class="fas fa-user-circle"></i>
+          </div>
+          <div class="client-details">
+            <h5 style="color: var(--detail-title); margin-bottom: var(--spacing-sm);">{{ obra.nombre_cliente }}</h5>
+            <p style="color: var(--detail-subtitle); margin: 0;">Cliente Principal del Proyecto</p>
+          </div>
+        </div>
+        
+        <div class="client-info-grid">
+          {% if obra.documento_cliente %}
+          <div class="client-info-item">
+            <div class="client-info-icon">
+              <i class="fas fa-id-card"></i>
+            </div>
+            <div class="client-info-content">
+              <div class="client-info-label">Documento</div>
+              <div class="client-info-value">{{ obra.documento_cliente }}</div>
+            </div>
+          </div>
+          {% endif %}
+          
+          {% if obra.telefono_cliente %}
+          <div class="client-info-item">
+            <div class="client-info-icon">
+              <i class="fas fa-phone"></i>
+            </div>
+            <div class="client-info-content">
+              <div class="client-info-label">Teléfono</div>
+              <div class="client-info-value">{{ obra.telefono_cliente }}</div>
+            </div>
+          </div>
+          {% endif %}
+          
+          {% if obra.email_cliente %}
+          <div class="client-info-item">
+            <div class="client-info-icon">
+              <i class="fas fa-envelope"></i>
+            </div>
+            <div class="client-info-content">
+              <div class="client-info-label">Email</div>
+              <div class="client-info-value">{{ obra.email_cliente }}</div>
+            </div>
+          </div>
+          {% endif %}
+          
+          {% if obra.direccion_cliente %}
+          <div class="client-info-item">
+            <div class="client-info-icon">
+              <i class="fas fa-map-marker-alt"></i>
+            </div>
+            <div class="client-info-content">
+              <div class="client-info-label">Dirección</div>
+              <div class="client-info-value">{{ obra.direccion_cliente }}</div>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </section>
+    {% endif %}
+  </div>
+  
+  <div class="flex-1 px-2-md-4">
+    <div class="detail-card">
+      <div class="stat-stat-header">
+        <h5 class="mb-0"><i class="fas fa-coins"></i> Información Financiera</h5>
+      </div>
+      <div class="stat-module-content text-center">
+        <div class="financial-info">
+          <h3 class="text-xanthous-600 mb-2">
+            {% if obra.valor is not none %}
+              Q{{ "{:,.2f}".format(obra.valor) }}
+            {% else %}
+              <span class="text-vanilla-600">N/D</span>
+            {% endif %}
+          </h3>
+          <p class="text-vanilla-600 mb-3">Valor Total del Proyecto</p>
+          
+          {% if obra.precio_unitario_estimado %}
+            <div class="price-breakdown">
+              <div class="mb-2">
+                <small class="text-vanilla-600">Precio Unitario:</small><br>
+                <strong class="text-prussian-blue">Q{{ "{:,.2f}".format(obra.precio_unitario_estimado) }}</strong>
+                <small class="text-vanilla-600">/ {{ obra.unidad_estimacion or 'unidad' }}</small>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    
+    <section class="detail-section timeline-section" style="margin: var(--spacing-xl) 0;">
+      <h4 style="color: var(--prussian-blue-600); margin-bottom: var(--spacing-lg); display: flex; align-items: center; gap: var(--spacing-sm);">
+        <i class="fas fa-calendar text-xanthous"></i>
+        Cronograma del Proyecto
+      </h4>
+      
+      <div class="timeline-container">
+        <div class="detail-card">
+          <div class="timeline-icon start-icon">
+            <i class="fas fa-play"></i>
+          </div>
+          <div class="timeline-content">
+            <h5>Fecha de Inicio</h5>
+            {% if obra.fecha_inicio %}
+              <div class="timeline-date">{{ obra.fecha_inicio.strftime('%d/%m/%Y') }}</div>
+            {% else %}
+              <div class="timeline-date" style="color: var(--vanilla-600);">Sin definir</div>
+            {% endif %}
+          </div>
+        </div>
+        
+        <div class="timeline-connector"></div>
+        
+        <div class="detail-card">
+          <div class="timeline-icon end-icon">
+            <i class="fas fa-flag-checkered"></i>
+          </div>
+          <div class="timeline-content">
+            <h5>Fecha de Finalización</h5>
+            {% if obra.fecha_fin %}
+              <div class="timeline-date">{{ obra.fecha_fin.strftime('%d/%m/%Y') }}</div>
+            {% else %}
+              <div class="timeline-date" style="color: var(--vanilla-600);">Sin definir</div>
+            {% endif %}
+          </div>
+        </div>
+        
+        {% if obra.fecha_inicio and obra.fecha_fin %}
+        <div class="timeline-duration">
+          <div class="detail-card">
+            <div class="duration-icon">
+              <i class="fas fa-clock"></i>
+            </div>
+            <div class="duration-content">
+              <h6>Duración Estimada</h6>
+              <div class="duration-value">{{ (obra.fecha_fin - obra.fecha_inicio).days }} días</div>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+    </section>
+    
+    <!-- Panel de Acciones -->
+    <section class="detail-section actions-section" style="margin: var(--spacing-xl) 0;">
+      <h4 style="color: var(--prussian-blue-600); margin-bottom: var(--spacing-lg); display: flex; align-items: center; gap: var(--spacing-sm);">
+        <i class="fas fa-cogs text-fire-engine-red"></i>
+        Panel de Acciones
+      </h4>
+      
+      <div class="actions-container">
+        <div class="action-group">
+          <h5 style="color: var(--detail-subtitle); margin-bottom: var(--spacing-sm); font-size: 0.9rem;">Gestión</h5>
+          <div class="action-buttons">
+            <a href="{{ url_for('editar_obra', id=obra.id_obra) }}" class="action-button primary">
+              <div class="action-icon">
+                <i class="fas fa-edit"></i>
+              </div>
+              <div class="action-text">
+                <strong>Editar Obra</strong>
+                <small>Modificar información</small>
+              </div>
+            </a>
+            
+            <a href="{{ url_for('listar_avances') }}?obra={{ obra.id_obra }}" class="action-button secondary">
+              <div class="action-icon">
+                <i class="fas fa-chart-line"></i>
+              </div>
+              <div class="action-text">
+                <strong>Ver Avances</strong>
+                <small>Seguimiento del progreso</small>
+              </div>
+            </a>
+            
+            <a href="{{ url_for('listar_contratos') }}?obra={{ obra.id_obra }}" class="action-button accent">
+              <div class="action-icon">
+                <i class="fas fa-file-contract"></i>
+              </div>
+              <div class="action-text">
+                <strong>Contratos</strong>
+                <small>Gestionar contratos</small>
+              </div>
+            </a>
+          </div>
+        </div>
+        
+        <div class="action-group">
+          <h5 style="color: var(--detail-subtitle); margin-bottom: var(--spacing-sm); font-size: 0.9rem;">Navegación</h5>
+          <div class="action-buttons">
+            <a href="{{ url_for('listar_obras') }}" class="action-button neutral">
+              <div class="action-icon">
+                <i class="fas fa-arrow-left"></i>
+              </div>
+              <div class="action-text">
+                <strong>Volver</strong>
+                <small>Lista de obras</small>
+              </div>
+            </a>
+            
+            <form action="{{ url_for('eliminar_obra', id=obra.id_obra) }}" method="post" 
+                  onsubmit="return confirm('¿Está seguro de eliminar esta obra? Esta acción no se puede deshacer.');" 
+                  style="margin: 0;">
+              <button type="submit" class="action-button danger">
+                <div class="action-icon">
+                  <i class="fas fa-trash"></i>
+                </div>
+                <div class="action-text">
+                  <strong>Eliminar</strong>
+                  <small>Eliminar obra</small>
+                </div>
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+  </div>
+</div>
+{% endblock %}

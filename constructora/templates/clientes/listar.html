@@ -1,0 +1,314 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sistema-unificado.css') }}">
+
+<script>
+// Mejoras JavaScript automáticas para tablas
+document.addEventListener('DOMContentLoaded', function() {
+    // Aplicar efectos de hover a filas de tabla
+    const tableRows = document.querySelectorAll('.data-table-enhanced tbody tr, table tbody tr');
+    tableRows.forEach((row, index) => {
+        row.style.animationDelay = `${index * 0.1}s`;
+        row.classList.add('fade-in-up');
+        
+        row.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+            this.style.boxShadow = '0 4px 15px rgba(247, 127, 0, 0.2)';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = 'none';
+        });
+    });
+    
+    // Mejorar botones de acción con tooltips
+    const actionButtons = document.querySelectorAll('.btn-action-enhanced, .action-buttons a, .action-buttons button');
+    actionButtons.forEach(button => {
+        if (!button.querySelector('.custom-tooltip')) {
+            button.addEventListener('mouseenter', function() {
+                const title = this.getAttribute('title');
+                if (title) {
+                    const tooltip = document.createElement('div');
+                    tooltip.className = 'custom-tooltip';
+                    tooltip.textContent = title;
+                    tooltip.style.cssText = `
+                        position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+                        background: var(--prussian-blue-700); color: var(--vanilla);
+                        padding: 4px 8px; border-radius: 4px; font-size: 0.7rem;
+                        white-space: nowrap; z-index: 1000; margin-bottom: 5px;
+                    `;
+                    this.style.position = 'relative';
+                    this.appendChild(tooltip);
+                }
+            });
+            
+            button.addEventListener('mouseleave', function() {
+                const tooltip = this.querySelector('.custom-tooltip');
+                if (tooltip) tooltip.remove();
+            });
+        }
+    });
+    
+    // Contador animado para números
+    const statNumbers = document.querySelectorAll('.stat-number-enhanced, .stat-number');
+    statNumbers.forEach(stat => {
+        const finalNumber = parseInt(stat.textContent) || 0;
+        if (finalNumber > 0) {
+            let currentNumber = 0;
+            const increment = Math.max(1, Math.ceil(finalNumber / 20));
+            const timer = setInterval(() => {
+                currentNumber += increment;
+                if (currentNumber >= finalNumber) {
+                    currentNumber = finalNumber;
+                    clearInterval(timer);
+                }
+                stat.textContent = currentNumber;
+            }, 100);
+        }
+    });
+});
+</script>
+{% endblock %}
+
+{% block title %}Clientes - Sistema Constructora
+<script>
+// Mejoras JavaScript automáticas para tablas
+document.addEventListener('DOMContentLoaded', function() {
+    // Aplicar efectos de hover a filas de tabla
+    const tableRows = document.querySelectorAll('.data-table-enhanced tbody tr, table tbody tr');
+    tableRows.forEach((row, index) => {
+        row.style.animationDelay = `${index * 0.1}s`;
+        row.classList.add('fade-in-up');
+        
+        row.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+            this.style.boxShadow = '0 4px 15px rgba(247, 127, 0, 0.2)';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = 'none';
+        });
+    });
+    
+    // Mejorar botones de acción con tooltips
+    const actionButtons = document.querySelectorAll('.btn-action-enhanced, .action-buttons a, .action-buttons button');
+    actionButtons.forEach(button => {
+        if (!button.querySelector('.custom-tooltip')) {
+            button.addEventListener('mouseenter', function() {
+                const title = this.getAttribute('title');
+                if (title) {
+                    const tooltip = document.createElement('div');
+                    tooltip.className = 'custom-tooltip';
+                    tooltip.textContent = title;
+                    tooltip.style.cssText = `
+                        position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+                        background: var(--prussian-blue-700); color: var(--vanilla);
+                        padding: 4px 8px; border-radius: 4px; font-size: 0.7rem;
+                        white-space: nowrap; z-index: 1000; margin-bottom: 5px;
+                    `;
+                    this.style.position = 'relative';
+                    this.appendChild(tooltip);
+                }
+            });
+            
+            button.addEventListener('mouseleave', function() {
+                const tooltip = this.querySelector('.custom-tooltip');
+                if (tooltip) tooltip.remove();
+            });
+        }
+    });
+    
+    // Contador animado para números
+    const statNumbers = document.querySelectorAll('.stat-number-enhanced, .stat-number');
+    statNumbers.forEach(stat => {
+        const finalNumber = parseInt(stat.textContent) || 0;
+        if (finalNumber > 0) {
+            let currentNumber = 0;
+            const increment = Math.max(1, Math.ceil(finalNumber / 20));
+            const timer = setInterval(() => {
+                currentNumber += increment;
+                if (currentNumber >= finalNumber) {
+                    currentNumber = finalNumber;
+                    clearInterval(timer);
+                }
+                stat.textContent = currentNumber;
+            }, 100);
+        }
+    });
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/enhanced-tables.css') }}">
+
+<div class="page-container animate-fade-in">
+    <!-- Header de página -->
+    <div class="page-container"><div class="page-header fade-in-up">
+        <div class="breadcrumb-nav">
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <span class="breadcrumb-separator">/</span>
+            <span>Clientes</span>
+        </div>
+        <h1 class="page-title">
+            <i class="fas fa-list text-xanthous"></i>
+            Gestión de Clientes
+        </h1>
+        <p class="page-subtitle">Administra todos los registros de clientes</p>
+    </div>
+
+    <!-- Acciones principales -->
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">
+                <i class="fas fa-table"></i>
+                Lista de Clientes
+            </h2>
+            <a href="{{ url_for('crear_cliente') }}" class="btn btn-accent">
+                <i class="fas fa-plus"></i>
+                Agregar cliente
+            </a>
+        </div>
+        <div class="card-body">
+            {% if clientes %}
+            <div class="table-container">
+                <div class="table-wrapper fade-in-up"><div class="table-container-responsive"><table class="data-table-enhanced">
+                    <thead><tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th><i class="fas fa-tasks"></i> Estado</th>
+                            <th class="hidden-md"><i class="fas fa-calendar-alt"></i> Fecha Creación</th>
+                            <th class="text-center"><i class="fas fa-cogs"></i> Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in clientes %}
+                        <tr>
+                            <td><span class="badge badge-info">{{ item.id or 'N/A' }}</span></td>
+                            <td>{{ item.nombre or 'Sin nombre' }}</td>
+                            <td>
+                                <span class="status-badge-enhanced success">Activo</span>
+                            </td>
+                            <td>{{ item.fecha_creacion or 'N/A' }}</td>
+                            <td>
+                                <div class="flex gap-2">
+                                    <a href="{{ url_for('ver_cliente', id=item.id) }}" 
+                                       class="btn btn-primary" title="Ver detalles">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{{ url_for('editar_cliente', id=item.id) }}" 
+                                       class="btn btn-warning" title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-danger" 
+                                            onclick="confirmarEliminacion({{ item.id }})" title="Eliminar">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table></div></div>
+            {% else %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                No hay registros de clientes disponibles. 
+                <a href="{{ url_for('crear_cliente') }}">¡Crea el primero!</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+function confirmarEliminacion(id) {
+    if (confirm('¿Estás seguro de que deseas eliminar este registro?')) {
+        fetch(`{{ url_for('eliminar_cliente', id=0) }}`.replace('0', id), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('Error al eliminar el registro');
+            }
+        });
+    }
+}
+</script>
+
+<script>
+// Mejoras JavaScript automáticas para tablas
+document.addEventListener('DOMContentLoaded', function() {
+    // Aplicar efectos de hover a filas de tabla
+    const tableRows = document.querySelectorAll('.data-table-enhanced tbody tr, table tbody tr');
+    tableRows.forEach((row, index) => {
+        row.style.animationDelay = `${index * 0.1}s`;
+        row.classList.add('fade-in-up');
+        
+        row.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+            this.style.boxShadow = '0 4px 15px rgba(247, 127, 0, 0.2)';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = 'none';
+        });
+    });
+    
+    // Mejorar botones de acción con tooltips
+    const actionButtons = document.querySelectorAll('.btn-action-enhanced, .action-buttons a, .action-buttons button');
+    actionButtons.forEach(button => {
+        if (!button.querySelector('.custom-tooltip')) {
+            button.addEventListener('mouseenter', function() {
+                const title = this.getAttribute('title');
+                if (title) {
+                    const tooltip = document.createElement('div');
+                    tooltip.className = 'custom-tooltip';
+                    tooltip.textContent = title;
+                    tooltip.style.cssText = `
+                        position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+                        background: var(--prussian-blue-700); color: var(--vanilla);
+                        padding: 4px 8px; border-radius: 4px; font-size: 0.7rem;
+                        white-space: nowrap; z-index: 1000; margin-bottom: 5px;
+                    `;
+                    this.style.position = 'relative';
+                    this.appendChild(tooltip);
+                }
+            });
+            
+            button.addEventListener('mouseleave', function() {
+                const tooltip = this.querySelector('.custom-tooltip');
+                if (tooltip) tooltip.remove();
+            });
+        }
+    });
+    
+    // Contador animado para números
+    const statNumbers = document.querySelectorAll('.stat-number-enhanced, .stat-number');
+    statNumbers.forEach(stat => {
+        const finalNumber = parseInt(stat.textContent) || 0;
+        if (finalNumber > 0) {
+            let currentNumber = 0;
+            const increment = Math.max(1, Math.ceil(finalNumber / 20));
+            const timer = setInterval(() => {
+                currentNumber += increment;
+                if (currentNumber >= finalNumber) {
+                    currentNumber = finalNumber;
+                    clearInterval(timer);
+                }
+                stat.textContent = currentNumber;
+            }, 100);
+        }
+    });
+});
+</script>
+{% endblock %}

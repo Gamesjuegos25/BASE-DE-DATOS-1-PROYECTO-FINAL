@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Requisición - Sistema Constructora{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/create-forms.css') }}">
+
+
+<div class="container">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+        <a href="{{ url_for('dashboard') }}">Dashboard</a> /
+        <a href="{{ url_for('listar_requisiciones') }}">Requisiciones</a> /
+        <span>Editar</span>
+    </nav>
+
+    <div class="page-header">
+        <h1><i class="fas fa-edit"></i> Editar Requisición</h1>
+        <p class="subtitle">Modifica los datos de la requisición #{{ requisicion.id_requisicion }}</p>
+    </div>
+
+    <div class="form-card">
+        <div class="create-form-container">
+<form method="POST" action="{{ url_for('editar_requisicion', id=requisicion.id_requisicion) }}">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="fecha_requisicion">
+                        <i class="fas fa-calendar-alt"></i> Fecha
+                    </label>
+                    <input type="date" id="fecha_requisicion" name="fecha_requisicion" 
+                           value="{{ requisicion.fecha_requisicion }}">
+                </div>
+
+                <div class="form-group">
+                    <label for="estado_requisicion">
+                        <i class="fas fa-info-circle"></i> Estado
+                    </label>
+                    <select id="estado_requisicion" name="estado_requisicion">
+                        <option value="Pendiente" {% if requisicion.estado_requisicion == 'Pendiente' %}selected{% endif %}>Pendiente</option>
+                        <option value="Aprobada" {% if requisicion.estado_requisicion == 'Aprobada' %}selected{% endif %}>Aprobada</option>
+                        <option value="Rechazada" {% if requisicion.estado_requisicion == 'Rechazada' %}selected{% endif %}>Rechazada</option>
+                        <option value="En Proceso" {% if requisicion.estado_requisicion == 'En Proceso' %}selected{% endif %}>En Proceso</option>
+                        <option value="Completada" {% if requisicion.estado_requisicion == 'Completada' %}selected{% endif %}>Completada</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="area_id">
+                        <i class="fas fa-sitemap"></i> Área Solicitante
+                    </label>
+                    <select id="area_id" name="area_id">
+                        <option value="">Sin área específica</option>
+                        {% for area in areas %}
+                            <option value="{{ area.id_area }}" 
+                                    {% if requisicion.id_area == area.id_area %}selected{% endif %}>
+                                {{ area.nombre_area }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Actualizar Requisición
+                </button>
+                <a href="{{ url_for('ver_requisicion', id=requisicion.id_requisicion) }}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,130 +1,229 @@
 {% extends "base.html" %}
 
+{% block head %}
+    <!-- CSS para formularios -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/form-pages.css') }}">
+    <!-- CSS y JS estandarizados para calendarios -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/calendar-styles.css') }}">
+    <script src="{{ url_for('static', filename='js/calendar-utils.js') }}"></script>
+{% endblock %}
+
+
 {% block title %}Nuevo Empleado - Sistema Constructora{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="header-section">
-        <h1>👷‍♂️ Nuevo Empleado</h1>
-        <a href="{{ url_for('listar_empleados') }}" class="btn-secondary">
-            ⬅️ Volver a Empleados
-        </a>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/create-forms.css') }}">
+
+<div class="create-form-max-w-7xl mx-auto px-6">
+    <!-- Header de página estilo detalle -->
+    <div class="create-page-header">
+        <nav class="breadcrumb">
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <span class="breadcrumb-separator">/</span>
+            <a href="{{ url_for('listar_empleados') }}">Empleados</a>
+            <span class="breadcrumb-separator">/</span>
+            <span>Nuevo</span>
+        </nav>
+        <h1 class="create-page-title">
+            <i class="fas fa-user-plus"></i>
+            Crear Nuevo Empleado
+        </h1>
     </div>
-    
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="alert alert-{{ category }}">
-                    {{ message }}
+
+    <div class="max-w-7xl mx-auto px-6-fluid">
+        <form method="POST" action="{{ url_for('crear_empleado') }}" id="create-empleado-form" class="needs-validation" novalidate>
+            <div class="create-form-flex flex-wrap -mx-2">
+                <!-- Información Personal -->
+                <div class="form-card">
+                    <div class="stat-stat-header">
+                        <h5><i class="fas fa-user"></i> Información Personal</h5>
+                    </div>
+                    <div class="stat-module-content">
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-id-stat-card"></i>Nombre<span class="required">*</span>
+                            </label>
+                            <input class="form-input" id="nombre_empleado" name="nombre_empleado" 
+                                   placeholder="Nombre del empleado" 
+                                   value="{{ request.form.nombre_empleado if request.form else '' }}" required>
+                            <div class="invalid-feedback">
+                                Por favor, ingrese el nombre del empleado.
+                            </div>
+                        </div>
+
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-id-stat-card"></i>Apellido<span class="required">*</span>
+                            </label>
+                            <input class="form-input" id="apellido_empleado" name="apellido_empleado" 
+                                   placeholder="Apellido del empleado"
+                                   value="{{ request.form.apellido_empleado if request.form else '' }}" required>
+                            <div class="invalid-feedback">
+                                Por favor, ingrese el apellido del empleado.
+                            </div>
+                        </div>
+
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-briefcase"></i>Tipo de Empleado<span class="required">*</span>
+                            </label>
+                            <select class="form-select" id="tipo_empleado" name="tipo_empleado" required>
+                                <option value="">Seleccionar tipo...</option>
+                                <optgroup label="👔 Profesionales (Q7,200 - Q9,500)">
+                                    <option value="ARQUITECTO" {{ 'selected' if request.form and request.form.tipo_empleado == 'ARQUITECTO' else '' }}>🏗️ Arquitecto - Q9,500/mes</option>
+                                    <option value="INGENIERO" {{ 'selected' if request.form and request.form.tipo_empleado == 'INGENIERO' else '' }}>⚡ Ingeniero - Q8,500/mes</option>
+                                    <option value="ADMINISTRADOR" {{ 'selected' if request.form and request.form.tipo_empleado == 'ADMINISTRADOR' else '' }}>� Administrador - Q7,200/mes</option>
+                                </optgroup>
+                                <optgroup label="👨‍💼 Mandos Medios (Q4,800 - Q6,200)">
+                                    <option value="SUPERVISOR" {{ 'selected' if request.form and request.form.tipo_empleado == 'SUPERVISOR' else '' }}>👨‍💼 Supervisor - Q6,200/mes</option>
+                                    <option value="ADMINISTRATIVO" {{ 'selected' if request.form and request.form.tipo_empleado == 'ADMINISTRATIVO' else '' }}>📋 Administrativo - Q4,800/mes</option>
+                                </optgroup>
+                                <optgroup label="🔧 Personal Técnico (Q3,500 - Q4,200)">
+                                    <option value="ALMACENISTA" {{ 'selected' if request.form and request.form.tipo_empleado == 'ALMACENISTA' else '' }}>📦 Almacenista - Q4,200/mes</option>
+                                    <option value="CONDUCTOR" {{ 'selected' if request.form and request.form.tipo_empleado == 'CONDUCTOR' else '' }}>🚛 Conductor - Q3,800/mes</option>
+                                    <option value="OBRERO_ESPECIALIZADO" {{ 'selected' if request.form and request.form.tipo_empleado == 'OBRERO_ESPECIALIZADO' else '' }}>🔧 Obrero Especializado - Q3,500/mes</option>
+                                </optgroup>
+                                <optgroup label="👷 Personal Operativo (Q2,600 - Q3,200)">
+                                    <option value="OPERARIO" {{ 'selected' if request.form and request.form.tipo_empleado == 'OPERARIO' else '' }}>⚒️ Operario - Q3,200/mes</option>
+                                    <option value="OBRERO" {{ 'selected' if request.form and request.form.tipo_empleado == 'OBRERO' else '' }}>👷 Obrero - Q2,800/mes</option>
+                                    <option value="SEGURIDAD" {{ 'selected' if request.form and request.form.tipo_empleado == 'SEGURIDAD' else '' }}>🛡️ Seguridad - Q2,600/mes</option>
+                                </optgroup>
+                            </select>
+                            <div class="invalid-feedback">
+                                Por favor, seleccione el tipo de empleado.
+                            </div>
+                        </div>
+
+                        <!-- Fecha de ingreso estandarizada -->
+                        <div class="calendar-field-group" data-field-type="fecha_emision">
+                            <label for="fecha_ingreso" class="form-label">
+                                <i class="fas fa-calendar-plus text-xanthous-600"></i> Fecha de Ingreso
+                            </label>
+                            <div class="input-wrapper date-input-wrapper">
+                                <input 
+                                    type="date" 
+                                    class="form-input standardized-calendar" 
+                                    name="fecha_ingreso" 
+                                    id="fecha_ingreso"
+                                    value="{{ request.form.fecha_ingreso if request.form else '' }}"
+                                    placeholder="Fecha de ingreso"
+                                    max="{{ 'now'|strftime('%Y-%m-%d') }}"
+                                    data-field-type="fecha_emision"
+                                />
+                                <i class="fas fa-calendar-alt input-icon"></i>
+                            </div>
+                            <small class="form-help text-vanilla-600">
+                                Fecha de ingreso del empleado a la empresa (no fechas futuras)
+                            </small>
+                        </div>
+                    </div>
                 </div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-    
-    <div class="form-container">
-        <form method="POST" class="form-modern">
-            <div class="form-section">
-                <h3>📋 Información Personal</h3>
-                
-                <div class="form-group">
-                    <label for="nombre">Nombre Completo *</label>
-                    <input type="text" 
-                           id="nombre" 
-                           name="nombre" 
-                           required 
-                           placeholder="Ej: Juan Carlos Pérez"
-                           value="{{ request.form.nombre if request.form else '' }}">
+
+                <!-- Información de Contacto y Salario -->
+                <div class="form-card">
+                    <div class="stat-stat-header">
+                        <h5><i class="fas fa-address-stat-card"></i> Contacto y Salario</h5>
+                    </div>
+                    <div class="stat-module-content">
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-phone"></i>Teléfono
+                            </label>
+                            <input class="form-input" id="telefono" name="telefono" 
+                                   placeholder="Ej: +57 300 123 4567"
+                                   value="{{ request.form.telefono if request.form else '' }}">
+                        </div>
+
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-envelope"></i>Email
+                            </label>
+                            <input class="form-input" id="email" name="email" 
+                                   placeholder="empleado@empresa.com"
+                                   value="{{ request.form.email if request.form else '' }}">
+                        </div>
+
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-dollar-sign text-xanthous"></i>Salario Fijo (Automático)
+                            </label>
+                            <input class="form-input" id="salario_fijo_empleado" name="salario_fijo_empleado" 
+                                   placeholder="Se asignará automáticamente según el cargo" readonly
+                                   value="{{ request.form.salario_fijo_empleado if request.form else '' }}"
+                                   style="background-color: #f8f9fa; cursor: not-allowed;">
+                            <div class="create-form-text">
+                                <i class="fas fa-info-circle text-prussian-blue-700"></i>El salario se asigna automáticamente según el tipo de empleado seleccionado
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                
-                <div class="form-group">
-                    <label for="tipo">Tipo/Cargo *</label>
-                    <select id="tipo" name="tipo" required>
-                        <option value="">Seleccionar cargo...</option>
-                        <option value="Operario" {{ 'selected' if request.form and request.form.tipo == 'Operario' else '' }}>👷 Operario</option>
-                        <option value="Supervisor" {{ 'selected' if request.form and request.form.tipo == 'Supervisor' else '' }}>👨‍💼 Supervisor</option>
-                        <option value="Ingeniero" {{ 'selected' if request.form and request.form.tipo == 'Ingeniero' else '' }}>👨‍🔬 Ingeniero</option>
-                        <option value="Arquitecto" {{ 'selected' if request.form and request.form.tipo == 'Arquitecto' else '' }}>👨‍🎨 Arquitecto</option>
-                        <option value="Administrador" {{ 'selected' if request.form and request.form.tipo == 'Administrador' else '' }}>📊 Administrador</option>
-                        <option value="Seguridad" {{ 'selected' if request.form and request.form.tipo == 'Seguridad' else '' }}>🛡️ Seguridad</option>
-                        <option value="Conductor" {{ 'selected' if request.form and request.form.tipo == 'Conductor' else '' }}>🚛 Conductor</option>
-                        <option value="Almacenista" {{ 'selected' if request.form and request.form.tipo == 'Almacenista' else '' }}>📦 Almacenista</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="salario">Salario Mensual (Q)</label>
-                    <input type="number" 
-                           id="salario" 
-                           name="salario" 
-                           step="0.01" 
-                           min="0"
-                           placeholder="Ej: 5000.00"
-                           value="{{ request.form.salario if request.form else '' }}">
-                    <small class="form-help">Opcional - Puede configurarse después</small>
-                </div>
-            </div>
-            
-            <div class="form-section">
-                <h3>📞 Información de Contacto (Opcional)</h3>
-                
-                <div class="form-group">
-                    <label for="telefono">Teléfono</label>
-                    <input type="tel" 
-                           id="telefono" 
-                           name="telefono" 
-                           placeholder="Ej: 1234-5678"
-                           value="{{ request.form.telefono if request.form else '' }}">
-                </div>
-                
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" 
-                           id="email" 
-                           name="email" 
-                           placeholder="Ej: empleado@constructora.com"
-                           value="{{ request.form.email if request.form else '' }}">
-                </div>
-                
-                <div class="form-group">
-                    <label for="direccion">Dirección</label>
-                    <textarea id="direccion" 
-                              name="direccion" 
-                              rows="2"
-                              placeholder="Dirección completa del empleado">{{ request.form.direccion if request.form else '' }}</textarea>
-                </div>
-            </div>
-            
-            <div class="form-actions">
-                <button type="submit" class="btn-primary">
-                    ✅ Crear Empleado
-                </button>
-                <a href="{{ url_for('listar_empleados') }}" class="btn-secondary">
-                    ❌ Cancelar
-                </a>
             </div>
         </form>
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="max-w-7xl mx-auto px-6-fluid">
+        <div class="form-card">
+            <div class="create-form-actions">
+                <a href="{{ url_for('listar_empleados') }}" class="create-btn create-btn btn btn-warm-secondary">
+                    <i class="fas fa-times"></i>Cancelar
+                </a>
+                <button type="submit" form="create-empleado-form" class="create-btn create-btn btn btn-warm-primary">
+                    <i class="fas fa-user-plus"></i>Crear Empleado
+                </button>
+            </div>
+        </div>
     </div>
 </div>
 
 <script>
-// Validación del formulario
-document.querySelector('form').addEventListener('submit', function(e) {
-    const nombre = document.getElementById('nombre').value.trim();
-    const tipo = document.getElementById('tipo').value;
+// Salarios por cargo
+const SALARIOS_POR_CARGO = {
+    'ARQUITECTO': 9500.00,
+    'INGENIERO': 8500.00,
+    'ADMINISTRADOR': 7200.00,
+    'SUPERVISOR': 6200.00,
+    'ADMINISTRATIVO': 4800.00,
+    'ALMACENISTA': 4200.00,
+    'CONDUCTOR': 3800.00,
+    'OBRERO_ESPECIALIZADO': 3500.00,
+    'OPERARIO': 3200.00,
+    'OBRERO': 2800.00,
+    'SEGURIDAD': 2600.00
+};
+
+// Actualizar salario cuando cambie el tipo de empleado
+document.getElementById('tipo_empleado').addEventListener('change', function() {
+    const tipoSeleccionado = this.value;
+    const campoSalario = document.getElementById('salario_fijo_empleado');
     
-    if (!nombre) {
-        alert('El nombre del empleado es obligatorio');
-        e.preventDefault();
-        return false;
+    if (tipoSeleccionado && SALARIOS_POR_CARGO[tipoSeleccionado]) {
+        const salario = SALARIOS_POR_CARGO[tipoSeleccionado];
+        campoSalario.value = `Q${salario.toLocaleString('es-GT', {minimumFractionDigits: 2, maximumFractionDigits: 2})}/mes`;
+        campoSalario.style.color = '#28a745';
+        campoSalario.style.fontWeight = 'bold';
+    } else {
+        campoSalario.value = 'Seleccione un tipo de empleado';
+        campoSalario.style.color = '#6c757d';
+        campoSalario.style.fontWeight = 'normal';
     }
-    
-    if (!tipo) {
-        alert('Debe seleccionar un tipo/cargo para el empleado');
-        e.preventDefault();
-        return false;
-    }
-    
-    return true;
 });
+
+// Validación del formulario
+(function() {
+    'use strict';
+    window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        var validation = Array.prototype.filter.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+})();
 </script>
 {% endblock %}

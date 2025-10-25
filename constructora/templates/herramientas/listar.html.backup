@@ -1,0 +1,110 @@
+{%% extends "base.html" %%}
+
+{%% block head %%}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sistema-unificado.css') }}">
+{%% endblock %%}
+
+{%% block title %%}Herramientas - Sistema Constructora{%% endblock %%}
+
+{%% block content %%}
+<div class="page-container animate-fade-in">
+    <!-- Header de página -->
+    <div class="page-header">
+        <div class="breadcrumb-nav">
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <span class="breadcrumb-separator">/</span>
+            <span>Herramientas</span>
+        </div>
+        <h1 class="page-title">
+            <i class="fas fa-list text-xanthous"></i>
+            Gestión de Herramientas
+        </h1>
+        <p class="page-subtitle">Administra todos los registros de herramientas</p>
+    </div>
+
+    <!-- Acciones principales -->
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">
+                <i class="fas fa-table"></i>
+                Lista de Herramientas
+            </h2>
+            <a href="{{ url_for('crear_herramientas') }}" class="btn btn-accent">
+                <i class="fas fa-plus"></i>
+                Agregar herramienta
+            </a>
+        </div>
+        <div class="card-body">
+            {%% if herramientas %%}
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Estado</th>
+                            <th>Fecha Creación</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {%% for item in herramientas %%}
+                        <tr>
+                            <td><span class="badge badge-info">{{ item.id or 'N/A' }}</span></td>
+                            <td>{{ item.nombre or 'Sin nombre' }}</td>
+                            <td>
+                                <span class="badge badge-success">Activo</span>
+                            </td>
+                            <td>{{ item.fecha_creacion or 'N/A' }}</td>
+                            <td>
+                                <div class="flex gap-2">
+                                    <a href="{{ url_for('ver_herramientas', id=item.id) }}" 
+                                       class="btn btn-primary" title="Ver detalles">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{{ url_for('editar_herramientas', id=item.id) }}" 
+                                       class="btn btn-warning" title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-danger" 
+                                            onclick="confirmarEliminacion({{ item.id }})" title="Eliminar">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {%% endfor %%}
+                    </tbody>
+                </table>
+            </div>
+            {%% else %%}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                No hay registros de herramientas disponibles. 
+                <a href="{{ url_for('crear_herramientas') }}">¡Crea el primero!</a>
+            </div>
+            {%% endif %%}
+        </div>
+    </div>
+</div>
+
+<script>
+function confirmarEliminacion(id) {
+    if (confirm('¿Estás seguro de que deseas eliminar este registro?')) {
+        fetch(`{{ url_for('eliminar_herramientas', id=0) }}`.replace('0', id), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                location.reload();
+            } else {
+                alert('Error al eliminar el registro');
+            }
+        });
+    }
+}
+</script>
+{%% endblock %%}

@@ -1,0 +1,176 @@
+{% extends "base.html" %}
+
+{% block title %}Bodegas e Inventarios - Sistema Constructora{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="header-section">
+        <h1>🏪 Gestión de Bodegas e Inventarios</h1>
+        <p>Control de materiales, existencias y movimientos</p>
+    </div>
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    
+    <!-- Estadísticas de inventario -->
+    <div class="stats-cards">
+        <div class="stat-card">
+            <h3>{{ bodegas.total_bodegas or 0 }}</h3>
+            <p>🏪 Bodegas Activas</p>
+        </div>
+        <div class="stat-card">
+            <h3>{{ bodegas.materiales_inventario or 0 }}</h3>
+            <p>📦 Materiales en Inventario</p>
+        </div>
+        <div class="stat-card">
+            <h3>Q{{ "{:,.2f}".format(bodegas.valor_inventario) if bodegas.valor_inventario else '0.00' }}</h3>
+            <p>💰 Valor del Inventario</p>
+        </div>
+        <div class="stat-card">
+            <h3>{{ bodegas.movimientos_hoy or 0 }}</h3>
+            <p>📊 Movimientos Hoy</p>
+        </div>
+    </div>
+    
+    <!-- Navegación de bodegas -->
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">⚡ Acciones Rápidas</h2>
+        </div>
+        <div class="actions-grid">
+            <a href="{{ url_for('crear_bodega') }}" class="btn btn-primary">
+                ➕ Nueva Bodega
+            </a>
+            <a href="{{ url_for('listar_bodegas') }}" class="btn btn-secondary">
+                🏪 Ver Bodegas
+            </a>
+            <a href="{{ url_for('inventarios') }}" class="btn btn-info">
+                📦 Inventarios
+            </a>
+            <a href="{{ url_for('movimientos_materiales') }}" class="btn btn-warning">
+                📊 Movimientos
+            </a>
+        </div>
+    </div>
+    
+    <!-- Resumen de inventarios -->
+    {% if bodegas.inventarios_resumen %}
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">📦 Resumen de Inventarios</h2>
+        </div>
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Bodega</th>
+                        <th>Material</th>
+                        <th>Stock Actual</th>
+                        <th>Unidad</th>
+                        <th>Valor Unitario</th>
+                        <th>Valor Total</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for inventario in bodegas.inventarios_resumen %}
+                    <tr>
+                        <td>{{ inventario.bodega or 'Bodega General' }}</td>
+                        <td><strong>{{ inventario.material or 'N/A' }}</strong></td>
+                        <td>{{ inventario.stock_actual or 0 }}</td>
+                        <td>{{ inventario.unidad or 'Unidad' }}</td>
+                        <td>Q{{ "{:,.2f}".format(inventario.valor_unitario) if inventario.valor_unitario else '0.00' }}</td>
+                        <td>Q{{ "{:,.2f}".format(inventario.valor_total) if inventario.valor_total else '0.00' }}</td>
+                        <td>
+                            {% if inventario.stock_actual and inventario.stock_actual > 10 %}
+                                <span class="badge badge-success">Disponible</span>
+                            {% elif inventario.stock_actual and inventario.stock_actual > 0 %}
+                                <span class="badge badge-warning">Bajo Stock</span>
+                            {% else %}
+                                <span class="badge badge-danger">Agotado</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <div class="card">
+        <div class="empty-state">
+            <div class="empty-icon">📦</div>
+            <h3>No hay inventarios registrados</h3>
+            <p>Comienza agregando la primera bodega y sus inventarios.</p>
+            <a href="{{ url_for('crear_bodega') }}" class="btn-primary">
+                ➕ Crear Primera Bodega
+            </a>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Movimientos recientes -->
+    {% if bodegas.movimientos_recientes %}
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">📊 Movimientos Recientes</h2>
+        </div>
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Tipo</th>
+                        <th>Material</th>
+                        <th>Cantidad</th>
+                        <th>Bodega</th>
+                        <th>Responsable</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for movimiento in bodegas.movimientos_recientes %}
+                    <tr>
+                        <td>{{ movimiento.fecha or 'N/A' }}</td>
+                        <td>
+                            <span class="badge badge-{{ 'success' if movimiento.tipo == 'Entrada' else 'warning' }}">
+                                {{ movimiento.tipo or 'N/A' }}
+                            </span>
+                        </td>
+                        <td>{{ movimiento.material or 'N/A' }}</td>
+                        <td>{{ movimiento.cantidad or 0 }}</td>
+                        <td>{{ movimiento.bodega or 'N/A' }}</td>
+                        <td>{{ movimiento.responsable or 'Sistema' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.actions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px;
+}
+
+.empty-icon {
+    font-size: 48px;
+    margin-bottom: 20px;
+}
+</style>
+{% endblock %}

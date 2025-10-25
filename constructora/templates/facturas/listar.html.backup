@@ -1,0 +1,288 @@
+{% extends "base.html" %}
+
+{% block title %}Facturas - ERP Constructora{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2><i class="fas fa-file-invoice"></i> Gestión de Facturas</h2>
+                <a href="/facturas/crear" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Nueva Factura
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <input type="text" class="form-control" id="filtro-numero" placeholder="Buscar por número de factura">
+        </div>
+        <div class="col-md-4">
+            <select class="form-control" id="filtro-estado">
+                <option value="">Todos los estados</option>
+                <option value="Pendiente">Pendiente</option>
+                <option value="Pagada">Pagada</option>
+                <option value="Vencida">Vencida</option>
+                <option value="Anulada">Anulada</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <input type="date" class="form-control" id="filtro-fecha" placeholder="Fecha de factura">
+        </div>
+    </div>
+
+    <!-- Lista de Facturas -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Lista de Facturas</h5>
+                </div>
+                <div class="card-body">
+                    {% if facturas %}
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Número</th>
+                                    <th>Cliente</th>
+                                    <th>Fecha</th>
+                                    <th>Vencimiento</th>
+                                    <th>Subtotal</th>
+                                    <th>Impuestos</th>
+                                    <th>Total</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for factura in facturas %}
+                                <tr>
+                                    <td><strong>{{ factura.numero_factura }}</strong></td>
+                                    <td>{{ factura.nombre_cliente or 'Sin cliente' }}</td>
+                                    <td>{{ format_date(factura.fecha_factura) }}</td>
+                                    <td>{{ format_date(factura.fecha_vencimiento) }}</td>
+                                    <td>{{ format_currency(factura.subtotal) }}</td>
+                                    <td>{{ format_currency(factura.impuestos) }}</td>
+                                    <td><strong>{{ format_currency(factura.total) }}</strong></td>
+                                    <td>
+                                        {% if factura.estado_factura == 'Pendiente' %}
+                                            <span class="badge badge-warning">{{ factura.estado_factura }}</span>
+                                        {% elif factura.estado_factura == 'Pagada' %}
+                                            <span class="badge badge-success">{{ factura.estado_factura }}</span>
+                                        {% elif factura.estado_factura == 'Vencida' %}
+                                            <span class="badge badge-danger">{{ factura.estado_factura }}</span>
+                                        {% else %}
+                                            <span class="badge badge-secondary">{{ factura.estado_factura }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="/facturas/{{ factura.id_factura }}/detalle" 
+                                               class="btn btn-sm btn-info" title="Ver detalle">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <button class="btn btn-sm btn-warning" 
+                                                    onclick="editarFactura({{ factura.id_factura }})" 
+                                                    title="Editar">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-success" 
+                                                    onclick="imprimirFactura({{ factura.id_factura }})" 
+                                                    title="Imprimir">
+                                                <i class="fas fa-print"></i>
+                                            </button>
+                                            <form action="{{ url_for('eliminar_factura', id=factura.id_factura) }}" 
+                                                  method="post" 
+                                                  style="display: inline;"
+                                                  onsubmit="return confirm('¿Está seguro de eliminar esta factura?');">
+                                                <button class="btn btn-sm btn-danger" title="Eliminar" type="submit">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-file-invoice fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No hay facturas registradas</h5>
+                        <p class="text-muted">Comience creando su primera factura</p>
+                        <a href="/facturas/crear" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Crear Primera Factura
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Estadísticas Rápidas -->
+    <div class="row mt-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5>Total Facturas</h5>
+                    <h3>{{ facturas|length }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5>Facturas Pagadas</h5>
+                    <h3>{{ facturas|selectattr("estado_factura", "equalto", "Pagada")|list|length }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h5>Facturas Pendientes</h5>
+                    <h3>{{ facturas|selectattr("estado_factura", "equalto", "Pendiente")|list|length }}</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h5>Total Facturado</h5>
+                    <h3>
+                        {% set total = facturas|sum(attribute='total') %}
+                        {{ format_currency(total) }}
+                    </h3>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para editar factura -->
+<div class="modal fade" id="modalEditarFactura" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Editar Factura</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formEditarFactura">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Estado de la Factura</label>
+                                <select class="form-control" name="estado_factura" required>
+                                    <option value="Pendiente">Pendiente</option>
+                                    <option value="Pagada">Pagada</option>
+                                    <option value="Vencida">Vencida</option>
+                                    <option value="Anulada">Anulada</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Fecha de Vencimiento</label>
+                                <input type="date" class="form-control" name="fecha_vencimiento" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Observaciones</label>
+                        <textarea class="form-control" name="observaciones" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="guardarCambiosFactura()">
+                    <i class="fas fa-save"></i> Guardar Cambios
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let facturaActual = null;
+
+function editarFactura(idFactura) {
+    facturaActual = idFactura;
+    $('#modalEditarFactura').modal('show');
+}
+
+function guardarCambiosFactura() {
+    const formData = new FormData(document.getElementById('formEditarFactura'));
+    const data = Object.fromEntries(formData);
+    
+    fetch(`/api/facturas/${facturaActual}/actualizar`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Factura actualizada correctamente');
+            location.reload();
+        } else {
+            alert('Error al actualizar la factura');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error al actualizar la factura');
+    });
+}
+
+function imprimirFactura(idFactura) {
+    window.open(`/facturas/${idFactura}/imprimir`, '_blank');
+}
+
+// Filtros en tiempo real
+document.getElementById('filtro-numero').addEventListener('input', filtrarFacturas);
+document.getElementById('filtro-estado').addEventListener('change', filtrarFacturas);
+document.getElementById('filtro-fecha').addEventListener('change', filtrarFacturas);
+
+function filtrarFacturas() {
+    const filtroNumero = document.getElementById('filtro-numero').value.toLowerCase();
+    const filtroEstado = document.getElementById('filtro-estado').value;
+    const filtroFecha = document.getElementById('filtro-fecha').value;
+    
+    const filas = document.querySelectorAll('tbody tr');
+    
+    filas.forEach(fila => {
+        const numero = fila.cells[0].textContent.toLowerCase();
+        const estado = fila.cells[7].textContent.trim();
+        const fecha = fila.cells[2].textContent;
+        
+        let mostrar = true;
+        
+        if (filtroNumero && !numero.includes(filtroNumero)) {
+            mostrar = false;
+        }
+        
+        if (filtroEstado && !estado.includes(filtroEstado)) {
+            mostrar = false;
+        }
+        
+        if (filtroFecha && !fecha.includes(filtroFecha)) {
+            mostrar = false;
+        }
+        
+        fila.style.display = mostrar ? '' : 'none';
+    });
+}
+</script>
+{% endblock %}

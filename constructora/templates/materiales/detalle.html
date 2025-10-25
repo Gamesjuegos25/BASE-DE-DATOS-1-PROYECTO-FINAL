@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <!-- CSS específico para páginas de detalle -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/detail-page.css') }}">
+    
+    <!-- CSS para páginas de detalle -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/detail-page.css') }}">{% endblock %}
+
+{% block title %}Detalle Material{% endblock %}
+{% block content %}
+<div class="page-header">
+  <nav class="breadcrumb">
+    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+    <span class="breadcrumb-separator">/</span>
+    <a href="{{ url_for('listar_materiales') }}">Materiales</a>
+    <span class="breadcrumb-separator">/</span>
+    <span>Detalle</span>
+  </nav>
+  <h1 class="page-title">📦 {{ material.nombre or 'Material' }} <small class="text-vanilla-600">ID: {{ material.id_material }}</small></h1>
+</div>
+
+<div class="flex flex-wrap -mx-2">
+  <div class="flex-1 px-2-md-8">
+    <div class="detail-card">
+      <div class="stat-stat-header">
+        <h4 style="color: var(--prussian-blue-600); margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: var(--spacing-sm);"><i class="fas fa-box text-xanthous"></i>Información del Material</h4>
+      </div>
+      <div class="stat-module-content">
+        <dl class="flex flex-wrap -mx-2">
+          <dt class="flex-1 px-2-sm-4"><i class="fas fa-tag"></i> Nombre</dt>
+          <dd class="flex-1 px-2-sm-8">
+            <strong>{{ material.nombre or 'N/D' }}</strong>
+          </dd>
+          
+          <dt class="flex-1 px-2-sm-4"><i class="fas fa-align-left"></i> Descripción</dt>
+          <dd class="flex-1 px-2-sm-8">
+            {{ material.descripcion or 'Sin descripción disponible' }}
+          </dd>
+          
+          <dt class="flex-1 px-2-sm-4"><i class="fas fa-truck"></i> Proveedor</dt>
+          <dd class="flex-1 px-2-sm-8">
+            {% if material.proveedor_nombre %}
+              <strong>{{ material.proveedor_nombre }}</strong><br>
+              <small class="text-vanilla-600">{{ material.proveedor_contacto or 'Sin contacto' }}</small>
+            {% else %}
+              <span class="text-vanilla-600">Sin proveedor asignado</span>
+            {% endif %}
+          </dd>
+          
+          <dt class="flex-1 px-2-sm-4"><i class="fas fa-layer-group"></i> Categoría</dt>
+          <dd class="flex-1 px-2-sm-8">
+            <span class="status-badge-detail">{{ material.categoria or 'Sin categoría' }}</span>
+          </dd>
+          
+          <dt class="flex-1 px-2-sm-4"><i class="fas fa-balance-scale"></i> Unidad de Medida</dt>
+          <dd class="flex-1 px-2-sm-8">
+            <span class="status-badge-detail">{{ material.unidad or 'N/D' }}</span>
+          </dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+  
+  <div class="flex-1 px-2-md-4">
+    <div class="detail-card">
+      <div class="stat-stat-header">
+        <h4 style="color: var(--prussian-blue-600); margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: var(--spacing-sm);"><i class="fas fa-coins text-xanthous"></i>Información Económica</h4>
+      </div>
+      <div class="stat-module-content text-center">
+        <div class="price-info">
+          <h3 class="text-xanthous-600 mb-2">
+            {% if material.precio is not none %}
+              Q{{ "{:,.2f}".format(material.precio) }}
+            {% else %}
+              <span class="text-vanilla-600">N/D</span>
+            {% endif %}
+          </h3>
+          <p class="text-vanilla-600 mb-3">Precio Unitario</p>
+          
+          {% if material.precio is not none %}
+            <div class="price-breakdown">
+              <div class="mb-2">
+                <small class="text-vanilla-600">Por {{ material.unidad or 'unidad' }}:</small><br>
+                <strong class="text-prussian-blue">Q{{ "{:,.2f}".format(material.precio) }}</strong>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    
+    <div class="detail-card">
+      <div class="stat-stat-header">
+        <h4 style="color: var(--prussian-blue-600); margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: var(--spacing-sm);"><i class="fas fa-warehouse text-xanthous"></i>Inventario</h4>
+      </div>
+      <div class="stat-module-content text-center">
+        <div class="stock-info">
+          <h4 class="text-prussian-blue-700 mb-2">{{ material.stock_actual or 0 }}</h4>
+          <p class="text-vanilla-600 mb-2">Unidades en Stock</p>
+          <small class="text-vanilla-600">Mínimo: {{ material.stock_minimo or 0 }}</small>
+        </div>
+      </div>
+    </div>
+    
+    <div class="detail-card">
+      <div class="stat-stat-header">
+        <h4 style="color: var(--prussian-blue-600); margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: var(--spacing-sm);"><i class="fas fa-cogs text-xanthous"></i>Acciones</h4>
+      </div>
+      <div class="stat-module-content">
+        <div class="flex flex-col gap-2">
+          <a class="btn btn btn btn-warm-primary" href="{{ url_for('editar_material', id=material.id_material) }}">
+            <i class="fas fa-edit"></i> Editar Material
+          </a>
+          <a class="btn btn btn btn-warm-primary" href="{{ url_for('listar_movimientos_materiales') }}?material={{ material.id_material }}">
+            <i class="fas fa-exchange-alt"></i> Ver Movimientos
+          </a>
+          <a class="btn btn btn btn-warm-secondary" href="{{ url_for('listar_materiales') }}">
+            <i class="fas fa-arrow-left"></i> Volver a Lista
+          </a>
+          <form action="{{ url_for('eliminar_material', id=material.id_material) }}" method="post" onsubmit="return confirm('¿Eliminar este material?');" class="mt-2">
+            <button class="btn btn btn btn-warm-danger w-100" type="submit">
+              <i class="fas fa-trash"></i> Eliminar
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.price-info h3 {
+  font-size: 2.5rem;
+  font-weight: bold;
+}
+
+.price-breakdown {
+  border-top: 1px solid #dee2e6;
+  padding-top: 1rem;
+}
+
+.stock-info h4 {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.card-header h5 {
+  color: #495057;
+}
+
+.badge {
+  font-size: 0.9rem;
+}
+
+.gap-2 > * + * {
+  margin-top: 0.5rem;
+}
+</style>
+{% endblock %}

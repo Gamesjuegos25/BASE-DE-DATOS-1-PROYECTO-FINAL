@@ -1,0 +1,523 @@
+/* =============================================================================
+   SISTEMA DE CONSTRUCTORA - ESTILOS GLOBALES PARA TABLAS
+   Archivo: static/css/table-styles.css
+   Descripción: Estilos modernos y responsivos para todas las tablas del sistema
+   ============================================================================= */
+
+/* =================================
+   VARIABLES CSS
+   ================================= */
+:root {
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --success-gradient: linear-gradient(45deg, var(--xanthous-600), #20c997);
+    --warning-gradient: linear-gradient(45deg, var(--xanthous), #fd7e14);
+    --danger-gradient: linear-gradient(45deg, var(--fire-engine-red), #e83e8c);
+    --info-gradient: linear-gradient(45deg, var(--prussian-blue-400), #6f42c1);
+    --shadow-light: 0 2px 4px rgba(0,0,0,0.1);
+    --shadow-medium: 0 4px 6px rgba(0,0,0,0.1);
+    --shadow-hover: 0 8px 15px rgba(0,0,0,0.2);
+    --border-radius: 8px;
+    --transition: all 0.2s ease;
+}
+
+/* =================================
+   CONTENEDOR DE TABLA PRINCIPAL
+   ================================= */
+.data-table-container,
+.table-container {
+    background: white;
+    border-radius: 12px;
+    box-shadow: var(--shadow-medium);
+    overflow: hidden;
+    margin-bottom: 2rem;
+    border: 1px solid #e3e6f0;
+}
+
+.table-header {
+    background: var(--primary-gradient);
+    padding: 20px 24px;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.table-title h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.record-count {
+    background: rgba(255,255,255,0.2);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    margin-left: 12px;
+}
+
+/* =================================
+   ESTILOS DE TABLA
+   ================================= */
+.data-table,
+.table {
+    width: 100%;
+    margin-bottom: 0;
+    color: #495057;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.data-table thead th,
+.table thead th {
+    background: #f8f9fc;
+    color: #5a5c69;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    padding: 16px 12px;
+    border-bottom: 2px solid #e3e6f0;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.data-table tbody td,
+.table tbody td {
+    padding: 16px 12px;
+    vertical-align: middle;
+    border-bottom: 1px solid #e3e6f0;
+    transition: var(--transition);
+}
+
+.data-table tbody tr,
+.table tbody tr {
+    transition: var(--transition);
+    cursor: pointer;
+}
+
+.data-table tbody tr:hover,
+.table tbody tr:hover {
+    background-color: #f8f9fc;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-light);
+}
+
+/* =================================
+   BOTONES DE ACCIÓN GLOBALES
+   ================================= */
+.action-buttons,
+.table-actions {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* Botones base */
+.btn,
+.btn-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: var(--border-radius);
+    font-weight: 500;
+    text-decoration: none;
+    transition: var(--transition);
+    cursor: pointer;
+    font-family: inherit;
+    line-height: 1;
+}
+
+/* Tamaños de botones */
+.btn-sm {
+    padding: 8px 12px;
+    font-size: 12px;
+    min-width: 36px;
+    height: 32px;
+}
+
+.btn-action {
+    padding: 6px 8px;
+    min-width: 32px;
+    height: 28px;
+}
+
+/* Colores de botones */
+.btn-info,
+.btn-view {
+    background: var(--info-gradient);
+    color: white;
+    border: 1px solid transparent;
+}
+
+.btn-info:hover,
+.btn-view:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(23, 162, 184, 0.3);
+    text-decoration: none;
+    color: white;
+}
+
+.btn-warning,
+.btn-edit {
+    background: var(--warning-gradient);
+    color: #212529;
+    border: 1px solid transparent;
+}
+
+.btn-warning:hover,
+.btn-edit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(255, 193, 7, 0.3);
+    text-decoration: none;
+    color: #212529;
+}
+
+.btn-danger,
+.btn-delete {
+    background: var(--danger-gradient);
+    color: white;
+    border: 1px solid transparent;
+}
+
+.btn-danger:hover,
+.btn-delete:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+    text-decoration: none;
+    color: white;
+}
+
+.btn-success {
+    background: var(--success-gradient);
+    color: white;
+    border: 1px solid transparent;
+}
+
+.btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+    text-decoration: none;
+    color: white;
+}
+
+/* =================================
+   BADGES Y ESTADOS
+   ================================= */
+.status-badge,
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: 1px solid transparent;
+}
+
+.badge-success {
+    background: linear-gradient(45deg, #d4edda, #c3e6cb);
+    color: #155724;
+    border-color: #c3e6cb;
+}
+
+.badge-warning {
+    background: linear-gradient(45deg, #fff3cd, #ffeaa7);
+    color: #856404;
+    border-color: #ffeaa7;
+}
+
+.badge-danger {
+    background: linear-gradient(45deg, #f8d7da, #f5c6cb);
+    color: #721c24;
+    border-color: #f5c6cb;
+}
+
+.badge-info {
+    background: linear-gradient(45deg, #d1ecf1, #bee5eb);
+    color: #0c5460;
+    border-color: #bee5eb;
+}
+
+.badge-secondary {
+    background: linear-gradient(45deg, #e9ecef, #ced4da);
+    color: var(--orange-wheel-300);
+    border-color: #ced4da;
+}
+
+/* =================================
+   RESPONSIVE TABLE WRAPPER
+   ================================= */
+.table-responsive {
+    position: relative;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 8px;
+}
+
+/* =================================
+   FIXED ACTION COLUMN
+   ================================= */
+.table thead th:last-child,
+.table tbody td:last-child {
+    position: sticky;
+    right: 0;
+    background: white;
+    z-index: 2;
+    border-left: 2px solid #e3e6f0;
+    box-shadow: -2px 0 4px rgba(0,0,0,0.1);
+    min-width: 140px;
+    max-width: 140px;
+    width: 140px;
+}
+
+.table thead th:last-child {
+    background: #f8f9fc;
+    z-index: 3;
+}
+
+/* Ensure action buttons are always visible */
+.action-buttons {
+    display: flex !important;
+    gap: 4px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
+    width: 100%;
+}
+
+/* =================================
+   RESPONSIVE DESIGN MEJORADO
+   ================================= */
+@media (min-width: 1200px) {
+    /* Desktop - mostrar todas las columnas */
+    .d-none-lg { display: table-cell !important; }
+}
+
+@media (max-width: 1199px) and (min-width: 992px) {
+    /* Tablet grande - ocultar columnas menos importantes */
+    .d-none-lg { display: none !important; }
+    .table { min-width: 900px; }
+}
+
+@media (max-width: 991px) and (min-width: 768px) {
+    /* Tablet - ocultar más columnas */
+    .d-none-md { display: none !important; }
+    .d-none-lg { display: none !important; }
+    .table { min-width: 700px; }
+    
+    .table-header {
+        padding: 16px 20px;
+        flex-direction: column;
+        gap: 12px;
+        align-items: stretch;
+    }
+}
+
+@media (max-width: 767px) {
+    /* Móvil - layout más compacto */
+    .d-none-sm { display: none !important; }
+    .d-none-md { display: none !important; }
+    .d-none-lg { display: none !important; }
+    
+    .table { 
+        min-width: 500px;
+        font-size: 13px;
+    }
+    
+    /* Botones de acción más pequeños en móvil */
+    .action-buttons .d-none.d-sm-block {
+        display: none !important;
+    }
+    
+    .action-buttons .d-block.d-sm-none {
+        display: flex !important;
+        flex-direction: column;
+        gap: 2px;
+        width: 100%;
+    }
+    
+    .action-buttons .d-block.d-sm-none .btn {
+        font-size: 11px;
+        padding: 4px 8px;
+        width: 100%;
+    }
+    
+    .table-header {
+        padding: 12px 16px;
+    }
+    
+    .table thead th,
+    .data-table thead th {
+        padding: 10px 6px;
+        font-size: 10px;
+    }
+    
+    .table tbody td,
+    .data-table tbody td {
+        padding: 10px 6px;
+        font-size: 12px;
+    }
+    
+    /* Asegurar que los botones de acción sean visibles */
+    .table thead th:last-child,
+    .table tbody td:last-child {
+        min-width: 100px;
+        max-width: 100px;
+        width: 100px;
+    }
+}
+
+@media (max-width: 576px) {
+    /* Móvil pequeño */
+    .table { 
+        min-width: 450px;
+        font-size: 12px;
+    }
+    
+    .table thead th,
+    .data-table thead th,
+    .table tbody td,
+    .data-table tbody td {
+        padding: 8px 4px;
+    }
+    
+    .table thead th:last-child,
+    .table tbody td:last-child {
+        min-width: 90px;
+        max-width: 90px;
+        width: 90px;
+    }
+    
+    .action-buttons .btn {
+        font-size: 10px;
+        padding: 3px 6px;
+    }
+}
+
+/* =================================
+   EMPTY STATES
+   ================================= */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    background: linear-gradient(135deg, #f8f9fc 0%, #e9ecef 100%);
+    border-radius: 12px;
+    margin: 20px;
+}
+
+.empty-content {
+    color: var(--orange-wheel-300);
+}
+
+.empty-state i,
+.empty-content i {
+    font-size: 48px;
+    color: #a0aec0;
+    margin-bottom: 16px;
+    opacity: 0.7;
+}
+
+.empty-state h3,
+.empty-content h3 {
+    color: #2d3748;
+    margin-bottom: 8px;
+    font-weight: 600;
+    font-size: 18px;
+}
+
+.empty-state p,
+.empty-content p {
+    color: #718096;
+    margin-bottom: 24px;
+    font-size: 14px;
+}
+
+/* =================================
+   ANIMACIONES
+   ================================= */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.table tbody tr {
+    animation: fadeInUp 0.3s ease-out;
+}
+
+.btn:active,
+.btn-action:active {
+    animation: pulse 0.1s ease-in-out;
+}
+
+/* =================================
+   UTILIDADES ADICIONALES
+   ================================= */
+.text-nowrap {
+    white-space: nowrap;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.font-weight-bold {
+    font-weight: 600;
+}
+
+.small {
+    font-size: 12px;
+}
+
+.text-muted {
+    color: var(--orange-wheel-300) !important;
+}
+
+/* =================================
+   SCROLLBAR PERSONALIZADA
+   ================================= */
+.table-container::-webkit-scrollbar,
+.data-table-container::-webkit-scrollbar {
+    height: 8px;
+}
+
+.table-container::-webkit-scrollbar-track,
+.data-table-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb,
+.data-table-container::-webkit-scrollbar-thumb {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover,
+.data-table-container::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(45deg, #5a6fd8, #6a42a2);
+}

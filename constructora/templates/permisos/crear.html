@@ -1,0 +1,207 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sistema-unificado.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/create-forms.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/calendar-styles.css') }}">
+{% endblock %}
+
+{% block title %}Nuevo Permiso - Sistema Constructora{% endblock %}
+
+{% block content %}
+<body>
+    <div class="create-form-max-w-7xl mx-auto px-6">
+        <!-- Header -->
+        <div class="create-page-header">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="{{ url_for('dashboard') }}">
+                            <i class="fas fa-home"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="{{ url_for('listar_permisos') }}">
+                            <i class="fas fa-list"></i> Permisos
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        <i class="fas fa-plus"></i> Crear Permiso
+                    </li>
+                </ol>
+            </nav>
+            
+            <div class="create-title-section">
+                <h1 class="create-title">
+                    <i class="fas fa-plus-circle"></i>
+                    Crear Permiso
+                </h1>
+                <p class="create-subtitle">Complete el formulario para registrar una nueva permiso</p>
+            </div>
+        </div>
+
+        <!-- Formulario -->
+        <div class="form-card">
+            <form method="POST" action="{{ url_for('crear_permiso') }}" class="needs-validation" novalidate>
+                <div class="create-form-flex flex-wrap -mx-2">
+                    <div class="create-form-group">
+                        <label class="form-label">
+                            Empleado <span class="required">*</span>
+                        </label>
+                        <select class="form-select" class="form-select" id="empleado_id" name="empleado_id" required>
+                            <option value="">Seleccione una opción</option>
+                            {%- for item in empleados %}
+                            <option value="{{ item[0] }}">{{ item[1] }}</option>
+                            {%- endfor %}
+                        </select>
+                        <div class="invalid-feedback">
+                            Por favor ingrese empleado.
+                        </div>
+                    </div>
+                    <div class="create-form-group">
+                        <label class="form-label">
+                            Tipo de Permiso <span class="required">*</span>
+                        </label>
+                        <select class="form-select" class="form-select" id="tipo_permiso" name="tipo_permiso" required>
+                            <option value="">Seleccione una opción</option>
+                            <option value="vacaciones">Vacaciones</option>
+                            <option value="enfermedad">Enfermedad</option>
+                            <option value="personal">Personal</option>
+                            <option value="capacitacion">Capacitacion</option>
+                            <option value="otro">Otro</option>
+                        </select>
+                        <div class="invalid-feedback">
+                            Por favor ingrese tipo de permiso.
+                        </div>
+                    </div>
+                </div>
+                <!-- Campos de fecha con sistema estandarizado -->
+                <div class="date-range-group">
+                    <div class="calendar-field-group">
+                        <label class="form-label">
+                            <i class="fas fa-calendar-plus"></i>Fecha de Inicio<span class="required">*</span>
+                        </label>
+                        <div class="standardized-calendar" data-field-type="date-start">
+                            <input class="form-input calendar-field" 
+                                   id="fecha_inicio" 
+                                   name="fecha_inicio" 
+                                   type="date" 
+                                   value="{{ request.form.fecha_inicio if request.form else '' }}" 
+                                   required>
+                            <i class="fas fa-calendar-alt calendar-icon"></i>
+                        </div>
+                        <div class="invalid-feedback">
+                            Por favor, ingrese la fecha de inicio del permiso.
+                        </div>
+                    </div>
+
+                    <div class="calendar-field-group">
+                        <label class="form-label">
+                            <i class="fas fa-calendar-check"></i>Fecha de Fin<span class="required">*</span>
+                        </label>
+                        <div class="standardized-calendar" data-field-type="date-end">
+                            <input class="form-input calendar-field" 
+                                   id="fecha_fin" 
+                                   name="fecha_fin" 
+                                   type="date" 
+                                   value="{{ request.form.fecha_fin if request.form else '' }}" 
+                                   required>
+                            <i class="fas fa-calendar-alt calendar-icon"></i>
+                        </div>
+                        <div class="invalid-feedback">
+                            Por favor, ingrese la fecha de fin del permiso.
+                        </div>
+                    </div>
+                </div>
+                <div class="create-form-flex flex-wrap -mx-2">
+                    <div class="create-form-group">
+                        <label class="form-label">
+                            Motivo <span class="required">*</span>
+                        </label>
+                        <textarea class="form-textarea" id="motivo" name="motivo" rows="3" required placeholder="Ingrese motivo"></textarea>
+                        <div class="invalid-feedback">
+                            Por favor ingrese motivo.
+                        </div>
+                    </div>
+                    <div class="create-form-group">
+                        <label class="form-label">
+                            Estado <span class="required">*</span>
+                        </label>
+                        <select class="form-select" class="form-select" id="estado" name="estado" required>
+                            <option value="">Seleccione una opción</option>
+                            <option value="pendiente">Pendiente</option>
+                            <option value="aprobado">Aprobado</option>
+                            <option value="rechazado">Rechazado</option>
+                        </select>
+                        <div class="invalid-feedback">
+                            Por favor ingrese estado.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones de acción -->
+                <div class="create-form-actions">
+                    <div class="action-buttons">
+                        <a href="{{ url_for('listar_permisos') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn btn btn-warm-primary">
+                            <i class="fas fa-save"></i> Guardar Permiso
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+<script>
+// Validación de formularios Bootstrap
+(function() {
+    'use strict';
+    window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        var validation = Array.prototype.filter.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+})();
+
+// Inicializar sistema de calendarización estandarizada
+document.addEventListener('DOMContentLoaded', function() {
+    // Cargar utilidades de calendario
+    const script = document.createElement('script');
+    script.src = "{{ url_for('static', filename='js/calendar-utils.js') }}";
+    script.onload = function() {
+        // Inicializar campos de fecha con validación de rango
+        if (typeof initializeDateValidations === 'function') {
+            initializeDateValidations();
+        }
+        
+        // Configurar validación de rango de fechas para permisos
+        const fechaInicio = document.getElementById('fecha_inicio');
+        const fechaFin = document.getElementById('fecha_fin');
+        
+        if (fechaInicio && fechaFin) {
+            fechaInicio.addEventListener('change', function() {
+                fechaFin.min = this.value;
+            });
+            
+            fechaFin.addEventListener('change', function() {
+                if (fechaInicio.value && this.value < fechaInicio.value) {
+                    this.setCustomValidity('La fecha de fin del permiso debe ser posterior a la fecha de inicio');
+                } else {
+                    this.setCustomValidity('');
+                }
+            });
+        }
+    };
+    document.head.appendChild(script);
+});
+</script>
+{% endblock %}

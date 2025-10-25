@@ -4,17 +4,28 @@
 
 {% block content %}
 <div class="page-header">
-    <h1 class="page-title">📊 Dashboard Ejecutivo</h1>
-    <p class="page-subtitle">Panel de control integral del sistema de gestión</p>
+    <div class="welcome-section">
+        <h1 class="page-title">
+            <i class="fas fa-tachometer-alt"></i>
+            Bienvenido, {{ session.usuario_nombre or 'Usuario' }}
+        </h1>
+        <p class="page-subtitle">
+            Panel de control integral del sistema de gestión - {{ session.usuario_rol or 'Sin rol asignado' }}
+        </p>
+        <div class="last-login">
+            <i class="fas fa-clock"></i>
+            Último acceso: <span id="lastLogin">{{ session.ultimo_acceso or 'Primera vez' }}</span>
+        </div>
+    </div>
 </div>
 
 <!-- Estadísticas principales -->
 <div class="dashboard-grid">
-    <div class="stat-card">
+    <div class="stat-stat-card fade-in-up">
         <div class="stat-header">
             <div class="stat-title">Total de Obras</div>
             <div class="stat-icon primary">
-                <i class="fas fa-building"></i>
+                <i class="fas fa-building text-prussian-blue"></i>
             </div>
         </div>
         <div class="stat-value">{{ stats.total_obras or 0 }}</div>
@@ -24,7 +35,7 @@
         </div>
     </div>
     
-    <div class="stat-card">
+    <div class="stat-stat-card fade-in-up">
         <div class="stat-header">
             <div class="stat-title">Obras Activas</div>
             <div class="stat-icon success">
@@ -38,11 +49,11 @@
         </div>
     </div>
     
-    <div class="stat-card">
+    <div class="stat-stat-card fade-in-up">
         <div class="stat-header">
             <div class="stat-title">Total Empleados</div>
             <div class="stat-icon info">
-                <i class="fas fa-users"></i>
+                <i class="fas fa-users text-orange-wheel"></i>
             </div>
         </div>
         <div class="stat-value">{{ stats.total_empleados or 0 }}</div>
@@ -52,7 +63,7 @@
         </div>
     </div>
     
-    <div class="stat-card">
+    <div class="stat-stat-card fade-in-up">
         <div class="stat-header">
             <div class="stat-title">Proveedores</div>
             <div class="stat-icon warning">
@@ -66,11 +77,11 @@
         </div>
     </div>
     
-    <div class="stat-card">
+    <div class="stat-stat-card fade-in-up">
         <div class="stat-header">
             <div class="stat-title">Materiales</div>
             <div class="stat-icon primary">
-                <i class="fas fa-boxes"></i>
+                <i class="fas fa-boxes text-vanilla-100"></i>
             </div>
         </div>
         <div class="stat-value">{{ stats.total_materiales or 0 }}</div>
@@ -80,7 +91,7 @@
         </div>
     </div>
     
-    <div class="stat-card">
+    <div class="stat-stat-card fade-in-up">
         <div class="stat-header">
             <div class="stat-title">Vehículos</div>
             <div class="stat-icon danger">
@@ -98,10 +109,10 @@
 <!-- Módulos del Sistema -->
 <div class="modules-grid">
     <!-- Gestión de Obras -->
-    <div class="module-card">
+    <div class="module-stat-card fade-in-up">
         <div class="module-header">
             <div class="module-icon">
-                <i class="fas fa-building"></i>
+                <i class="fas fa-building text-prussian-blue"></i>
             </div>
             <h3 class="module-title">Gestión de Obras</h3>
             <p class="module-description">Administra y supervisa todas las obras en construcción</p>
@@ -118,10 +129,10 @@
                 </div>
             </div>
             <div class="module-actions">
-                <a href="{{ url_for('crear_obra') }}" class="btn btn-primary btn-sm">
+                <a href="{{ url_for('crear_obra') }}" class="btn btn btn btn-warm-primary btn-sm">
                     <i class="fas fa-plus"></i> Nueva Obra
                 </a>
-                <a href="{{ url_for('listar_obras') }}" class="btn btn-secondary btn-sm">
+                <a href="{{ url_for('listar_obras') }}" class="btn btn btn btn-warm-secondary btn-sm">
                     <i class="fas fa-list"></i> Ver Todas
                 </a>
             </div>
@@ -129,10 +140,10 @@
     </div>
 
     <!-- Recursos Humanos -->
-    <div class="module-card">
+    <div class="module-stat-card fade-in-up">
         <div class="module-header">
             <div class="module-icon">
-                <i class="fas fa-users"></i>
+                <i class="fas fa-users text-orange-wheel"></i>
             </div>
             <h3 class="module-title">Recursos Humanos</h3>
             <p class="module-description">Gestiona empleados, contratos y nómina</p>
@@ -149,10 +160,10 @@
                 </div>
             </div>
             <div class="module-actions">
-                <a href="{{ url_for('crear_empleado') }}" class="btn btn-success btn-sm">
+                <a href="{{ url_for('crear_empleado') }}" class="btn btn btn-accent btn-sm">
                     <i class="fas fa-user-plus"></i> Nuevo
                 </a>
-                <a href="{{ url_for('listar_empleados') }}" class="btn btn-secondary btn-sm">
+                <a href="{{ url_for('listar_empleados') }}" class="btn btn btn btn-warm-secondary btn-sm">
                     <i class="fas fa-list"></i> Listar
                 </a>
             </div>
@@ -160,10 +171,10 @@
     </div>
 
     <!-- Materiales y Proveedores -->
-    <div class="module-card">
+    <div class="module-stat-card fade-in-up">
         <div class="module-header">
             <div class="module-icon">
-                <i class="fas fa-boxes"></i>
+                <i class="fas fa-boxes text-vanilla-100"></i>
             </div>
             <h3 class="module-title">Materiales & Proveedores</h3>
             <p class="module-description">Control de inventario y gestión de proveedores</p>
@@ -180,10 +191,10 @@
                 </div>
             </div>
             <div class="module-actions">
-                <a href="{{ url_for('crear_material') }}" class="btn btn-warning btn-sm">
+                <a href="{{ url_for('crear_material') }}" class="btn btn btn btn-warm-secondary btn-sm">
                     <i class="fas fa-plus"></i> Material
                 </a>
-                <a href="{{ url_for('listar_materiales') }}" class="btn btn-secondary btn-sm">
+                <a href="{{ url_for('listar_materiales') }}" class="btn btn btn btn-warm-secondary btn-sm">
                     <i class="fas fa-list"></i> Ver Todo
                 </a>
             </div>
@@ -191,10 +202,10 @@
     </div>
 
     <!-- Equipos y Vehículos -->
-    <div class="module-card">
+    <div class="module-stat-card fade-in-up">
         <div class="module-header">
             <div class="module-icon">
-                <i class="fas fa-tools"></i>
+                <i class="fas fa-tools text-xanthous-100"></i>
             </div>
             <h3 class="module-title">Equipos & Vehículos</h3>
             <p class="module-description">Administra maquinaria y vehículos de la empresa</p>
@@ -211,10 +222,10 @@
                 </div>
             </div>
             <div class="module-actions">
-                <a href="{{ url_for('crear_equipo') }}" class="btn btn-info btn-sm">
+                <a href="{{ url_for('crear_equipo') }}" class="btn btn btn btn-warm-primary btn-sm">
                     <i class="fas fa-plus"></i> Equipo
                 </a>
-                <a href="{{ url_for('listar_equipos') }}" class="btn btn-secondary btn-sm">
+                <a href="{{ url_for('listar_equipos') }}" class="btn btn btn btn-warm-secondary btn-sm">
                     <i class="fas fa-list"></i> Ver Todo
                 </a>
             </div>
@@ -222,7 +233,7 @@
     </div>
 
     <!-- Bodegas e Inventarios -->
-    <div class="module-card">
+    <div class="module-stat-card fade-in-up">
         <div class="module-header">
             <div class="module-icon">
                 <i class="fas fa-warehouse"></i>
@@ -242,21 +253,89 @@
                 </div>
             </div>
             <div class="module-actions">
-                <a href="{{ url_for('bodegas_index') }}" class="btn btn-primary btn-sm">
-                    <i class="fas fa-warehouse"></i> Gestionar
+                <a href="{{ url_for('listar_bodegas') }}" class="btn btn btn btn-warm-primary btn-sm">
+                    <i class="fas fa-warehouse"></i> Bodegas
                 </a>
-                <a href="{{ url_for('listar_proyectos') }}" class="btn btn-secondary btn-sm">
-                    <i class="fas fa-project-diagram"></i> Proyectos
+                <a href="{{ url_for('inventarios') }}" class="btn btn btn-accent btn-sm">
+                    <i class="fas fa-boxes text-vanilla-100"></i> Inventarios
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actividades y Bitácoras -->
+    <div class="module-stat-card fade-in-up">
+        <div class="module-header">
+            <div class="module-icon">
+                <i class="fas fa-clipboard-list"></i>
+            </div>
+            <h3 class="module-title">Actividades & Bitácoras</h3>
+            <p class="module-description">Control de actividades y registros de obra</p>
+        </div>
+        <div class="module-content">
+            <div class="module-stats">
+                <div class="module-stat">
+                    <div class="module-stat-value">{{ stats.total_actividades or 0 }}</div>
+                    <div class="module-stat-label">Actividades</div>
+                </div>
+                <div class="module-stat">
+                    <div class="module-stat-value">{{ stats.total_bitacoras or 0 }}</div>
+                    <div class="module-stat-label">Bitácoras</div>
+                </div>
+            </div>
+            <div class="module-actions">
+                <a href="{{ url_for('crear_actividad') }}" class="btn btn btn btn-warm-primary btn-sm">
+                    <i class="fas fa-plus"></i> Actividad
+                </a>
+                <a href="{{ url_for('listar_actividades') }}" class="btn btn btn btn-warm-secondary btn-sm">
+                    <i class="fas fa-tasks"></i> Ver Todo
+                </a>
+                <a href="{{ url_for('listar_bitacoras') }}" class="btn btn btn btn-warm-primary btn-sm">
+                    <i class="fas fa-book"></i> Bitácoras
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Facturación y Contratos -->
+    <div class="module-stat-card fade-in-up">
+        <div class="module-header">
+            <div class="module-icon">
+                <i class="fas fa-file-invoice-dollar"></i>
+            </div>
+            <h3 class="module-title">Facturación & Contratos</h3>
+            <p class="module-description">Gestiona facturas, contratos y cobros</p>
+        </div>
+        <div class="module-content">
+            <div class="module-stats">
+                <div class="module-stat">
+                    <div class="module-stat-value">{{ stats.total_facturas or 0 }}</div>
+                    <div class="module-stat-label">Facturas</div>
+                </div>
+                <div class="module-stat">
+                    <div class="module-stat-value">{{ stats.total_contratos or 0 }}</div>
+                    <div class="module-stat-label">Contratos</div>
+                </div>
+            </div>
+            <div class="module-actions">
+                <a href="{{ url_for('crear_factura') }}" class="btn btn btn-accent btn-sm">
+                    <i class="fas fa-plus"></i> Factura
+                </a>
+                <a href="{{ url_for('listar_facturas') }}" class="btn btn btn btn-warm-secondary btn-sm">
+                    <i class="fas fa-file-invoice"></i> Ver Facturas
+                </a>
+                <a href="{{ url_for('listar_contratos') }}" class="btn btn btn btn-warm-primary btn-sm">
+                    <i class="fas fa-file-contract"></i> Contratos
                 </a>
             </div>
         </div>
     </div>
 
     <!-- Reportes y Análisis -->
-    <div class="module-card">
+    <div class="module-stat-card fade-in-up">
         <div class="module-header">
             <div class="module-icon">
-                <i class="fas fa-chart-bar"></i>
+                <i class="fas fa-chart-bar text-xanthous"></i>
             </div>
             <h3 class="module-title">Reportes & Análisis</h3>
             <p class="module-description">Informes detallados y análisis de rendimiento</p>
@@ -273,11 +352,11 @@
                 </div>
             </div>
             <div class="module-actions">
-                <a href="{{ url_for('reportes_academicos') }}" class="btn btn-success btn-sm">
+                <a href="{{ url_for('reportes_academicos') }}" class="btn btn btn-accent btn-sm">
                     <i class="fas fa-graduation-cap"></i> Académicos
                 </a>
-                <a href="{{ url_for('reportes_sistema_completo') }}" class="btn btn-secondary btn-sm">
-                    <i class="fas fa-chart-line"></i> Completos
+                <a href="{{ url_for('reportes_sistema_completo') }}" class="btn btn btn btn-warm-secondary btn-sm">
+                    <i class="fas fa-chart-line text-xanthous"></i> Completos
                 </a>
             </div>
         </div>
@@ -286,7 +365,7 @@
 
 <!-- Obras Recientes -->
 {% if obras_recientes %}
-<div class="table-container">
+<div class="table-max-w-7xl mx-auto px-6">
     <div class="table-header">
         <h2 class="table-title">📋 Obras Recientes</h2>
         <div class="table-tools">
@@ -317,22 +396,22 @@
                 </td>
                 <td>{{ obra.cliente or 'Sin asignar' }}</td>
                 <td>
-                    <span class="badge {{ 'badge-success' if obra.estado == 'Activa' else 'badge-warning' }}">
+                    <span class="badge {{ 'badge badge-success' if obra.estado == 'Activa' else 'badge badge-warning' }}">
                         {{ obra.estado or 'Sin estado' }}
                     </span>
                 </td>
                 <td>{{ obra.fecha_inicio.strftime('%d/%m/%Y') if obra.fecha_inicio else 'Sin fecha' }}</td>
                 <td>
-                    <strong class="text-success">
-                        ${{ "{:,.0f}".format(obra.valor) if obra.valor else '0' }}
+                    <strong class="text-xanthous-600">
+                        Q{{ "{:,.0f}".format(obra.valor) if obra.valor else '0' }}
                     </strong>
                 </td>
                 <td>
                     <div class="table-actions">
-                        <button class="btn btn-sm btn-primary">
+                        <button class="btn btn-sm btn btn btn-warm-primary">
                             <i class="fas fa-eye"></i>
                         </button>
-                        <button class="btn btn-sm btn-secondary">
+                        <button class="btn btn-sm btn btn btn-warm-secondary">
                             <i class="fas fa-edit"></i>
                         </button>
                     </div>

@@ -1,0 +1,683 @@
+/* =================================================================
+   FORM PAGES CSS - WARM AUTUMN GLOW THEME
+   Diseño moderno para formularios de creación y edición
+   ================================================================= */
+
+/* ================================
+   VARIABLES CSS PARA FORMULARIOS
+   ================================ */
+:root {
+  /* Formularios específicos */
+  --form-bg: linear-gradient(135deg, var(--vanilla-50), var(--vanilla-100));
+  --form-card-bg: white;
+  --form-border: var(--vanilla-300);
+  --form-focus: var(--xanthous-500);
+  --form-error: var(--fire-engine-red-500);
+  --form-success: var(--prussian-blue-500);
+  --form-shadow: 0 4px 12px rgba(0, 48, 73, 0.1);
+  --form-shadow-focus: 0 0 0 3px rgba(252, 191, 73, 0.2);
+}
+
+/* ================================
+   LAYOUT PRINCIPAL DE FORMULARIOS
+   ================================ */
+.form-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: var(--spacing-lg);
+  background: var(--form-bg);
+  min-height: 100vh;
+}
+
+.form-header {
+  background: linear-gradient(135deg, var(--prussian-blue-600), var(--prussian-blue-500));
+  padding: var(--spacing-xl);
+  border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.form-header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 100%;
+  height: 200%;
+  background: radial-gradient(ellipse, rgba(252, 191, 73, 0.1) 0%, transparent 70%);
+  transform: rotate(45deg);
+}
+
+.form-header-content {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+}
+
+.form-title {
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  margin: 0 0 var(--spacing-sm) 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-md);
+}
+
+.form-title i {
+  font-size: var(--font-size-xl);
+  color: var(--xanthous-400);
+}
+
+.form-subtitle {
+  font-size: var(--font-size-base);
+  opacity: 0.9;
+  margin: 0;
+}
+
+/* ================================
+   TARJETA DE FORMULARIO
+   ================================ */
+.form-card {
+  background: var(--form-card-bg);
+  border-radius: 0 0 var(--border-radius-lg) var(--border-radius-lg);
+  box-shadow: var(--form-shadow);
+  overflow: hidden;
+}
+
+.form-content {
+  padding: var(--spacing-xl);
+}
+
+/* ================================
+   GRUPOS DE CAMPOS
+   ================================ */
+.form-section {
+  margin-bottom: var(--spacing-xl);
+  border-bottom: 1px solid var(--form-border);
+  padding-bottom: var(--spacing-lg);
+}
+
+.form-section:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.section-title {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--prussian-blue-700);
+  margin: 0 0 var(--spacing-md) 0;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.section-title i {
+  color: var(--xanthous-600);
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-lg);
+}
+
+.form-grid-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.form-grid-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.form-grid-full {
+  grid-template-columns: 1fr;
+}
+
+/* ================================
+   GRUPOS DE CAMPOS INDIVIDUALES
+   ================================ */
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-label {
+  font-weight: 600;
+  color: var(--prussian-blue-700);
+  margin-bottom: var(--spacing-xs);
+  font-size: var(--font-size-sm);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.form-label i {
+  color: var(--xanthous-600);
+  font-size: var(--font-size-xs);
+}
+
+.form-label.required::after {
+  content: '*';
+  color: var(--fire-engine-red-500);
+  margin-left: var(--spacing-xs);
+}
+
+/* ================================
+   CAMPOS DE ENTRADA
+   ================================ */
+.form-input,
+.form-select,
+.form-textarea {
+  padding: var(--spacing-md);
+  border: 2px solid var(--form-border);
+  border-radius: var(--border-radius-md);
+  background: white;
+  font-size: var(--font-size-base);
+  transition: all 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: var(--form-focus);
+  box-shadow: var(--form-shadow-focus);
+  transform: translateY(-1px);
+}
+
+.form-textarea {
+  min-height: 100px;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.form-select {
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" fill="%23fcbf49" viewBox="0 0 16 16"><path d="M8 10.5l-4-4h8l-4 4z"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right var(--spacing-sm) center;
+  background-size: 16px;
+  padding-right: var(--spacing-xl);
+}
+
+/* ================================
+   CAMPOS ESPECIALES
+   ================================ */
+.input-group {
+  display: flex;
+  align-items: stretch;
+}
+
+.input-group .form-input {
+  border-radius: var(--border-radius-md) 0 0 var(--border-radius-md);
+}
+
+.input-addon {
+  background: var(--vanilla-100);
+  border: 2px solid var(--form-border);
+  border-left: none;
+  border-radius: 0 var(--border-radius-md) var(--border-radius-md) 0;
+  padding: var(--spacing-md);
+  display: flex;
+  align-items: center;
+  color: var(--prussian-blue-600);
+  font-weight: 500;
+}
+
+.form-check {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-sm);
+}
+
+.form-check-input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--xanthous-500);
+}
+
+.form-check-label {
+  font-size: var(--font-size-sm);
+  color: var(--prussian-blue-600);
+  cursor: pointer;
+}
+
+/* ================================
+   ESTADOS DE VALIDACIÓN
+   ================================ */
+.form-input.is-valid,
+.form-select.is-valid,
+.form-textarea.is-valid {
+  border-color: var(--form-success);
+}
+
+.form-input.is-invalid,
+.form-select.is-invalid,
+.form-textarea.is-invalid {
+  border-color: var(--form-error);
+}
+
+.valid-feedback {
+  color: var(--form-success);
+  font-size: var(--font-size-sm);
+  margin-top: var(--spacing-xs);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.invalid-feedback {
+  color: var(--form-error);
+  font-size: var(--font-size-sm);
+  margin-top: var(--spacing-xs);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.form-help {
+  color: var(--prussian-blue-400);
+  font-size: var(--font-size-xs);
+  margin-top: var(--spacing-xs);
+  font-style: italic;
+}
+
+/* ================================
+   BOTONES DE FORMULARIO
+   ================================ */
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-lg) var(--spacing-xl);
+  background: var(--vanilla-50);
+  border-top: 1px solid var(--form-border);
+  gap: var(--spacing-md);
+}
+
+.btn-form {
+  padding: var(--spacing-md) var(--spacing-xl);
+  border: none;
+  border-radius: var(--border-radius-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: var(--font-size-base);
+  min-width: 120px;
+  justify-content: center;
+}
+
+.btn-form.primary {
+  background: linear-gradient(135deg, var(--xanthous-500), var(--orange-wheel-500));
+  color: white;
+  box-shadow: var(--shadow-soft);
+}
+
+.btn-form.primary:hover {
+  background: linear-gradient(135deg, var(--orange-wheel-500), var(--fire-engine-red-500));
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-elevated);
+}
+
+.btn-form.secondary {
+  background: white;
+  color: var(--prussian-blue-600);
+  border: 2px solid var(--prussian-blue-300);
+}
+
+.btn-form.secondary:hover {
+  background: var(--prussian-blue-600);
+  color: white;
+}
+
+.btn-form.danger {
+  background: var(--fire-engine-red-500);
+  color: white;
+}
+
+.btn-form.danger:hover {
+  background: var(--fire-engine-red-600);
+  transform: translateY(-2px);
+}
+
+/* ================================
+   UPLOAD DE ARCHIVOS
+   ================================ */
+.file-upload {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.file-input {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.file-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xl);
+  border: 2px dashed var(--form-border);
+  border-radius: var(--border-radius-md);
+  background: var(--vanilla-50);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  text-align: center;
+}
+
+.file-label:hover,
+.file-input:focus + .file-label {
+  border-color: var(--form-focus);
+  background: var(--xanthous-50);
+}
+
+.file-icon {
+  font-size: var(--font-size-2xl);
+  color: var(--xanthous-500);
+}
+
+.file-text {
+  color: var(--prussian-blue-600);
+  font-weight: 500;
+}
+
+.file-subtext {
+  color: var(--prussian-blue-400);
+  font-size: var(--font-size-sm);
+}
+
+/* ================================
+   NAVEGACIÓN ENTRE PASOS
+   ================================ */
+.form-steps {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--spacing-xl);
+  background: white;
+  padding: var(--spacing-lg);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-soft);
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--border-radius-md);
+  transition: all 0.3s ease;
+  color: var(--prussian-blue-400);
+}
+
+.step.active {
+  background: var(--xanthous-100);
+  color: var(--xanthous-800);
+}
+
+.step.completed {
+  background: var(--prussian-blue-100);
+  color: var(--prussian-blue-800);
+}
+
+.step-number {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--vanilla-300);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+}
+
+.step.active .step-number {
+  background: var(--xanthous-500);
+  color: white;
+}
+
+.step.completed .step-number {
+  background: var(--prussian-blue-500);
+  color: white;
+}
+
+/* ================================
+   MENSAJES DE ALERTA
+   ================================ */
+.form-alert {
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--border-radius-md);
+  margin-bottom: var(--spacing-lg);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+}
+
+.form-alert.success {
+  background: var(--prussian-blue-50);
+  border-left: 4px solid var(--prussian-blue-500);
+  color: var(--prussian-blue-700);
+}
+
+.form-alert.warning {
+  background: var(--orange-wheel-50);
+  border-left: 4px solid var(--orange-wheel-500);
+  color: var(--orange-wheel-700);
+}
+
+.form-alert.error {
+  background: var(--fire-engine-red-50);
+  border-left: 4px solid var(--fire-engine-red-500);
+  color: var(--fire-engine-red-700);
+}
+
+.form-alert.info {
+  background: var(--xanthous-50);
+  border-left: 4px solid var(--xanthous-500);
+  color: var(--xanthous-700);
+}
+
+/* ================================
+   RESPONSIVE DESIGN
+   ================================ */
+@media (max-width: 1200px) {
+  .form-container {
+    max-width: 800px;
+    padding: var(--spacing-md);
+  }
+  
+  .form-grid-2,
+  .form-grid-3 {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .form-container {
+    padding: var(--spacing-sm);
+  }
+  
+  .form-header {
+    padding: var(--spacing-lg);
+  }
+  
+  .form-content {
+    padding: var(--spacing-lg);
+  }
+  
+  .form-title {
+    font-size: var(--font-size-xl);
+    flex-direction: column;
+    gap: var(--spacing-sm);
+  }
+  
+  .form-grid,
+  .form-grid-2,
+  .form-grid-3 {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+  }
+  
+  .form-actions {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+  }
+  
+  .btn-form {
+    width: 100%;
+  }
+  
+  .form-steps {
+    overflow-x: auto;
+    padding: var(--spacing-sm);
+  }
+}
+
+@media (max-width: 576px) {
+  .form-header {
+    padding: var(--spacing-md);
+  }
+  
+  .form-content {
+    padding: var(--spacing-md);
+  }
+  
+  .form-section {
+    margin-bottom: var(--spacing-lg);
+    padding-bottom: var(--spacing-md);
+  }
+  
+  .input-group {
+    flex-direction: column;
+  }
+  
+  .input-group .form-input {
+    border-radius: var(--border-radius-md);
+  }
+  
+  .input-addon {
+    border: 2px solid var(--form-border);
+    border-top: none;
+    border-radius: 0 0 var(--border-radius-md) var(--border-radius-md);
+  }
+}
+
+/* ================================
+   ANIMACIONES
+   ================================ */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.form-card {
+  animation: slideDown 0.4s ease-out;
+}
+
+.form-group {
+  animation: fadeInScale 0.3s ease-out;
+}
+
+.form-alert {
+  animation: slideDown 0.3s ease-out;
+}
+
+/* ================================
+   UTILIDADES ESPECÍFICAS
+   ================================ */
+.form-row {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: end;
+}
+
+.form-inline {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.form-readonly {
+  background: var(--vanilla-100) !important;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.form-loading {
+  position: relative;
+  pointer-events: none;
+}
+
+.form-loading::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+/* Estados de hover mejorados */
+.form-input:hover:not(:focus):not(:disabled),
+.form-select:hover:not(:focus):not(:disabled),
+.form-textarea:hover:not(:focus):not(:disabled) {
+  border-color: var(--xanthous-400);
+}
+
+/* Mejoras de accesibilidad */
+.form-input:focus-visible,
+.form-select:focus-visible,
+.form-textarea:focus-visible {
+  outline: 2px solid var(--form-focus);
+  outline-offset: 2px;
+}
+
+/* Estilos para campos deshabilitados */
+.form-input:disabled,
+.form-select:disabled,
+.form-textarea:disabled {
+  background: var(--vanilla-100);
+  color: var(--prussian-blue-400);
+  cursor: not-allowed;
+  opacity: 0.7;
+}

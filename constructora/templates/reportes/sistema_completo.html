@@ -5,12 +5,12 @@
 
 {% block content %}
 <div class="dashboard-header">
-    <h1><i class="fas fa-chart-bar"></i> Reportes del Sistema Completo</h1>
+    <h1><i class="fas fa-chart-bar text-xanthous"></i> Reportes del Sistema Completo</h1>
     <div class="header-actions">
-        <button class="btn btn-success" onclick="exportarPDF()">
+        <button class="btn btn btn-accent" onclick="exportarPDF()">
             <i class="fas fa-file-pdf"></i> Exportar PDF
         </button>
-        <button class="btn btn-info" onclick="actualizarReportes()">
+        <button class="btn btn btn btn-warm-primary" onclick="actualizarReportes()">
             <i class="fas fa-sync-alt"></i> Actualizar
         </button>
     </div>
@@ -20,9 +20,9 @@
 <div class="executive-summary">
     <h2><i class="fas fa-tachometer-alt"></i> Resumen Ejecutivo del Sistema</h2>
     <div class="stats-grid">
-        <div class="stat-card primary">
+        <div class="stat-stat-card primary fade-in-up">
             <div class="stat-icon">
-                <i class="fas fa-building"></i>
+                <i class="fas fa-building text-prussian-blue"></i>
             </div>
             <div class="stat-info">
                 <h3>{{ estadisticas.resumen_general.total_obras }}</h3>
@@ -30,9 +30,9 @@
             </div>
         </div>
         
-        <div class="stat-card success">
+        <div class="stat-stat-card success fade-in-up">
             <div class="stat-icon">
-                <i class="fas fa-users"></i>
+                <i class="fas fa-users text-orange-wheel"></i>
             </div>
             <div class="stat-info">
                 <h3>{{ estadisticas.resumen_general.total_empleados }}</h3>
@@ -40,9 +40,9 @@
             </div>
         </div>
         
-        <div class="stat-card warning">
+        <div class="stat-stat-card warning fade-in-up">
             <div class="stat-icon">
-                <i class="fas fa-boxes"></i>
+                <i class="fas fa-boxes text-vanilla-100"></i>
             </div>
             <div class="stat-info">
                 <h3>{{ estadisticas.resumen_general.total_materiales }}</h3>
@@ -50,7 +50,7 @@
             </div>
         </div>
         
-        <div class="stat-card info">
+        <div class="stat-stat-card info fade-in-up">
             <div class="stat-icon">
                 <i class="fas fa-truck"></i>
             </div>
@@ -60,9 +60,9 @@
             </div>
         </div>
         
-        <div class="stat-card danger">
+        <div class="stat-stat-card danger fade-in-up">
             <div class="stat-icon">
-                <i class="fas fa-exclamation-triangle"></i>
+                <i class="fas fa-exclamation-triangle text-fire-engine-red"></i>
             </div>
             <div class="stat-info">
                 <h3>{{ estadisticas.resumen_general.total_incidentes }}</h3>
@@ -70,7 +70,7 @@
             </div>
         </div>
         
-        <div class="stat-card dark">
+        <div class="stat-stat-card dark fade-in-up">
             <div class="stat-icon">
                 <i class="fas fa-book"></i>
             </div>
@@ -84,17 +84,17 @@
 
 <!-- Análisis Financiero -->
 <div class="section financial-section">
-    <h2><i class="fas fa-dollar-sign"></i> Análisis Financiero</h2>
+    <h2><i class="fas fa-coins"></i> Análisis Financiero</h2>
     <div class="financial-grid">
-        <div class="financial-card">
+        <div class="financial-stat-card fade-in-up">
             <h3>Valor Total de Proyectos</h3>
             <div class="financial-amount">
-                ${{ "{:,.0f}".format(estadisticas.valor_total_proyectos) }}
+                Q{{ "{:,.0f}".format(estadisticas.valor_total_proyectos) }}
             </div>
             <p class="financial-desc">Suma total de todas las obras activas</p>
         </div>
         
-        <div class="financial-card">
+        <div class="financial-stat-card fade-in-up">
             <h3>Avance Promedio</h3>
             <div class="progress-circle">
                 <div class="progress-text">{{ estadisticas.avance_promedio_obras }}%</div>
@@ -108,7 +108,7 @@
 <div class="section charts-section">
     <h2><i class="fas fa-chart-pie"></i> Distribución por Estados</h2>
     <div class="charts-grid">
-        <div class="chart-container">
+        <div class="chart-max-w-7xl mx-auto px-6">
             <h3>Obras por Estado</h3>
             <div class="chart-data">
                 {% for estado, cantidad in estadisticas.obras_por_estado.items() %}
@@ -123,7 +123,7 @@
             </div>
         </div>
         
-        <div class="chart-container">
+        <div class="chart-max-w-7xl mx-auto px-6">
             <h3>Incidentes por Estado</h3>
             <div class="chart-data">
                 {% for estado, cantidad in estadisticas.incidentes_por_estado.items() %}
@@ -144,7 +144,7 @@
 <div class="section metrics-section">
     <h2><i class="fas fa-clipboard-check"></i> Métricas de Control y Calidad</h2>
     <div class="metrics-grid">
-        <div class="metric-card">
+        <div class="metric-stat-card fade-in-up">
             <h4>Auditorías Realizadas</h4>
             <div class="metric-value">{{ estadisticas.resumen_general.total_auditorias }}</div>
             <div class="metric-trend positive">
@@ -152,7 +152,7 @@
             </div>
         </div>
         
-        <div class="metric-card">
+        <div class="metric-stat-card fade-in-up">
             <h4>Contratos Activos</h4>
             <div class="metric-value">{{ estadisticas.resumen_general.total_contratos }}</div>
             <div class="metric-trend neutral">
@@ -160,7 +160,7 @@
             </div>
         </div>
         
-        <div class="metric-card">
+        <div class="metric-stat-card fade-in-up">
             <h4>Equipos Disponibles</h4>
             <div class="metric-value">{{ estadisticas.resumen_general.total_equipos }}</div>
             <div class="metric-trend positive">
@@ -168,11 +168,11 @@
             </div>
         </div>
         
-        <div class="metric-card">
+        <div class="metric-stat-card fade-in-up">
             <h4>Registros de Avance</h4>
             <div class="metric-value">{{ estadisticas.resumen_general.total_avances }}</div>
             <div class="metric-trend positive">
-                <i class="fas fa-chart-line"></i> Control de progreso
+                <i class="fas fa-chart-line text-xanthous"></i> Control de progreso
             </div>
         </div>
     </div>
@@ -192,7 +192,7 @@
         </div>
         
         <div class="system-module">
-            <h4><i class="fas fa-users"></i> Recursos Humanos</h4>
+            <h4><i class="fas fa-users text-orange-wheel"></i> Recursos Humanos</h4>
             <ul>
                 <li>Empleados: {{ estadisticas.resumen_general.total_empleados }} activos</li>
                 <li>Áreas de Trabajo: Operativas</li>

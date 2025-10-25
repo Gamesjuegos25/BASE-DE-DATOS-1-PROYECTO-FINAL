@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Detalle Trabajo - Sistema Constructora{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+        <a href="{{ url_for('dashboard') }}">Dashboard</a> /
+        <a href="{{ url_for('listar_trabajos') }}">Trabajos</a> /
+        <span>Detalle</span>
+    </nav>
+
+    <div class="page-header">
+        <h1><i class="fas fa-hard-hat"></i> Detalle del Trabajo</h1>
+        <p class="subtitle">Información completa del trabajo #{{ trabajo.id_trabajo }}</p>
+    </div>
+
+    <div class="detail-card">
+        <div class="detail-header">
+            <h2>Información del Trabajo</h2>
+        </div>
+        
+        <div class="detail-grid">
+            <div class="detail-item">
+                <span class="detail-label"><i class="fas fa-hashtag"></i> ID</span>
+                <span class="detail-value">{{ trabajo.id_trabajo }}</span>
+            </div>
+
+            <div class="detail-item full-width">
+                <span class="detail-label"><i class="fas fa-info-circle"></i> Descripción</span>
+                <span class="detail-value">{{ trabajo.descripcion_trabajo }}</span>
+            </div>
+
+            <div class="detail-item">
+                <span class="detail-label"><i class="fas fa-coins"></i> Precio Unitario</span>
+                <span class="detail-value">
+                    {% if trabajo.precio_unitario_trabajo %}
+                        Q{{ "{:,.2f}".format(trabajo.precio_unitario_trabajo) }}
+                    {% else %}
+                        <span class="text-muted">No especificado</span>
+                    {% endif %}
+                </span>
+            </div>
+
+            <div class="detail-item">
+                <span class="detail-label"><i class="fas fa-ruler"></i> Unidad de Medida</span>
+                <span class="detail-value">{{ trabajo.unidad_trabajo or 'No especificada' }}</span>
+            </div>
+
+            <div class="detail-item">
+                <span class="detail-label"><i class="fas fa-tasks"></i> Actividades Asignadas</span>
+                <span class="detail-value">
+                    <span class="badge badge-info">{{ trabajo.actividades_asignadas }} actividades</span>
+                </span>
+            </div>
+        </div>
+
+        <div class="detail-actions">
+            <a href="{{ url_for('listar_trabajos') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Volver
+            </a>
+            <a href="{{ url_for('editar_trabajo', id=trabajo.id_trabajo) }}" class="btn btn-primary">
+                <i class="fas fa-edit"></i> Editar
+            </a>
+            <form action="{{ url_for('eliminar_trabajo', id=trabajo.id_trabajo) }}" 
+                  method="POST" class="inline-form"
+                  onsubmit="return confirm('¿Estás seguro de eliminar este trabajo?');">
+                <button type="submit" class="btn btn-danger">
+                    <i class="fas fa-trash"></i> Eliminar
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

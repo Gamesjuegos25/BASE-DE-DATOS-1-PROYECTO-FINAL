@@ -1,0 +1,373 @@
+/* ============================================
+   THEME OVERRIDE - APLICACIÓN FORZADA DE COLORES
+   Asegura que todos los elementos usen los colores del tema
+   ============================================ */
+
+/* SOBRESCRIBIR COLORES GLOBALES */
+* {
+    --primary-color: var(--prussian-blue) !important;
+    --secondary-color: var(--orange-wheel) !important;
+    --accent-color: var(--xanthous) !important;
+    --danger-color: var(--fire-engine-red) !important;
+    --background-color: var(--vanilla) !important;
+}
+
+/* APLICAR COLORES A ELEMENTOS COMUNES */
+body {
+    background-color: var(--vanilla-100) !important;
+    color: var(--prussian-blue-800) !important;
+}
+
+/* HEADER Y NAVEGACIÓN */
+.header,
+header {
+    background: linear-gradient(135deg, var(--prussian-blue), var(--prussian-blue-600)) !important;
+    color: var(--vanilla) !important;
+}
+
+.header h1,
+.header .header-subtitle {
+    color: var(--vanilla) !important;
+}
+
+/* SIDEBAR */
+.sidebar {
+    background: linear-gradient(180deg, var(--prussian-blue-300), var(--prussian-blue)) !important;
+}
+
+.sidebar .nav-link {
+    color: var(--vanilla-200) !important;
+    border-left: 3px solid transparent !important;
+}
+
+.sidebar .nav-link:hover,
+.sidebar .nav-link.active {
+    background: linear-gradient(90deg, var(--orange-wheel-200), var(--orange-wheel-100)) !important;
+    color: var(--vanilla) !important;
+    border-left-color: var(--xanthous) !important;
+}
+
+/* BOTONES */
+button,
+.btn,
+input[type="submit"],
+input[type="button"],
+.button {
+    background: linear-gradient(135deg, var(--prussian-blue), var(--prussian-blue-600)) !important;
+    color: var(--vanilla) !important;
+    border: 2px solid var(--prussian-blue-400) !important;
+}
+
+button:hover,
+.btn:hover,
+input[type="submit"]:hover,
+input[type="button"]:hover,
+.button:hover {
+    background: linear-gradient(135deg, var(--orange-wheel), var(--orange-wheel-600)) !important;
+    border-color: var(--orange-wheel-400) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 25px rgba(247, 127, 0, 0.3) !important;
+}
+
+/* BOTONES ESPECÍFICOS */
+.btn-primary {
+    background: linear-gradient(135deg, var(--prussian-blue), var(--prussian-blue-600)) !important;
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, var(--orange-wheel), var(--orange-wheel-600)) !important;
+}
+
+.btn-success {
+    background: linear-gradient(135deg, var(--xanthous-600), var(--xanthous)) !important;
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, var(--fire-engine-red), var(--fire-engine-red-600)) !important;
+}
+
+.btn-warning {
+    background: linear-gradient(135deg, var(--xanthous), var(--xanthous-600)) !important;
+}
+
+/* TARJETAS Y CONTENEDORES */
+.card,
+.content-card,
+.info-card,
+.stat-card {
+    background: linear-gradient(135deg, var(--vanilla), var(--vanilla-200)) !important;
+    border: 1px solid var(--prussian-blue-200) !important;
+    box-shadow: 0 4px 15px rgba(0, 48, 73, 0.1) !important;
+}
+
+.card-header {
+    background: linear-gradient(90deg, var(--prussian-blue-100), var(--prussian-blue-200)) !important;
+    color: var(--vanilla) !important;
+    border-bottom: 2px solid var(--orange-wheel-300) !important;
+}
+
+/* TABLAS */
+table,
+.table {
+    background: var(--vanilla) !important;
+    border: 1px solid var(--prussian-blue-200) !important;
+}
+
+table th,
+.table th,
+thead th {
+    background: linear-gradient(90deg, var(--prussian-blue-400), var(--prussian-blue-500)) !important;
+    color: var(--vanilla) !important;
+    border-bottom: 2px solid var(--orange-wheel) !important;
+}
+
+table td,
+.table td,
+tbody td {
+    border-bottom: 1px solid var(--prussian-blue-100) !important;
+    color: var(--prussian-blue-700) !important;
+}
+
+table tr:hover,
+.table tr:hover,
+tbody tr:hover {
+    background: linear-gradient(90deg, var(--vanilla-300), var(--vanilla-200)) !important;
+}
+
+/* FORMULARIOS */
+input,
+textarea,
+select,
+.form-control {
+    background: var(--vanilla-100) !important;
+    border: 2px solid var(--prussian-blue-200) !important;
+    color: var(--prussian-blue-700) !important;
+}
+
+input:focus,
+textarea:focus,
+select:focus,
+.form-control:focus {
+    border-color: var(--orange-wheel) !important;
+    box-shadow: 0 0 0 3px rgba(247, 127, 0, 0.2) !important;
+    background: var(--vanilla) !important;
+}
+
+.form-label,
+label {
+    color: var(--prussian-blue-600) !important;
+    font-weight: 600 !important;
+}
+
+/* ALERTAS Y NOTIFICACIONES */
+.alert {
+    border-left: 4px solid var(--orange-wheel) !important;
+    background: linear-gradient(90deg, var(--vanilla-100), var(--vanilla)) !important;
+}
+
+.alert-success {
+    border-left-color: var(--xanthous) !important;
+    background: linear-gradient(90deg, var(--xanthous-100), var(--xanthous-200)) !important;
+}
+
+.alert-danger,
+.alert-error {
+    border-left-color: var(--fire-engine-red) !important;
+    background: linear-gradient(90deg, var(--fire-engine-red-100), var(--fire-engine-red-200)) !important;
+    color: var(--fire-engine-red-800) !important;
+}
+
+.alert-warning {
+    border-left-color: var(--orange-wheel) !important;
+    background: linear-gradient(90deg, var(--orange-wheel-100), var(--orange-wheel-200)) !important;
+}
+
+.alert-info {
+    border-left-color: var(--prussian-blue) !important;
+    background: linear-gradient(90deg, var(--prussian-blue-100), var(--prussian-blue-200)) !important;
+}
+
+/* ENLACES */
+a {
+    color: var(--prussian-blue-600) !important;
+}
+
+a:hover {
+    color: var(--orange-wheel) !important;
+}
+
+/* ICONOS */
+.fa, .fas, .far, .fal, .fab {
+    transition: all 0.3s ease !important;
+}
+
+/* ELEMENTOS ESPECÍFICOS DE LA APLICACIÓN */
+.logout-btn {
+    background: linear-gradient(135deg, var(--fire-engine-red), var(--fire-engine-red-600)) !important;
+    color: var(--vanilla) !important;
+}
+
+.logout-btn:hover {
+    background: linear-gradient(135deg, var(--fire-engine-red-600), var(--fire-engine-red-700)) !important;
+}
+
+.user-menu {
+    background: rgba(234, 226, 183, 0.1) !important;
+    border: 1px solid var(--vanilla-300) !important;
+}
+
+.user-avatar {
+    background: linear-gradient(135deg, var(--orange-wheel), var(--xanthous)) !important;
+    color: var(--prussian-blue) !important;
+}
+
+/* DASHBOARD ESPECÍFICO */
+.dashboard-card {
+    background: linear-gradient(135deg, var(--vanilla), var(--vanilla-200)) !important;
+    border: 1px solid var(--prussian-blue-200) !important;
+}
+
+.stat-number {
+    color: var(--prussian-blue-700) !important;
+}
+
+.stat-label {
+    color: var(--prussian-blue-500) !important;
+}
+
+/* MÓDULOS ESPECÍFICOS */
+.module-card {
+    background: linear-gradient(135deg, var(--vanilla), var(--vanilla-200)) !important;
+    border: 2px solid var(--prussian-blue-200) !important;
+}
+
+.module-card:hover {
+    border-color: var(--orange-wheel) !important;
+    box-shadow: 0 8px 25px rgba(247, 127, 0, 0.2) !important;
+}
+
+.module-icon {
+    color: var(--orange-wheel) !important;
+}
+
+/* PAGINACIÓN */
+.pagination .page-link {
+    background: var(--vanilla) !important;
+    border: 1px solid var(--prussian-blue-200) !important;
+    color: var(--prussian-blue-600) !important;
+}
+
+.pagination .page-link:hover,
+.pagination .page-item.active .page-link {
+    background: linear-gradient(135deg, var(--prussian-blue), var(--prussian-blue-600)) !important;
+    color: var(--vanilla) !important;
+}
+
+/* MODALES */
+.modal-content {
+    background: linear-gradient(135deg, var(--vanilla), var(--vanilla-200)) !important;
+    border: 2px solid var(--prussian-blue-300) !important;
+}
+
+.modal-header {
+    background: linear-gradient(90deg, var(--prussian-blue-400), var(--prussian-blue-500)) !important;
+    color: var(--vanilla) !important;
+    border-bottom: 2px solid var(--orange-wheel) !important;
+}
+
+/* BREADCRUMB */
+.breadcrumb {
+    background: linear-gradient(90deg, var(--vanilla-200), var(--vanilla-300)) !important;
+}
+
+.breadcrumb-item a {
+    color: var(--prussian-blue-600) !important;
+}
+
+.breadcrumb-item.active {
+    color: var(--orange-wheel) !important;
+}
+
+/* PROGRESS BARS */
+.progress {
+    background: var(--vanilla-300) !important;
+}
+
+.progress-bar {
+    background: linear-gradient(90deg, var(--orange-wheel), var(--xanthous)) !important;
+}
+
+/* BADGES */
+.badge {
+    background: linear-gradient(135deg, var(--prussian-blue), var(--prussian-blue-600)) !important;
+    color: var(--vanilla) !important;
+}
+
+.badge-primary {
+    background: linear-gradient(135deg, var(--prussian-blue), var(--prussian-blue-600)) !important;
+}
+
+.badge-secondary {
+    background: linear-gradient(135deg, var(--orange-wheel), var(--orange-wheel-600)) !important;
+}
+
+.badge-success {
+    background: linear-gradient(135deg, var(--xanthous-600), var(--xanthous)) !important;
+}
+
+.badge-danger {
+    background: linear-gradient(135deg, var(--fire-engine-red), var(--fire-engine-red-600)) !important;
+}
+
+.badge-warning {
+    background: linear-gradient(135deg, var(--xanthous), var(--xanthous-600)) !important;
+}
+
+/* EFECTOS GLOBALES */
+.hover-effect:hover {
+    transform: translateY(-2px) scale(1.02) !important;
+    box-shadow: 0 8px 25px rgba(0, 48, 73, 0.2) !important;
+}
+
+.glow-effect {
+    box-shadow: 0 0 20px rgba(247, 127, 0, 0.3) !important;
+}
+
+/* ANIMACIONES */
+@keyframes warm-pulse {
+    0%, 100% { box-shadow: 0 0 5px rgba(247, 127, 0, 0.4); }
+    50% { box-shadow: 0 0 20px rgba(247, 127, 0, 0.8); }
+}
+
+.pulse-warm {
+    animation: warm-pulse 2s infinite !important;
+}
+
+/* RESPONSIVE OVERRIDES */
+@media (max-width: 768px) {
+    .sidebar {
+        background: linear-gradient(180deg, var(--prussian-blue), var(--prussian-blue-400)) !important;
+    }
+    
+    .main-content {
+        background: var(--vanilla-100) !important;
+    }
+}
+
+/* SCROLLBARS PERSONALIZADOS */
+::-webkit-scrollbar {
+    width: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--vanilla-200) !important;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--prussian-blue-400), var(--orange-wheel)) !important;
+    border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, var(--orange-wheel), var(--xanthous)) !important;
+}

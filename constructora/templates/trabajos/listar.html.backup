@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}Trabajos - Sistema Constructora{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+        <a href="{{ url_for('dashboard') }}">Dashboard</a> /
+        <span>Trabajos</span>
+    </nav>
+
+    <div class="page-header">
+        <div>
+            <h1><i class="fas fa-hard-hat"></i> Gestión de Trabajos</h1>
+            <p class="subtitle">Administra los tipos de trabajos de construcción</p>
+        </div>
+        <a href="{{ url_for('crear_trabajo') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Nuevo Trabajo
+        </a>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-hard-hat"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ trabajos|length }}</h3>
+                <p>Tipos de Trabajo</p>
+            </div>
+        </div>
+
+<!-- Estadísticas del Módulo -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon bg-blue">
+            <i class="fas fa-list"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ trabajos|length or 0 }}</div>
+            <div class="stat-label">Total Trabajos</div>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon bg-green">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ trabajos|length or 0 }}</div>
+            <div class="stat-label">Activos</div>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon bg-orange">
+            <i class="fas fa-clock"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">0</div>
+            <div class="stat-label">Pendientes</div>
+        </div>
+    </div>
+</div>
+
+    </div>
+
+    <!-- Tabla de Trabajos -->
+    <div class="card">
+        <div class="card-header">
+            <h2><i class="fas fa-list"></i> Lista de Trabajos</h2>
+        </div>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Descripción</th>
+                        <th>Precio Unitario</th>
+                        <th>Unidad</th>
+                        <th>Actividades</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if trabajos %}
+                        {% for trabajo in trabajos %}
+                        <tr>
+                            <td>{{ trabajo.id_trabajo }}</td>
+                            <td>{{ trabajo.descripcion_trabajo }}</td>
+                            <td>
+                                {% if trabajo.precio_unitario_trabajo %}
+                                    Q{{ "{:,.2f}".format(trabajo.precio_unitario_trabajo) }}
+                                {% else %}
+                                    <span class="text-muted">N/A</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ trabajo.unidad_trabajo or 'N/A' }}</td>
+                            <td>
+                                <span class="badge badge-info">
+                                    {{ trabajo.actividades_asignadas }} actividades
+                                </span>
+                            </td>
+                            <td class="actions">
+                                <a href="{{ url_for('ver_trabajo', id=trabajo.id_trabajo) }}" 
+                                   class="btn-action btn-view" title="Ver detalle">
+                                    <i class="fas fa-eye"></i> Ver
+                                </a>
+                                <a href="{{ url_for('editar_trabajo', id=trabajo.id_trabajo) }}" 
+                                   class="btn-action btn-edit" title="Editar">
+                                    <i class="fas fa-edit"></i> Editar
+                                </a>
+                                <form action="{{ url_for('eliminar_trabajo', id=trabajo.id_trabajo) }}" 
+                                      method="POST" class="inline-form" 
+                                      onsubmit="return confirm('¿Estás seguro de eliminar este trabajo?');">
+                                    <button type="submit" class="btn-action btn-danger" title="Eliminar">
+                                        <i class="fas fa-trash"></i> Eliminar
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center">No hay trabajos registrados</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

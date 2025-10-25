@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <!-- CSS específico para páginas de detalle -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/detail-page.css') }}">
+    
+    <!-- CSS para páginas de detalle -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/detail-page.css') }}">{% endblock %}
+
+
+{% block title %}Detalle Presupuesto - Sistema Constructora{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-6">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+        <a href="{{ url_for('dashboard') }}">Dashboard</a> /
+        <a href="{{ url_for('listar_presupuestos') }}">Presupuestos</a> /
+        <span>Detalle</span>
+    </nav>
+
+    <div class="page-header">
+        <h1><i class="fas fa-calculator"></i> Detalle del Presupuesto</h1>
+        <p class="subtitle">Información completa del presupuesto #{{ presupuesto.id_presupuesto }}</p>
+    </div>
+
+    <div class="detail-card">
+        <div class="detail-header">
+            <h2>Información del Presupuesto</h2>
+        </div>
+        
+        <div class="detail-grid">
+            <div class="detail-item">
+                <span class="detail-label"><i class="fas fa-hashtag"></i> ID</span>
+                <span class="detail-value">{{ presupuesto.id_presupuesto }}</span>
+            </div>
+
+            <div class="detail-item">
+                <span class="detail-label"><i class="fas fa-coins"></i> Monto Estimado</span>
+                <span class="detail-value">Q{{ "{:,.2f}".format(presupuesto.monto_estimado_presupuesto) }}</span>
+            </div>
+
+            <div class="detail-item">
+                <span class="detail-label"><i class="fas fa-calendar-alt"></i> Fecha</span>
+                <span class="detail-value">{{ presupuesto.fecha_presupuesto }}</span>
+            </div>
+
+            <div class="detail-item full-width">
+                <span class="detail-label"><i class="fas fa-building text-prussian-blue"></i> Obra Asociada</span>
+                <span class="detail-value">
+                    {% if presupuesto.nombre_obra %}
+                        <span class="status-badge-detail">{{ presupuesto.nombre_obra }}</span>
+                    {% else %}
+                        <span class="status-badge-detail">Sin obra asignada</span>
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+
+        <div class="detail-actions">
+            <a href="{{ url_for('listar_presupuestos') }}" class="btn btn btn btn-warm-secondary">
+                <i class="fas fa-arrow-left"></i> Volver
+            </a>
+            <a href="{{ url_for('editar_presupuesto', id=presupuesto.id_presupuesto) }}" class="btn btn btn btn-warm-primary">
+                <i class="fas fa-edit"></i> Editar
+            </a>
+            <form action="{{ url_for('eliminar_presupuesto', id=presupuesto.id_presupuesto) }}" 
+                  method="POST" class="inline-form"
+                  onsubmit="return confirm('¿Estás seguro de eliminar este presupuesto?');">
+                <button type="submit" class="btn btn btn btn-warm-danger">
+                    <i class="fas fa-trash"></i> Eliminar
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

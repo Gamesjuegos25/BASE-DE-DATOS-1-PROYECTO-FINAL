@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <!-- CSS para formularios -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/form-pages.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/date-picker-enhanced.css') }}">
+    <!-- CSS y JS estandarizados para calendarios -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/calendar-styles.css') }}">
+    <script src="{{ url_for('static', filename='js/calendar-utils.js') }}"></script>
+{% endblock %}
+
+{% block title %}Crear Incidente - Sistema Constructora{% endblock %}
+
+{% block content %}
+    <div class="create-form-max-w-7xl mx-auto px-6">
+        <!-- Header -->
+        <div class="create-page-header">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="{{ url_for('dashboard') }}">
+                            <i class="fas fa-home"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="{{ url_for('listar_incidentes') }}">
+                            <i class="fas fa-list"></i> Incidentes
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        <i class="fas fa-plus"></i> Crear Incidente
+                    </li>
+                </ol>
+            </nav>
+            
+            <div class="create-title-section">
+                <h1 class="create-title">
+                    <i class="fas fa-plus-circle"></i>
+                    Crear Incidente
+                </h1>
+                <p class="create-subtitle">Complete el formulario para registrar una nueva incidente</p>
+            </div>
+        </div>
+
+        <!-- Formulario -->
+        <div class="form-card">
+            <form method="POST" action="{{ url_for('crear_incidente') }}" class="needs-validation" novalidate>
+                <div class="create-form-flex flex-wrap -mx-2">
+                    <div class="create-form-group">
+                        <label class="form-label">
+                            Obra <span class="required">*</span>
+                        </label>
+                        <select class="form-select" id="obra_id" name="obra_id" required>
+                            <option value="">Seleccione una obra</option>
+                            {% for obra in obras %}
+                            <option value="{{ obra.id or obra.obra_id }}">{{ obra.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="invalid-feedback">
+                            Por favor ingrese obra.
+                        </div>
+                    </div>
+                    <div class="create-form-group">
+                        <label class="form-label">
+                            Empleado Reportante <span class="required">*</span>
+                        </label>
+                        <select class="form-select" id="empleado_id" name="empleado_id" required>
+                            <option value="">Seleccione un empleado</option>
+                            {% for empleado in empleados %}
+                            <option value="{{ empleado.id or empleado.empleado_id }}">{{ empleado.nombre }} {{ empleado.apellido or '' }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="invalid-feedback">
+                            Por favor ingrese empleado reportante.
+                        </div>
+                    </div>
+                </div>
+                <div class="create-form-flex flex-wrap -mx-2">
+                    <!-- Fecha del incidente estandarizada -->
+                    <div class="calendar-field-group" data-field-type="fecha_incidente">
+                        <label for="fecha_incidente" class="form-label">
+                            <i class="fas fa-exclamation-circle text-red-500"></i> Fecha del Incidente
+                            <span class="required-mark text-red-500 ml-1">*</span>
+                        </label>
+                        <div class="input-wrapper date-input-wrapper">
+                            <input 
+                                type="datetime-local" 
+                                class="form-input standardized-calendar" 
+                                name="fecha_incidente" 
+                                id="fecha_incidente"
+                                value="{{ request.form.fecha_incidente if request.form else '' }}"
+                                placeholder="Fecha y hora del incidente"
+                                required
+                                max="{{ 'now'|strftime('%Y-%m-%dT%H:%M') }}"
+                                data-field-type="fecha_incidente"
+                            />
+                            <i class="fas fa-clock input-icon"></i>
+                        </div>
+                        <small class="form-help text-vanilla-600">
+                            Fecha y hora exacta del incidente (no fechas futuras)
+                        </small>
+                    </div>
+                    <div class="create-form-group">
+                        <label class="form-label">
+                            Tipo de Incidente <span class="required">*</span>
+                        </label>
+                        <select class="form-select" id="tipo_incidente" name="tipo_incidente" required>
+                            <option value="">Seleccione el tipo</option>
+                            <option value="accidente">🚨 Accidente</option>
+                            <option value="seguridad">🔒 Seguridad</option>
+                            <option value="calidad">⚡ Calidad</option>
+                            <option value="ambiental">🌍 Ambiental</option>
+                            <option value="otro">❓ Otro</option>
+                        </select>
+                        <div class="invalid-feedback">
+                            Por favor ingrese tipo de incidente.
+                        </div>
+                    </div>
+                </div>
+                <div class="create-form-flex flex-wrap -mx-2">
+                    <div class="create-form-group">
+                        <label class="form-label">
+                            Descripción del Incidente <span class="required">*</span>
+                        </label>
+                        <textarea class="form-textarea" id="descripcion" name="descripcion" rows="4" required placeholder="Ingrese descripción del incidente"></textarea>
+                        <div class="invalid-feedback">
+                            Por favor ingrese descripción del incidente.
+                        </div>
+                    </div>
+                    <div class="create-form-group">
+                        <label class="form-label">
+                            Gravedad <span class="required">*</span>
+                        </label>
+                        <select class="form-select" id="gravedad" name="gravedad" required>
+                            <option value="">Seleccione la gravedad</option>
+                            <option value="leve">🟢 Leve</option>
+                            <option value="moderada">🟡 Moderada</option>
+                            <option value="grave">🟠 Grave</option>
+                            <option value="crítica">🔴 Crítica</option>
+                        </select>
+                        <div class="invalid-feedback">
+                            Por favor ingrese gravedad.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones de acción -->
+                <div class="create-form-actions">
+                    <div class="action-buttons">
+                        <a href="{{ url_for('listar_incidentes') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn btn btn-warm-primary">
+                            <i class="fas fa-save"></i> Guardar Incidente
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+<script>
+    // Validación de formularios Bootstrap
+    (function() {
+        'use strict';
+        window.addEventListener('load', function() {
+            var forms = document.getElementsByClassName('needs-validation');
+            var validation = Array.prototype.filter.call(forms, function(form) {
+                form.addEventListener('submit', function(event) {
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        }, false);
+    })();
+</script>
+
+{% endblock %}

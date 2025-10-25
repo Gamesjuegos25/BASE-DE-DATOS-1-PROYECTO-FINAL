@@ -1,120 +1,249 @@
-<!-- templates/actividades/crear.html -->
 {% extends "base.html" %}
 
-{% block title %}Nueva Actividad{% endblock %}
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sistema-unificado.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/calendar-styles.css') }}">
+{% endblock %}
+
+{% block title %}Nueva Actividad - Sistema Constructora{% endblock %}
 
 {% block content %}
-<div class="dashboard-header">
-    <h1><i class="fas fa-plus"></i> Nueva Actividad</h1>
-    <a href="{{ url_for('listar_actividades') }}" class="btn btn-secondary">
-        <i class="fas fa-arrow-left"></i> Volver a Lista
-    </a>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/create-forms.css') }}">
+
+<div class="create-form-max-w-7xl mx-auto px-6">
+    <!-- Header de página estilo detalle -->
+    <div class="create-page-header">
+        <nav class="breadcrumb">
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <span class="breadcrumb-separator">/</span>
+            <a href="{{ url_for('listar_actividades') }}">Actividades</a>
+            <span class="breadcrumb-separator">/</span>
+            <span>Nueva</span>
+        </nav>
+        <h1 class="create-page-title">
+            <i class="fas fa-tasks"></i>
+            Crear Nueva Actividad
+        </h1>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-6-fluid">
+        <form method="POST" action="{{ url_for('crear_actividad') }}" id="create-actividad-form" class="needs-validation" novalidate>
+            <div class="create-form-flex flex-wrap -mx-2">
+                <!-- Información General -->
+                <div class="form-card">
+                    <div class="stat-stat-header">
+                        <h5><i class="fas fa-info-circle text-prussian-blue-700"></i> Información de la Actividad</h5>
+                    </div>
+                    <div class="stat-module-content">
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-tasks"></i>Nombre de la Actividad<span class="required">*</span>
+                            </label>
+                            <input class="form-input" id="nombre" name="nombre" 
+                                   placeholder="Ej: Instalación eléctrica principal" 
+                                   value="{{ request.form.nombre if request.form else '' }}" required>
+                            <div class="invalid-feedback">
+                                Por favor, ingrese el nombre de la actividad.
+                            </div>
+                        </div>
+
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-align-left"></i>Descripción<span class="required">*</span>
+                            </label>
+                            <textarea class="form-textarea" id="descripcion" name="descripcion" rows="4" 
+                                      placeholder="Describe los detalles de la actividad" required>{{ request.form.descripcion if request.form else '' }}</textarea>
+                            <div class="invalid-feedback">
+                                Por favor, ingrese la descripción de la actividad.
+                            </div>
+                        </div>
+
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-layer-group"></i>Área<span class="required">*</span>
+                            </label>
+                            <select class="form-select" id="area_id" name="area_id" required>
+                                <option value="">Seleccione un área</option>
+                                {%- for item in areas %}
+                                <option value="{{ item[0] }}" {{ 'selected' if request.form.area_id == item[0]|string else '' }}>{{ item[1] }}</option>
+                                {%- endfor %}
+                            </select>
+                            <div class="invalid-feedback">
+                                Por favor, seleccione un área.
+                            </div>
+                        </div>
+
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-hourglass-half"></i>Duración Estimada (horas)
+                            </label>
+                            <input class="form-input" id="duracion_estimada" name="duracion_estimada" 
+                                   placeholder="8.0" 
+                                   value="{{ request.form.duracion_estimada if request.form else '' }}">
+                            <div class="invalid-feedback">
+                                Por favor, ingrese la duración estimada.
+                            </div>
+                        </div>
+
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-exclamation-triangle text-fire-engine-red"></i>Prioridad<span class="required">*</span>
+                            </label>
+                            <select class="form-select" id="prioridad" name="prioridad" required>
+                                <option value="">Seleccione una prioridad</option>
+                                <option value="baja" {{ 'selected' if request.form.prioridad == 'baja' else '' }}>Baja</option>
+                                <option value="media" {{ 'selected' if request.form.prioridad == 'media' else '' }}>Media</option>
+                                <option value="alta" {{ 'selected' if request.form.prioridad == 'alta' else '' }}>Alta</option>
+                                <option value="crítica" {{ 'selected' if request.form.prioridad == 'crítica' else '' }}>Crítica</option>
+                            </select>
+                            <div class="invalid-feedback">
+                                Por favor, seleccione una prioridad.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Calendarización -->
+                <div class="form-card">
+                    <div class="stat-stat-header">
+                        <h5><i class="fas fa-calendar-alt text-prussian-blue-700"></i> Calendarización</h5>
+                    </div>
+                    <div class="stat-module-content">
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-calendar-day"></i>Fecha Programada
+                            </label>
+                            <input class="form-input calendar-input" 
+                                   type="date" 
+                                   id="fecha_programada" 
+                                   name="fecha_programada" 
+                                   value="{{ request.form.fecha_programada if request.form else '' }}">
+                            <div class="calendar-help-text">
+                                <i class="fas fa-info-circle"></i>
+                                Seleccione la fecha cuando debe ejecutarse esta actividad
+                            </div>
+                        </div>
+
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-clock"></i>Hora de Inicio
+                            </label>
+                            <input class="form-input calendar-input" 
+                                   type="time" 
+                                   id="hora_inicio" 
+                                   name="hora_inicio" 
+                                   value="{{ request.form.hora_inicio if request.form else '08:00' }}">
+                        </div>
+
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-clock"></i>Hora de Finalización (Estimada)
+                            </label>
+                            <input class="form-input calendar-input" 
+                                   type="time" 
+                                   id="hora_fin" 
+                                   name="hora_fin" 
+                                   value="{{ request.form.hora_fin if request.form else '17:00' }}">
+                        </div>
+
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-repeat"></i>Frecuencia
+                            </label>
+                            <select class="form-select calendar-select" id="frecuencia" name="frecuencia">
+                                <option value="unica" {{ 'selected' if request.form.frecuencia == 'unica' else '' }}>Única vez</option>
+                                <option value="diaria" {{ 'selected' if request.form.frecuencia == 'diaria' else '' }}>Diaria</option>
+                                <option value="semanal" {{ 'selected' if request.form.frecuencia == 'semanal' else '' }}>Semanal</option>
+                                <option value="mensual" {{ 'selected' if request.form.frecuencia == 'mensual' else '' }}>Mensual</option>
+                            </select>
+                        </div>
+
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-sticky-note"></i>Notas de Calendarización
+                            </label>
+                            <textarea class="form-textarea calendar-textarea" 
+                                      id="notas_calendario" 
+                                      name="notas_calendario" 
+                                      rows="3" 
+                                      placeholder="Notas adicionales sobre la programación...">{{ request.form.notas_calendario if request.form else '' }}</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Botones de acción -->
+            <div class="form-actions mt-6">
+                <div class="flex justify-between">
+                    <a href="{{ url_for('listar_actividades') }}" class="btn btn btn btn-warm-secondary">
+                        <i class="fas fa-times"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn btn btn btn-warm-primary">
+                        <i class="fas fa-save"></i> Guardar Actividad
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
 </div>
 
-<div class="form-container">
-    <form method="POST" class="form-card">
-        <div class="form-section">
-            <h3><i class="fas fa-info-circle"></i> Información Básica</h3>
-            
-            <div class="form-group">
-                <label for="nombre">Nombre de la Actividad *</label>
-                <input type="text" id="nombre" name="nombre" required
-                       placeholder="Ej: Excavación y Cimentación"
-                       class="form-control">
-                <small class="form-text">Nombre descriptivo de la actividad a realizar</small>
-            </div>
-            
-            <div class="form-group">
-                <label for="descripcion">Descripción Detallada</label>
-                <textarea id="descripcion" name="descripcion" 
-                         placeholder="Descripción detallada de la actividad, procedimientos, materiales necesarios..."
-                         class="form-control" rows="4"></textarea>
-                <small class="form-text">Detalles técnicos y procedimientos de la actividad</small>
-            </div>
-            
-            <div class="form-group">
-                <label for="fecha_programada">Fecha Programada</label>
-                <input type="date" id="fecha_programada" name="fecha_programada" 
-                       class="form-control">
-                <small class="form-text">Fecha estimada para ejecutar esta actividad</small>
-            </div>
-        </div>
+<script src="{{ url_for('static', filename='js/calendar-utils.js') }}"></script>
+<script>
+// Validación de formularios Bootstrap
+(function() {
+    'use strict';
+    window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        var validation = Array.prototype.filter.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+})();
+
+// Inicializar funcionalidad de calendario
+document.addEventListener('DOMContentLoaded', function() {
+    initializeCalendarSystem();
+    
+    // Auto-calcular hora de fin basada en duración estimada
+    const duracionInput = document.getElementById('duracion_estimada');
+    const horaInicioInput = document.getElementById('hora_inicio');
+    const horaFinInput = document.getElementById('hora_fin');
+    
+    function calcularHoraFin() {
+        const duracion = parseFloat(duracionInput.value) || 8;
+        const horaInicio = horaInicioInput.value || '08:00';
         
-        <div class="form-actions">
-            <button type="submit" class="btn btn-primary">
-                <i class="fas fa-save"></i> Crear Actividad
-            </button>
-            <button type="reset" class="btn btn-secondary">
-                <i class="fas fa-redo"></i> Limpiar Formulario
-            </button>
-        </div>
-    </form>
-</div>
-
-<style>
-.form-container {
-    max-width: 800px;
-    margin: 0 auto;
-}
-
-.form-card {
-    background: white;
-    border-radius: 10px;
-    padding: 2rem;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-}
-
-.form-section {
-    margin-bottom: 2rem;
-}
-
-.form-section h3 {
-    color: #2c3e50;
-    margin-bottom: 1.5rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 2px solid #3498db;
-}
-
-.form-group {
-    margin-bottom: 1.5rem;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 600;
-    color: #2c3e50;
-}
-
-.form-control {
-    width: 100%;
-    padding: 0.75rem;
-    border: 2px solid #e3e6ea;
-    border-radius: 5px;
-    font-size: 1rem;
-    transition: border-color 0.3s;
-}
-
-.form-control:focus {
-    outline: none;
-    border-color: #3498db;
-}
-
-.form-text {
-    color: #6c757d;
-    font-size: 0.875rem;
-    margin-top: 0.25rem;
-}
-
-.form-actions {
-    text-align: center;
-    padding-top: 2rem;
-    border-top: 1px solid #e3e6ea;
-}
-
-.form-actions .btn {
-    margin: 0 0.5rem;
-    padding: 0.75rem 2rem;
-}
-</style>
+        if (horaInicio) {
+            const [horas, minutos] = horaInicio.split(':').map(Number);
+            const inicioEnMinutos = horas * 60 + minutos;
+            const finEnMinutos = inicioEnMinutos + (duracion * 60);
+            
+            const horasFin = Math.floor(finEnMinutos / 60);
+            const minutosFin = finEnMinutos % 60;
+            
+            const horaFinFormateada = String(horasFin).padStart(2, '0') + ':' + String(minutosFin).padStart(2, '0');
+            horaFinInput.value = horaFinFormateada;
+        }
+    }
+    
+    if (duracionInput && horaInicioInput && horaFinInput) {
+        duracionInput.addEventListener('input', calcularHoraFin);
+        horaInicioInput.addEventListener('change', calcularHoraFin);
+    }
+    
+    // Validación de fechas
+    const fechaInput = document.getElementById('fecha_programada');
+    if (fechaInput) {
+        fechaInput.addEventListener('change', function() {
+            validateCalendarDate(this);
+        });
+    }
+});
+</script>
 {% endblock %}

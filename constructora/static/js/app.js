@@ -738,4 +738,27 @@ if (typeof window !== 'undefined') {
     window.mostrarFormularioEmpleado = mostrarFormularioEmpleado;
     window.mostrarFormularioMaterial = mostrarFormularioMaterial;
     window.mostrarFormularioProveedor = mostrarFormularioProveedor;
+    window.toggleUserDropdown = toggleUserDropdown;
 }
+
+// Función para controlar el dropdown de usuario
+function toggleUserDropdown() {
+    const dropdown = document.getElementById('userDropdown');
+    const userMenu = document.querySelector('.user-menu');
+    
+    if (dropdown) {
+        dropdown.classList.toggle('show');
+        userMenu.classList.toggle('open');
+    }
+}
+
+// Cerrar dropdown al hacer clic fuera
+document.addEventListener('click', function(event) {
+    const userMenu = document.querySelector('.user-menu');
+    const dropdown = document.getElementById('userDropdown');
+    
+    if (userMenu && dropdown && !userMenu.contains(event.target)) {
+        dropdown.classList.remove('show');
+        userMenu.classList.remove('open');
+    }
+});

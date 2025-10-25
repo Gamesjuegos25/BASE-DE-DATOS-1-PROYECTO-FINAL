@@ -1,12 +1,140 @@
 {% extends "base.html" %}
 
-{% block title %}Proveedores - Sistema Constructora{% endblock %}
+{% block head %}
+    <!-- CSS para páginas de listado -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/list-pages.css') }}">{% endblock %}
+
+
+{% block title %}Proveedores - Sistema Constructora
+<script>
+// Mejoras JavaScript automáticas para tablas
+document.addEventListener('DOMContentLoaded', function() {
+    // Aplicar efectos de hover a filas de tabla
+    const tableRows = document.querySelectorAll('.data-table-enhanced tbody tr, table tbody tr');
+    tableRows.forEach((row, index) => {
+        row.style.animationDelay = `${index * 0.1}s`;
+        row.classList.add('fade-in-up');
+        
+        row.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+            this.style.boxShadow = '0 4px 15px rgba(247, 127, 0, 0.2)';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = 'none';
+        });
+    });
+    
+    // Mejorar botones de acción con tooltips
+    const actionButtons = document.querySelectorAll('.btn-action-enhanced, .action-buttons a, .action-buttons button');
+    actionButtons.forEach(button => {
+        if (!button.querySelector('.custom-tooltip')) {
+            button.addEventListener('mouseenter', function() {
+                const title = this.getAttribute('title');
+                if (title) {
+                    const tooltip = document.createElement('div');
+                    tooltip.className = 'custom-tooltip';
+                    tooltip.textContent = title;
+                    tooltip.style.cssText = `
+                        position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+                        background: var(--prussian-blue-700); color: var(--vanilla);
+                        padding: 4px 8px; border-radius: 4px; font-size: 0.7rem;
+                        white-space: nowrap; z-index: 1000; margin-bottom: 5px;
+                    `;
+                    this.style.position = 'relative';
+                    this.appendChild(tooltip);
+                }
+            });
+            
+            button.addEventListener('mouseleave', function() {
+                const tooltip = this.querySelector('.custom-tooltip');
+                if (tooltip) tooltip.remove();
+            });
+        }
+    });
+    
+    // Contador animado para números
+    const statNumbers = document.querySelectorAll('.stat-number-enhanced, .stat-number');
+    statNumbers.forEach(stat => {
+        const finalNumber = parseInt(stat.textContent) || 0;
+        if (finalNumber > 0) {
+            let currentNumber = 0;
+            const increment = Math.max(1, Math.ceil(finalNumber / 20));
+            const timer = setInterval(() => {
+                currentNumber += increment;
+                if (currentNumber >= finalNumber) {
+                    currentNumber = finalNumber;
+                    clearInterval(timer);
+                }
+                stat.textContent = currentNumber;
+            }, 100);
+        }
+    });
+});
+</script>
+{% endblock %}
 
 {% block content %}
-<div class="container">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/enhanced-tables.css') }}">
+
+<div class="page-container"><div class="page-header fade-in-up">
+    <div class="header-content">
+        <div class="header-left">
+            <h1 class="page-title">
+                <i class="fas fa-truck"></i>
+                Gestión de Proveedores
+            </h1>
+            <p class="page-subtitle">Control y administración de proveedores</p>
+        </div>
+        <div class="header-actions">
+            <a href="{{ url_for('crear_proveedor') }}" class="btn btn btn btn-warm-primary">
+                <i class="fas fa-plus"></i>
+                Nuevo Proveedor
+            </a>
+        </div>
+    </div>
+
+<!-- Estadísticas de Proveedores -->
+<div class="stats-grid">
+    <div class="stat-stat-card fade-in-up">
+        <div class="stat-icon bg-blue">
+            <i class="fas fa-truck"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ proveedores|length or 0 }}</div>
+            <div class="stat-label">Total Proveedores</div>
+        </div>
+    </div>
+    
+    <div class="stat-stat-card fade-in-up">
+        <div class="stat-icon bg-green">
+            <i class="fas fa-check-circle text-xanthous-600"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ proveedores|length or 0 }}</div>
+            <div class="stat-label">Activos</div>
+        </div>
+    </div>
+    
+    <div class="stat-stat-card fade-in-up">
+        <div class="stat-icon bg-orange">
+            <i class="fas fa-handshake"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">0</div>
+            <div class="stat-label">Contratos Activos</div>
+        </div>
+    </div>
+</div>
+
+</div>
+
+
+<div class="max-w-7xl mx-auto px-6">
     <div class="header-section">
-        <h1>🏪 Gestión de Proveedores</h1>
-        <a href="{{ url_for('crear_proveedor') }}" class="btn-primary">
+        <h1><i class="fas fa-list"></i> 🏪 Gestión de Proveedores</h1>
+        <a href="{{ url_for('crear_proveedor') }}" class="btn btn btn-warm-primary">
             ➕ Nuevo Proveedor
         </a>
     </div>
@@ -21,41 +149,40 @@
         {% endif %}
     {% endwith %}
     
-    <div class="stats-cards">
-        <div class="stat-card">
+    <div class="stats-cards fade-in-up">
+        <div class="stat-stat-card fade-in-up">
             <h3>{{ proveedores|length }}</h3>
             <p>Total Proveedores</p>
         </div>
-        <div class="stat-card">
+        <div class="stat-stat-card fade-in-up">
             <h3>{{ proveedores|selectattr('contacto')|list|length }}</h3>
             <p>Con Contacto</p>
         </div>
-        <div class="stat-card">
+        <div class="stat-stat-card fade-in-up">
             <h3>{{ proveedores|length }}</h3>
             <p>Activos</p>
         </div>
-        <div class="stat-card">
+        <div class="stat-stat-card fade-in-up">
             <h3>0</h3>
             <p>Nuevos este mes</p>
         </div>
     </div>
     
     {% if proveedores %}
-        <div class="table-container">
+        <div class="list-table-container">
             <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
+                <thead><tr>
+                        <th class="d-none d-md-table-cell">ID</th>
                         <th>Nombre del Proveedor</th>
                         <th>Contacto</th>
-                        <th>Estado</th>
-                        <th>Acciones</th>
+                        <th><i class="fas fa-tasks"></i> Estado</th>
+                        <th class="text-center"><i class="fas fa-cogs"></i> Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for proveedor in proveedores %}
                     <tr>
-                        <td>{{ proveedor.id or proveedor.proveedor_id or 'N/A' }}</td>
+                        <td>{{ proveedor.id_proveedor or 'N/A' }}</td>
                         <td>
                             <strong>{{ proveedor.nombre or 'Sin nombre' }}</strong>
                         </td>
@@ -63,44 +190,110 @@
                             {% if proveedor.contacto %}
                                 {{ proveedor.contacto }}
                             {% else %}
-                                <span class="text-muted">Sin contacto</span>
+                                <span class="text-vanilla-600">Sin contacto</span>
                             {% endif %}
                         </td>
                         <td>
-                            <span class="badge badge-success">Activo</span>
+                            <span class="status-badge">Activo</span>
                         </td>
-                        <td>
-                            <button class="btn-sm btn-secondary" onclick="verProveedor('{{ proveedor.id or proveedor.proveedor_id }}')">
-                                👁️ Ver
-                            </button>
-                            <button class="btn-sm btn-primary" onclick="editarProveedor('{{ proveedor.id or proveedor.proveedor_id }}')">
-                                ✏️ Editar
-                            </button>
+                        <td class="actions-cell">
+                            <div class="list-table-container">
+                                <a class="btn-action btn-view" title="Ver detalles" href="{{ url_for('ver_proveedor', id=proveedor.id_proveedor) }}">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a class="btn-action btn-edit" title="Editar" href="{{ url_for('editar_proveedor', id=proveedor.id_proveedor) }}">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <form action="{{ url_for('eliminar_proveedor', id=proveedor.id_proveedor) }}" method="post" onsubmit="return confirm('¿Eliminar este proveedor?');">
+                                    <button class="btn-action btn btn btn-warm-danger" title="Eliminar" type="submit">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
                     {% endfor %}
                 </tbody>
-            </table>
-        </div>
+            </table></div></div></div></div>
     {% else %}
         <div class="empty-state">
             <div class="empty-icon">🏪</div>
             <h3>No hay proveedores registrados</h3>
             <p>Comienza agregando el primer proveedor de materiales y servicios.</p>
-            <a href="{{ url_for('crear_proveedor') }}" class="btn-primary">
+            <a href="{{ url_for('crear_proveedor') }}" class="btn btn btn-warm-primary">
                 ➕ Agregar Primer Proveedor
             </a>
         </div>
     {% endif %}
 </div>
 
-<script>
-function verProveedor(id) {
-    alert('Función ver proveedor #' + id + ' (por implementar)');
-}
+<script></script>
 
-function editarProveedor(id) {
-    alert('Función editar proveedor #' + id + ' (por implementar)');
-}
+<script>
+// Mejoras JavaScript automáticas para tablas
+document.addEventListener('DOMContentLoaded', function() {
+    // Aplicar efectos de hover a filas de tabla
+    const tableRows = document.querySelectorAll('.data-table-enhanced tbody tr, table tbody tr');
+    tableRows.forEach((row, index) => {
+        row.style.animationDelay = `${index * 0.1}s`;
+        row.classList.add('fade-in-up');
+        
+        row.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+            this.style.boxShadow = '0 4px 15px rgba(247, 127, 0, 0.2)';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = 'none';
+        });
+    });
+    
+    // Mejorar botones de acción con tooltips
+    const actionButtons = document.querySelectorAll('.btn-action-enhanced, .action-buttons a, .action-buttons button');
+    actionButtons.forEach(button => {
+        if (!button.querySelector('.custom-tooltip')) {
+            button.addEventListener('mouseenter', function() {
+                const title = this.getAttribute('title');
+                if (title) {
+                    const tooltip = document.createElement('div');
+                    tooltip.className = 'custom-tooltip';
+                    tooltip.textContent = title;
+                    tooltip.style.cssText = `
+                        position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+                        background: var(--prussian-blue-700); color: var(--vanilla);
+                        padding: 4px 8px; border-radius: 4px; font-size: 0.7rem;
+                        white-space: nowrap; z-index: 1000; margin-bottom: 5px;
+                    `;
+                    this.style.position = 'relative';
+                    this.appendChild(tooltip);
+                }
+            });
+            
+            button.addEventListener('mouseleave', function() {
+                const tooltip = this.querySelector('.custom-tooltip');
+                if (tooltip) tooltip.remove();
+            });
+        }
+    });
+    
+    // Contador animado para números
+    const statNumbers = document.querySelectorAll('.stat-number-enhanced, .stat-number');
+    statNumbers.forEach(stat => {
+        const finalNumber = parseInt(stat.textContent) || 0;
+        if (finalNumber > 0) {
+            let currentNumber = 0;
+            const increment = Math.max(1, Math.ceil(finalNumber / 20));
+            const timer = setInterval(() => {
+                currentNumber += increment;
+                if (currentNumber >= finalNumber) {
+                    currentNumber = finalNumber;
+                    clearInterval(timer);
+                }
+                stat.textContent = currentNumber;
+            }, 100);
+        }
+    });
+});
 </script>
 {% endblock %}

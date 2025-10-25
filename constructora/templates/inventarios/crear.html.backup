@@ -1,0 +1,247 @@
+{% extends "base.html" %}
+
+{% block title %}Crear Inventario{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{{ url_for('dashboard') }}">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{{ url_for('inventarios') }}">
+                    <i class="fas fa-boxes"></i> Inventarios
+                </a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                <i class="fas fa-plus"></i> Crear Inventario
+            </li>
+        </ol>
+    </nav>
+    
+    <div class="title-section">
+        <h1 class="page-title">
+            <i class="fas fa-plus"></i>
+            Crear Nuevo Inventario
+        </h1>
+        <p class="page-subtitle">Registro de nuevo control de stock</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card">
+            <div class="card-body">
+                <form action="{{ url_for('crear_inventario') }}" method="post">
+                    <h5 class="card-title mb-4">
+                        <i class="fas fa-info-circle text-primary"></i>
+                        Información del Inventario
+                    </h5>
+                    
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label for="cantidad_inventario">
+                                <i class="fas fa-hashtag"></i> Cantidad Total
+                            </label>
+                            <input type="number" 
+                                   id="cantidad_inventario" 
+                                   name="cantidad_inventario" 
+                                   class="form-control" 
+                                   min="0" 
+                                   step="0.01"
+                                   placeholder="Ej: 100.50">
+                            <small class="form-text text-muted">
+                                Cantidad inicial del inventario
+                            </small>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <h5 class="card-title mb-4">
+                        <i class="fas fa-warehouse text-success"></i>
+                        Asignación de Bodegas (Opcional)
+                    </h5>
+                    
+                    {% if bodegas %}
+                        <div class="row">
+                            {% for bodega in bodegas %}
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-check form-check-card">
+                                        <input type="checkbox" 
+                                               class="form-check-input" 
+                                               id="bodega_{{ bodega.id_bodega }}" 
+                                               name="bodegas" 
+                                               value="{{ bodega.id_bodega }}">
+                                        <label class="form-check-label" for="bodega_{{ bodega.id_bodega }}">
+                                            <div class="check-card">
+                                                <div class="check-header">
+                                                    <i class="fas fa-warehouse"></i>
+                                                    <strong>Bodega #{{ bodega.id_bodega }}</strong>
+                                                </div>
+                                                <div class="check-body">
+                                                    <p class="mb-1">
+                                                        <strong>Responsable:</strong> {{ bodega.responsable_bodega or 'Sin asignar' }}
+                                                    </p>
+                                                    {% if bodega.ubicacion_bodega %}
+                                                        <p class="mb-0 text-muted">
+                                                            <i class="fas fa-map-marker-alt"></i> {{ bodega.ubicacion_bodega }}
+                                                        </p>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            No hay bodegas disponibles. 
+                            <a href="{{ url_for('crear_bodega') }}">Crear una bodega primero</a>.
+                        </div>
+                    {% endif %}
+
+                    <hr class="my-4">
+
+                    <h5 class="card-title mb-4">
+                        <i class="fas fa-cubes text-info"></i>
+                        Asignación de Materiales (Opcional)
+                    </h5>
+                    
+                    {% if materiales %}
+                        <div class="materials-selection">
+                            <div class="form-group">
+                                <input type="text" 
+                                       id="search_materials" 
+                                       class="form-control mb-3" 
+                                       placeholder="Buscar materiales...">
+                            </div>
+                            
+                            <div class="row" id="materials_list">
+                                {% for material in materiales %}
+                                    <div class="col-md-6 mb-3 material-item" data-name="{{ material.nombre_material|lower }}">
+                                        <div class="form-check form-check-card">
+                                            <input type="checkbox" 
+                                                   class="form-check-input" 
+                                                   id="material_{{ material.id_material }}" 
+                                                   name="materiales" 
+                                                   value="{{ material.id_material }}">
+                                            <label class="form-check-label" for="material_{{ material.id_material }}">
+                                                <div class="check-card">
+                                                    <div class="check-header">
+                                                        <i class="fas fa-cube"></i>
+                                                        <strong>{{ material.nombre_material }}</strong>
+                                                    </div>
+                                                    <div class="check-body">
+                                                        {% if material.descripcion_material %}
+                                                            <p class="mb-1">{{ material.descripcion_material }}</p>
+                                                        {% endif %}
+                                                        {% if material.precio_unitario %}
+                                                            <p class="mb-0 text-success">
+                                                                <strong>Q{{ "%.2f"|format(material.precio_unitario) }}</strong>
+                                                            </p>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                            </label>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            No hay materiales disponibles. 
+                            <a href="{{ url_for('crear_material') }}">Crear materiales primero</a>.
+                        </div>
+                    {% endif %}
+
+                    <hr class="my-4">
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-save"></i> Crear Inventario
+                        </button>
+                        <a href="{{ url_for('inventarios') }}" class="btn btn-secondary btn-lg">
+                            <i class="fas fa-times"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Filtro de búsqueda para materiales
+document.getElementById('search_materials').addEventListener('input', function(e) {
+    const searchTerm = e.target.value.toLowerCase();
+    const materials = document.querySelectorAll('.material-item');
+    
+    materials.forEach(function(material) {
+        const materialName = material.getAttribute('data-name');
+        if (materialName.includes(searchTerm)) {
+            material.style.display = 'block';
+        } else {
+            material.style.display = 'none';
+        }
+    });
+});
+</script>
+
+<style>
+.form-check-card {
+    margin: 0;
+}
+
+.check-card {
+    border: 2px solid #e3e6f0;
+    border-radius: 8px;
+    padding: 15px;
+    transition: all 0.3s ease;
+    background: #fff;
+    cursor: pointer;
+}
+
+.check-card:hover {
+    border-color: #4e73df;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+}
+
+.form-check-input:checked + .form-check-label .check-card {
+    border-color: #4e73df;
+    background: #f8f9fc;
+}
+
+.check-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.check-header i {
+    color: #5a5c69;
+}
+
+.check-body p {
+    font-size: 0.875rem;
+    line-height: 1.4;
+}
+
+.materials-selection {
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid #e3e6f0;
+    border-radius: 8px;
+    padding: 15px;
+    background: #f8f9fc;
+}
+</style>
+{% endblock %}

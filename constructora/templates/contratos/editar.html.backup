@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Contrato - Sistema Constructora{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/create-forms.css') }}">
+
+
+<div class="container">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+        <a href="{{ url_for('dashboard') }}">Dashboard</a> /
+        <a href="{{ url_for('listar_contratos') }}">Contratos</a> /
+        <span>Editar</span>
+    </nav>
+
+    <div class="page-header">
+        <h1><i class="fas fa-edit"></i> Editar Contrato</h1>
+        <p class="subtitle">Modifica los datos del contrato #{{ contrato.id_contrato }}</p>
+    </div>
+
+    <div class="form-card">
+        <div class="create-form-container">
+<form method="POST" action="{{ url_for('editar_contrato', id=contrato.id_contrato) }}">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="fecha_inicio">
+                        <i class="fas fa-calendar-alt"></i> Fecha de Inicio *
+                    </label>
+                    <input type="date" id="fecha_inicio" name="fecha_inicio" 
+                           value="{{ contrato.fecha_inicio_contrato }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="fecha_fin">
+                        <i class="fas fa-calendar-check"></i> Fecha de Fin
+                    </label>
+                    <input type="date" id="fecha_fin" name="fecha_fin" 
+                           value="{{ contrato.fecha_fin_contrato or '' }}">
+                </div>
+
+                <div class="form-group">
+                    <label for="tipo_pago">
+                        <i class="fas fa-money-bill-wave"></i> Tipo de Pago
+                    </label>
+                    <select id="tipo_pago" name="tipo_pago">
+                        <option value="">Seleccionar tipo de pago</option>
+                        <option value="Contado" {% if contrato.tipo_pago_contrato == 'Contado' %}selected{% endif %}>Contado</option>
+                        <option value="Crédito" {% if contrato.tipo_pago_contrato == 'Crédito' %}selected{% endif %}>Crédito</option>
+                        <option value="Mixto" {% if contrato.tipo_pago_contrato == 'Mixto' %}selected{% endif %}>Mixto</option>
+                        <option value="Por avance" {% if contrato.tipo_pago_contrato == 'Por avance' %}selected{% endif %}>Por avance</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="obra_id">
+                        <i class="fas fa-building"></i> Obra Asociada
+                    </label>
+                    <select id="obra_id" name="obra_id">
+                        <option value="">Sin obra específica</option>
+                        {% for obra in obras %}
+                            <option value="{{ obra.id_obra }}" 
+                                    {% if contrato.id_obra == obra.id_obra %}selected{% endif %}>
+                                {{ obra.nombre_obra }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Actualizar Contrato
+                </button>
+                <a href="{{ url_for('ver_contrato', id=contrato.id_contrato) }}" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

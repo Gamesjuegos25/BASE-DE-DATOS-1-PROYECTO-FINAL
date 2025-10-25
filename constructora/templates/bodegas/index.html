@@ -1,11 +1,90 @@
 {% extends "base.html" %}
 
-{% block title %}Bodegas e Inventarios - Sistema Constructora{% endblock %}
+{% block head %}
+    <!-- CSS para páginas de listado -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/list-pages.css') }}"></div>
+{% endblock %}
+
+
+{% block title %}Bodegas e Inventarios - Sistema Constructora</div>
+
+<script>
+// Mejoras JavaScript automáticas para tablas
+document.addEventListener('DOMContentLoaded', function() {
+    // Aplicar efectos de hover a filas de tabla
+    const tableRows = document.querySelectorAll('.data-table-enhanced tbody tr, table tbody tr');
+    tableRows.forEach((row, index) => {
+        row.style.animationDelay = `${index * 0.1}s`;
+        row.classList.add('fade-in-up');
+        
+        row.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+            this.style.boxShadow = '0 4px 15px rgba(247, 127, 0, 0.2)';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = 'none';
+        });
+    });
+    
+    // Mejorar botones de acción con tooltips
+    const actionButtons = document.querySelectorAll('.btn-action-enhanced, .action-buttons a, .action-buttons button');
+    actionButtons.forEach(button => {
+        if (!button.querySelector('.custom-tooltip')) {
+            button.addEventListener('mouseenter', function() {
+                const title = this.getAttribute('title');
+                if (title) {
+                    const tooltip = document.createElement('div');
+                    tooltip.className = 'custom-tooltip';
+                    tooltip.textContent = title;
+                    tooltip.style.cssText = `
+                        position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+                        background: var(--prussian-blue-700); color: var(--vanilla);
+                        padding: 4px 8px; border-radius: 4px; font-size: 0.7rem;
+                        white-space: nowrap; z-index: 1000; margin-bottom: 5px;
+                    `;
+                    this.style.position = 'relative';
+                    this.appendChild(tooltip);
+                }
+            });
+            
+            button.addEventListener('mouseleave', function() {
+                const tooltip = this.querySelector('.custom-tooltip');
+                if (tooltip) tooltip.remove();
+            });
+        }
+    });
+    
+    // Contador animado para números
+    const statNumbers = document.querySelectorAll('.stat-number-enhanced, .stat-number');
+    statNumbers.forEach(stat => {
+        const finalNumber = parseInt(stat.textContent) || 0;
+        if (finalNumber > 0) {
+            let currentNumber = 0;
+            const increment = Math.max(1, Math.ceil(finalNumber / 20));
+            const timer = setInterval(() => {
+                currentNumber += increment;
+                if (currentNumber >= finalNumber) {
+                    currentNumber = finalNumber;
+                    clearInterval(timer);
+                }
+                stat.textContent = currentNumber;
+            }, 100);
+        }
+    });
+});
+</script>
+</div>
+</div>
+{% endblock %}
 
 {% block content %}
-<div class="container">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/enhanced-tables.css') }}">
+
+<div class="max-w-7xl mx-auto px-6">
     <div class="header-section">
-        <h1>🏪 Gestión de Bodegas e Inventarios</h1>
+        <h1><i class="fas fa-list"></i> 🏪 Gestión de Bodegas e Inventarios</h1>
         <p>Control de materiales, existencias y movimientos</p>
     </div>
     
@@ -20,41 +99,41 @@
     {% endwith %}
     
     <!-- Estadísticas de inventario -->
-    <div class="stats-cards">
-        <div class="stat-card">
+    <div class="stats-cards fade-in-up">
+        <div class="stat-stat-card fade-in-up">
             <h3>{{ bodegas.total_bodegas or 0 }}</h3>
             <p>🏪 Bodegas Activas</p>
         </div>
-        <div class="stat-card">
+        <div class="stat-stat-card fade-in-up">
             <h3>{{ bodegas.materiales_inventario or 0 }}</h3>
             <p>📦 Materiales en Inventario</p>
         </div>
-        <div class="stat-card">
+        <div class="stat-stat-card fade-in-up">
             <h3>Q{{ "{:,.2f}".format(bodegas.valor_inventario) if bodegas.valor_inventario else '0.00' }}</h3>
             <p>💰 Valor del Inventario</p>
         </div>
-        <div class="stat-card">
+        <div class="stat-stat-card fade-in-up">
             <h3>{{ bodegas.movimientos_hoy or 0 }}</h3>
             <p>📊 Movimientos Hoy</p>
         </div>
     </div>
     
     <!-- Navegación de bodegas -->
-    <div class="card">
-        <div class="card-header">
-            <h2 class="card-title">⚡ Acciones Rápidas</h2>
+    <div class="stat-card fade-in-up">
+        <div class="stat-stat-header">
+            <h2 class="stat-card-title">⚡ Acciones Rápidas</h2>
         </div>
         <div class="actions-grid">
-            <a href="{{ url_for('crear_bodega') }}" class="btn btn-primary">
+            <a href="{{ url_for('crear_bodega') }}" class="btn btn btn btn-warm-primary">
                 ➕ Nueva Bodega
             </a>
-            <a href="{{ url_for('listar_bodegas') }}" class="btn btn-secondary">
+            <a href="{{ url_for('listar_bodegas') }}" class="btn btn btn btn-warm-secondary">
                 🏪 Ver Bodegas
             </a>
-            <a href="{{ url_for('inventarios') }}" class="btn btn-info">
+            <a href="{{ url_for('inventarios') }}" class="btn btn btn btn-warm-primary">
                 📦 Inventarios
             </a>
-            <a href="{{ url_for('movimientos_materiales') }}" class="btn btn-warning">
+            <a href="{{ url_for('movimientos_materiales') }}" class="btn btn btn btn-warm-secondary">
                 📊 Movimientos
             </a>
         </div>
@@ -62,21 +141,20 @@
     
     <!-- Resumen de inventarios -->
     {% if bodegas.inventarios_resumen %}
-    <div class="card">
-        <div class="card-header">
-            <h2 class="card-title">📦 Resumen de Inventarios</h2>
+    <div class="stat-card fade-in-up">
+        <div class="stat-stat-header">
+            <h2 class="stat-card-title">📦 Resumen de Inventarios</h2>
         </div>
-        <div class="table-container">
+        <div class="list-table-container">
             <table class="data-table">
-                <thead>
-                    <tr>
+                <thead><tr>
                         <th>Bodega</th>
                         <th>Material</th>
                         <th>Stock Actual</th>
                         <th>Unidad</th>
                         <th>Valor Unitario</th>
                         <th>Valor Total</th>
-                        <th>Estado</th>
+                        <th><i class="fas fa-tasks"></i> Estado</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -90,26 +168,25 @@
                         <td>Q{{ "{:,.2f}".format(inventario.valor_total) if inventario.valor_total else '0.00' }}</td>
                         <td>
                             {% if inventario.stock_actual and inventario.stock_actual > 10 %}
-                                <span class="badge badge-success">Disponible</span>
+                                <span class="status-badge">Disponible</span>
                             {% elif inventario.stock_actual and inventario.stock_actual > 0 %}
-                                <span class="badge badge-warning">Bajo Stock</span>
+                                <span class="status-badge">Bajo Stock</span>
                             {% else %}
-                                <span class="badge badge-danger">Agotado</span>
+                                <span class="status-badge">Agotado</span>
                             {% endif %}
                         </td>
                     </tr>
                     {% endfor %}
                 </tbody>
-            </table>
-        </div>
+            </table></div></div></div></div>
     </div>
     {% else %}
-    <div class="card">
+    <div class="stat-card fade-in-up">
         <div class="empty-state">
             <div class="empty-icon">📦</div>
             <h3>No hay inventarios registrados</h3>
             <p>Comienza agregando la primera bodega y sus inventarios.</p>
-            <a href="{{ url_for('crear_bodega') }}" class="btn-primary">
+            <a href="{{ url_for('crear_bodega') }}" class="btn btn btn-warm-primary">
                 ➕ Crear Primera Bodega
             </a>
         </div>
@@ -118,15 +195,14 @@
     
     <!-- Movimientos recientes -->
     {% if bodegas.movimientos_recientes %}
-    <div class="card">
-        <div class="card-header">
-            <h2 class="card-title">📊 Movimientos Recientes</h2>
+    <div class="stat-card fade-in-up">
+        <div class="stat-stat-header">
+            <h2 class="stat-card-title">📊 Movimientos Recientes</h2>
         </div>
-        <div class="table-container">
+        <div class="list-table-container">
             <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Fecha</th>
+                <thead><tr>
+                        <th class="hidden-md"><i class="fas fa-calendar-alt"></i> Fecha</th>
                         <th>Tipo</th>
                         <th>Material</th>
                         <th>Cantidad</th>
@@ -139,7 +215,7 @@
                     <tr>
                         <td>{{ movimiento.fecha or 'N/A' }}</td>
                         <td>
-                            <span class="badge badge-{{ 'success' if movimiento.tipo == 'Entrada' else 'warning' }}">
+                            <span class="status-badge">
                                 {{ movimiento.tipo or 'N/A' }}
                             </span>
                         </td>
@@ -150,8 +226,7 @@
                     </tr>
                     {% endfor %}
                 </tbody>
-            </table>
-        </div>
+            </table></div></div></div></div>
     </div>
     {% endif %}
 </div>
@@ -173,4 +248,75 @@
     margin-bottom: 20px;
 }
 </style>
+</div>
+
+<script>
+// Mejoras JavaScript automáticas para tablas
+document.addEventListener('DOMContentLoaded', function() {
+    // Aplicar efectos de hover a filas de tabla
+    const tableRows = document.querySelectorAll('.data-table-enhanced tbody tr, table tbody tr');
+    tableRows.forEach((row, index) => {
+        row.style.animationDelay = `${index * 0.1}s`;
+        row.classList.add('fade-in-up');
+        
+        row.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+            this.style.boxShadow = '0 4px 15px rgba(247, 127, 0, 0.2)';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = 'none';
+        });
+    });
+    
+    // Mejorar botones de acción con tooltips
+    const actionButtons = document.querySelectorAll('.btn-action-enhanced, .action-buttons a, .action-buttons button');
+    actionButtons.forEach(button => {
+        if (!button.querySelector('.custom-tooltip')) {
+            button.addEventListener('mouseenter', function() {
+                const title = this.getAttribute('title');
+                if (title) {
+                    const tooltip = document.createElement('div');
+                    tooltip.className = 'custom-tooltip';
+                    tooltip.textContent = title;
+                    tooltip.style.cssText = `
+                        position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+                        background: var(--prussian-blue-700); color: var(--vanilla);
+                        padding: 4px 8px; border-radius: 4px; font-size: 0.7rem;
+                        white-space: nowrap; z-index: 1000; margin-bottom: 5px;
+                    `;
+                    this.style.position = 'relative';
+                    this.appendChild(tooltip);
+                }
+            });
+            
+            button.addEventListener('mouseleave', function() {
+                const tooltip = this.querySelector('.custom-tooltip');
+                if (tooltip) tooltip.remove();
+            });
+        }
+    });
+    
+    // Contador animado para números
+    const statNumbers = document.querySelectorAll('.stat-number-enhanced, .stat-number');
+    statNumbers.forEach(stat => {
+        const finalNumber = parseInt(stat.textContent) || 0;
+        if (finalNumber > 0) {
+            let currentNumber = 0;
+            const increment = Math.max(1, Math.ceil(finalNumber / 20));
+            const timer = setInterval(() => {
+                currentNumber += increment;
+                if (currentNumber >= finalNumber) {
+                    currentNumber = finalNumber;
+                    clearInterval(timer);
+                }
+                stat.textContent = currentNumber;
+            }, 100);
+        }
+    });
+});
+</script>
+</div>
+</div>
 {% endblock %}

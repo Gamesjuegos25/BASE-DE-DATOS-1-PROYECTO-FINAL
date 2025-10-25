@@ -1,0 +1,559 @@
+{% extends "base.html" %}
+
+{% block title %}Nueva Obra - Sistema Constructora{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/create-forms.css') }}">
+
+<div class="create-form-container">
+    <!-- Header de página estilo detalle -->
+    <div class="create-page-header">
+        <nav class="breadcrumb">
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <span class="breadcrumb-separator">/</span>
+            <a href="{{ url_for('listar_obras') }}">Obras</a>
+            <span class="breadcrumb-separator">/</span>
+            <span>Nueva</span>
+        </nav>
+        <h1 class="create-page-title">
+            <i class="fas fa-building"></i>
+            Crear Nueva Obra
+        </h1>
+    </div>
+
+    <div class="container-fluid">
+        <form method="POST" action="{{ url_for('crear_obra') }}" id="create-obra-form" class="needs-validation" novalidate>
+            <div class="create-form-row">
+                <!-- Información General -->
+                <div class="create-form-card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-info-circle"></i> Información General</h5>
+                    </div>
+                    <div class="card-body">
+          <div class="form-group mb-4">
+            <label for="nombre" class="form-label">
+              <i class="fas fa-tag text-primary"></i> Nombre de la Obra *
+            </label>
+            <input type="text" id="nombre" name="nombre" class="form-control" required 
+                   placeholder="Ej: Edificio Residencial Norte">
+          </div>
+          
+          <div class="form-group mb-4">
+            <label for="descripcion" class="form-label">
+              <i class="fas fa-align-left text-primary"></i> Descripción
+            </label>
+            <textarea id="descripcion" name="descripcion" class="form-control" rows="4" 
+                      placeholder="Descripción detallada del proyecto"></textarea>
+          </div>
+          
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group mb-3">
+                <label for="ubicacion" class="form-label">
+                  <i class="fas fa-map-marker-alt text-primary"></i> Ubicación
+                </label>
+                <input type="text" id="ubicacion" name="ubicacion" class="form-control" 
+                       placeholder="Dirección o ubicación del proyecto">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group mb-3">
+                <label for="estado" class="form-label">
+                  <i class="fas fa-info-circle text-primary"></i> Estado
+                </label>
+                <select id="estado" name="estado" class="form-control">
+                  <option value="">Seleccionar estado</option>
+                  <option value="Planeación" selected>Planeación</option>
+                  <option value="En Progreso">En Progreso</option>
+                  <option value="Pausado">Pausado</option>
+                  <option value="Completado">Completado</option>
+                  <option value="Cancelado">Cancelado</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+        
+      <!-- Sección de Cliente (Obligatorio) -->
+      <div class="card mt-3">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="fas fa-user-tie"></i> Información del Cliente *</h5>
+          <small class="text-muted">Selecciona un cliente existente o crea uno nuevo</small>
+        </div>
+        <div class="card-body">
+          <div class="form-group mb-4">
+            <label class="form-label">
+              <i class="fas fa-users text-primary"></i> Tipo de Cliente
+            </label>
+            <div class="btn-group w-100" role="group" aria-label="Tipo de cliente">
+              <input type="radio" class="btn-check" name="tipo_cliente" value="existente" id="cliente-existente-radio" checked>
+              <label class="btn btn-outline-primary" for="cliente-existente-radio">
+                <i class="fas fa-user"></i> Cliente Existente
+              </label>
+              
+              <input type="radio" class="btn-check" name="tipo_cliente" value="nuevo" id="cliente-nuevo-radio">
+              <label class="btn btn-outline-primary" for="cliente-nuevo-radio">
+                <i class="fas fa-user-plus"></i> Nuevo Cliente
+              </label>
+            </div>
+          </div>
+          
+          <!-- Cliente Existente -->
+          <div id="cliente-existente" class="client-option">
+            <div class="form-group">
+              <label for="cliente_id" class="form-label">
+                <i class="fas fa-address-book text-primary"></i> Seleccionar Cliente *
+              </label>
+              <select id="cliente_id" name="cliente_id" class="form-control" required>
+                <option value="">Seleccionar cliente...</option>
+                {% for cliente in clientes %}
+                <option value="{{ cliente.id }}">{{ cliente.nombre }} - {{ cliente.documento or 'Sin documento' }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+          
+          <!-- Nuevo Cliente -->
+          <div id="cliente-nuevo" class="client-option" style="display: none;">
+            <div class="row">
+              <div class="col-md-8">
+                <div class="form-group mb-3">
+                  <label for="nuevo_cliente_nombre" class="form-label">
+                    <i class="fas fa-user text-primary"></i> Nombre Completo *
+                  </label>
+                  <input type="text" id="nuevo_cliente_nombre" name="nuevo_cliente_nombre" class="form-control" 
+                         placeholder="Nombre completo del cliente">
+                </div>
+              </div>
+              
+              <div class="col-md-4">
+                <div class="form-group mb-3">
+                  <label for="nuevo_cliente_documento" class="form-label">
+                    <i class="fas fa-id-card text-primary"></i> Documento
+                  </label>
+                  <input type="text" id="nuevo_cliente_documento" name="nuevo_cliente_documento" class="form-control" 
+                         placeholder="CC, NIT, etc.">
+                </div>
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group mb-3">
+                  <label for="nuevo_cliente_telefono" class="form-label">
+                    <i class="fas fa-phone text-primary"></i> Teléfono
+                  </label>
+                  <input type="tel" id="nuevo_cliente_telefono" name="nuevo_cliente_telefono" class="form-control" 
+                         placeholder="Número de contacto">
+                </div>
+              </div>
+              
+              <div class="col-md-6">
+                <div class="form-group mb-3">
+                  <label for="nuevo_cliente_email" class="form-label">
+                    <i class="fas fa-envelope text-primary"></i> Email
+                  </label>
+                  <input type="email" id="nuevo_cliente_email" name="nuevo_cliente_email" class="form-control" 
+                         placeholder="correo@ejemplo.com">
+                </div>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="nuevo_cliente_direccion" class="form-label">
+                <i class="fas fa-map-marker-alt text-primary"></i> Dirección
+              </label>
+              <input type="text" id="nuevo_cliente_direccion" name="nuevo_cliente_direccion" class="form-control" 
+                     placeholder="Dirección completa">
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Sección: Tipo de Obra (Catálogo con precio/descripcion fijos) -->
+      <div class="card mt-3">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="fas fa-hammer"></i> Tipo de Obra (Catálogo)</h5>
+          <small class="text-muted">Opcional: usa un tipo predefinido con precio y descripción fijos</small>
+        </div>
+        <div class="card-body">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">
+                            <input type="checkbox" id="es_precio_fijo" name="es_precio_fijo">
+                            Usar precio y descripción fijos del catálogo
+                        </label>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="id_tipo_obra" class="form-label">Tipo de Obra</label>
+                        <select id="id_tipo_obra" name="id_tipo_obra" class="form-control" disabled>
+                            <option value="">Seleccionar tipo...</option>
+                            {% for t in tipos_obra %}
+                            <option value="{{ t.id }}" data-unidad="{{ t.unidad_medida }}" data-rango="{{ t.rango_precio }}" data-precio="{{ t.precio_base }}">
+                                {{ t.nombre_tipo }}
+                                {% if t.unidad_medida %} - ({{ t.unidad_medida }}){% endif %}
+                                {% if t.rango_precio %} • {{ t.rango_precio }}{% endif %}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <small id="tipo-info" class="form-text text-muted" style="display:block; margin-top:6px;"></small>
+                    </div>
+                </div>
+                <div class="alert alert-info" id="alerta-tipo-obra" style="display:none;">
+                    Al activar el catálogo, la descripción y el valor se fijarán automáticamente según el tipo seleccionado.
+                </div>
+
+                <!-- Estimación para cotización -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="unidad_estimacion" class="form-label">Unidad de estimación</label>
+                        <select id="unidad_estimacion" name="unidad_estimacion" class="form-control" disabled>
+                            <option value="">Auto (según tipo)</option>
+                            <option value="m2">m2</option>
+                            <option value="unidad">Unidad</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="area_m2" class="form-label">Área estimada (m²)</label>
+                        <input type="number" step="0.01" id="area_m2" name="area_m2" class="form-control" placeholder="0" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="cantidad_estimada" class="form-label">Cantidad estimada (unidades)</label>
+                        <input type="number" step="0.01" id="cantidad_estimada" name="cantidad_estimada" class="form-control" placeholder="1" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Valor estimado</label>
+                        <input type="text" id="valor_estimado_preview" class="form-control" placeholder="$0" disabled>
+                    </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-md-4">
+      <!-- Cronograma -->
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="fas fa-calendar"></i> Cronograma del Proyecto</h5>
+        </div>
+        <div class="card-body">
+          <div class="form-group mb-3">
+            <label for="fecha_inicio" class="form-label">
+              <i class="fas fa-play-circle text-success"></i> Fecha de Inicio
+            </label>
+            <input type="date" id="fecha_inicio" name="fecha_inicio" class="form-control">
+          </div>
+          
+          <div class="form-group mb-3">
+            <label for="fecha_fin" class="form-label">
+              <i class="fas fa-flag-checkered text-warning"></i> Fecha de Finalización
+            </label>
+            <input type="date" id="fecha_fin" name="fecha_fin" class="form-control">
+          </div>
+          
+          <div id="duracion-estimada" class="alert alert-info" style="display: none;">
+            <strong>Duración Estimada:</strong> <span id="duracion-dias">0</span> días
+          </div>
+        </div>
+      </div>
+      
+      <!-- Información Financiera -->
+      <div class="card mt-3">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="fas fa-coins"></i> Información Financiera</h5>
+        </div>
+        <div class="card-body">
+          <div class="form-group">
+            <label for="valor" class="form-label">
+              <i class="fas fa-dollar-sign text-success"></i> Valor del Proyecto (COP)
+            </label>
+            <input type="number" id="valor" name="valor" class="form-control" min="0" step="1000" 
+                   placeholder="0">
+            <small class="form-text text-muted">Valor total estimado del proyecto</small>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Acciones del Formulario -->
+      <div class="card mt-3">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="fas fa-cogs"></i> Acciones</h5>
+        </div>
+        <div class="card-body">
+          <button type="submit" class="btn btn-success w-100 mb-2">
+            <i class="fas fa-save"></i> Crear Obra
+          </button>
+          
+          <a href="{{ url_for('listar_obras') }}" class="btn btn-secondary w-100">
+            <i class="fas fa-arrow-left"></i> Volver a Lista
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+
+<style>
+/* Breadcrumb Navigation */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  font-size: 14px;
+}
+
+.breadcrumb a {
+  color: #007bff;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.breadcrumb a:hover {
+  color: #0056b3;
+  text-decoration: underline;
+}
+
+.breadcrumb-separator {
+  margin: 0 8px;
+  color: #6c757d;
+}
+
+.page-title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 0;
+}
+
+.page-title small {
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+/* Form Styling */
+.form-label {
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 0.5rem;
+}
+
+.form-label i {
+  margin-right: 0.5rem;
+}
+
+.card {
+  border: 1px solid #e3e6f0;
+  border-radius: 0.35rem;
+  box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+}
+
+.card-header {
+  background-color: #f8f9fc;
+  border-bottom: 1px solid #e3e6f0;
+  padding: 1rem 1.25rem;
+}
+
+.card-header h5 {
+  color: #5a5c69;
+  margin: 0;
+}
+
+/* Client Option Styling */
+.client-option {
+  border: 1px solid #e3e6f0;
+  border-radius: 0.35rem;
+  padding: 1.5rem;
+  background-color: #f8f9fc;
+  margin-top: 1rem;
+}
+
+/* Button Group for Client Selection */
+.btn-group .btn-outline-primary {
+  border-color: #4e73df;
+  color: #4e73df;
+}
+
+.btn-group .btn-outline-primary:hover {
+  background-color: #4e73df;
+  border-color: #4e73df;
+}
+
+.btn-check:checked + .btn-outline-primary {
+  background-color: #4e73df;
+  border-color: #4e73df;
+  color: white;
+}
+
+/* Alert Styling */
+.alert-info {
+  background-color: #d1ecf1;
+  border-color: #bee5eb;
+  color: #0c5460;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .col-md-4 .card {
+    margin-top: 1rem;
+  }
+  
+  .btn-group {
+    flex-direction: column;
+  }
+  
+  .btn-group .btn {
+    border-radius: 0.35rem !important;
+    margin-bottom: 0.5rem;
+  }
+}
+</style>
+
+<script>
+// Manejar cambio entre cliente existente y nuevo
+document.addEventListener('DOMContentLoaded', function() {
+    const radioButtons = document.querySelectorAll('input[name="tipo_cliente"]');
+    const clienteExistente = document.getElementById('cliente-existente');
+    const clienteNuevo = document.getElementById('cliente-nuevo');
+    const selectCliente = document.getElementById('cliente_id');
+    const camposNuevoCliente = document.querySelectorAll('#cliente-nuevo input');
+    
+    function toggleClienteSection() {
+        const tipoSeleccionado = document.querySelector('input[name="tipo_cliente"]:checked').value;
+        
+        if (tipoSeleccionado === 'existente') {
+            clienteExistente.style.display = 'block';
+            clienteNuevo.style.display = 'none';
+            selectCliente.required = true;
+            
+            // Quitar required de campos de nuevo cliente
+            camposNuevoCliente.forEach(campo => {
+                if (campo.id === 'nuevo_cliente_nombre') {
+                    campo.required = false;
+                }
+            });
+        } else {
+            clienteExistente.style.display = 'none';
+            clienteNuevo.style.display = 'block';
+            selectCliente.required = false;
+            selectCliente.value = '';
+            
+            // Hacer required el nombre del nuevo cliente
+            document.getElementById('nuevo_cliente_nombre').required = true;
+        }
+    }
+    
+    radioButtons.forEach(radio => {
+        radio.addEventListener('change', toggleClienteSection);
+    });
+    
+    // Inicializar el estado
+    toggleClienteSection();
+    
+    // Calcular duración del proyecto
+    function calcularDuracion() {
+        const fechaInicio = document.getElementById('fecha_inicio').value;
+        const fechaFin = document.getElementById('fecha_fin').value;
+        const duracionDiv = document.getElementById('duracion-estimada');
+        const duracionSpan = document.getElementById('duracion-dias');
+        
+        if (fechaInicio && fechaFin) {
+            const inicio = new Date(fechaInicio);
+            const fin = new Date(fechaFin);
+            const diferencia = fin.getTime() - inicio.getTime();
+            const dias = Math.ceil(diferencia / (1000 * 3600 * 24));
+            
+            if (dias > 0) {
+                duracionSpan.textContent = dias;
+                duracionDiv.style.display = 'block';
+            } else {
+                duracionDiv.style.display = 'none';
+            }
+        } else {
+            duracionDiv.style.display = 'none';
+        }
+    }
+    
+    document.getElementById('fecha_inicio').addEventListener('change', calcularDuracion);
+    document.getElementById('fecha_fin').addEventListener('change', calcularDuracion);
+    
+    // Comportamiento para Tipo de Obra fijo
+    const chkFijo = document.getElementById('es_precio_fijo');
+    const selTipo = document.getElementById('id_tipo_obra');
+    const txtDesc = document.getElementById('descripcion');
+    const numValor = document.getElementById('valor');
+    const info = document.getElementById('tipo-info');
+    const alerta = document.getElementById('alerta-tipo-obra');
+    const unidadSel = document.getElementById('unidad_estimacion');
+    const areaInput = document.getElementById('area_m2');
+    const cantInput = document.getElementById('cantidad_estimada');
+    const valorPreview = document.getElementById('valor_estimado_preview');
+
+    function toggleTipoObra() {
+        const activo = chkFijo.checked;
+        selTipo.disabled = !activo;
+        alerta.style.display = activo ? 'block' : 'none';
+        if (activo) {
+            // Bloquear edición manual (el trigger del servidor fijará valores)
+            txtDesc.setAttribute('disabled', 'disabled');
+            numValor.setAttribute('disabled', 'disabled');
+            unidadSel.removeAttribute('disabled');
+            areaInput.removeAttribute('disabled');
+            cantInput.removeAttribute('disabled');
+        } else {
+            txtDesc.removeAttribute('disabled');
+            numValor.removeAttribute('disabled');
+            info.textContent = '';
+            unidadSel.setAttribute('disabled', 'disabled');
+            areaInput.setAttribute('disabled', 'disabled');
+            cantInput.setAttribute('disabled', 'disabled');
+            valorPreview.value = '';
+        }
+    }
+
+    function updateTipoInfo() {
+        const opt = selTipo.options[selTipo.selectedIndex];
+        if (!opt || !opt.value) { info.textContent = ''; return; }
+        const unidad = opt.getAttribute('data-unidad') || '';
+        const rango = opt.getAttribute('data-rango') || '';
+        info.textContent = `${unidad ? 'Unidad: ' + unidad + ' • ' : ''}${rango ? 'Rango: ' + rango : ''}`;
+
+        // Auto-set unidad por defecto si existe
+        if (unidad && (!unidadSel.value || unidadSel.value === '')) {
+            if (unidad.toLowerCase().includes('m2')) unidadSel.value = 'm2';
+            else unidadSel.value = 'unidad';
+        }
+        calcularEstimacion();
+    }
+
+    function calcularEstimacion() {
+        const opt = selTipo.options[selTipo.selectedIndex];
+        if (!opt || !opt.value) { valorPreview.value = ''; return; }
+        const precio = parseFloat(opt.getAttribute('data-precio') || '0') || 0;
+        const unidad = (unidadSel.value || opt.getAttribute('data-unidad') || '').toLowerCase();
+        const area = parseFloat(areaInput.value || '0') || 0;
+        const cant = parseFloat(cantInput.value || '0') || 0;
+        let mult = 1;
+        if (unidad.includes('m2')) mult = area > 0 ? area : 1;
+        else mult = cant > 0 ? cant : 1;
+        const total = Math.round(precio * mult * 100) / 100;
+        valorPreview.value = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP' }).format(total);
+    }
+
+    if (chkFijo) {
+        chkFijo.addEventListener('change', toggleTipoObra);
+    }
+    if (selTipo) {
+        selTipo.addEventListener('change', updateTipoInfo);
+    }
+    [unidadSel, areaInput, cantInput].forEach(el => {
+        if (el) el.addEventListener('input', calcularEstimacion);
+        if (el) el.addEventListener('change', calcularEstimacion);
+    });
+    toggleTipoObra();
+});
+</script>
+{% endblock %}

@@ -1,0 +1,252 @@
+{% extends "base.html" %}
+
+{% block title %}Gestión de Facturas - ERP Constructora{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1 class="page-title">📄 Gestión de Facturas</h1>
+    <p class="page-subtitle">Administra todas las facturas del sistema</p>
+</div>
+
+<!-- Estadísticas de Facturación -->
+<div class="dashboard-grid mb-8">
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-title">Total Facturas</div>
+            <div class="stat-icon primary">
+                <i class="fas fa-file-invoice"></i>
+            </div>
+        </div>
+        <div class="stat-value">{{ facturas|length or 0 }}</div>
+        <div class="stat-change positive">
+            <i class="fas fa-arrow-up"></i>
+            <span>Sistema activo</span>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-title">Monto Total</div>
+            <div class="stat-icon success">
+                <i class="fas fa-coins"></i>
+            </div>
+        </div>
+        <div class="stat-value">Q{{ "{:,.0f}".format(facturas|sum(attribute='total') or 0) }}</div>
+        <div class="stat-change positive">
+            <i class="fas fa-arrow-up"></i>
+            <span>Facturación</span>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-title">Facturas Pagadas</div>
+            <div class="stat-icon info">
+                <i class="fas fa-check-circle"></i>
+            </div>
+        </div>
+        <div class="stat-value">{{ facturas|selectattr('estado', 'equalto', 'PAGADA')|list|length or 0 }}</div>
+        <div class="stat-change positive">
+            <i class="fas fa-arrow-up"></i>
+            <span>Cobradas</span>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-header">
+            <div class="stat-title">Pendientes</div>
+            <div class="stat-icon warning">
+                <i class="fas fa-clock"></i>
+            </div>
+        </div>
+        <div class="stat-value">{{ facturas|selectattr('estado', 'equalto', 'PENDIENTE')|list|length or 0 }}</div>
+        <div class="stat-change negative">
+            <i class="fas fa-exclamation-triangle"></i>
+            <span>Por cobrar</span>
+        </div>
+    </div>
+</div>
+
+<!-- Tabla de Facturas -->
+<div class="table-container">
+    <div class="table-header">
+        <h2 class="table-title">📋 Lista de Facturas</h2>
+        <div class="table-tools">
+            <div class="table-search">
+                <i class="search-icon fas fa-search"></i>
+                <input type="text" class="form-control" placeholder="Buscar facturas..." id="searchFacturas">
+            </div>
+            <div class="flex gap-3">
+                <a href="{{ url_for('crear_factura') }}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Nueva Factura
+                </a>
+                <a href="{{ url_for('contratos_facturables') }}" class="btn btn-outline">
+                    <i class="fas fa-file-contract"></i> Contratos Facturables
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <table class="table" id="tablFacturas">
+        <thead>
+            <tr>
+                <th>Número</th>
+                <th>Fecha Emisión</th>
+                <th>Cliente/Contrato</th>
+                <th>Subtotal</th>
+                <th>IVA</th>
+                <th>Total</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for factura in facturas %}
+            <tr>
+                <td>
+                    <strong class="text-primary">{{ factura.numero_factura }}</strong>
+                </td>
+                <td>{{ factura.fecha_emision.strftime('%d/%m/%Y') if factura.fecha_emision else 'N/A' }}</td>
+                <td>
+                    {% if factura.empleado_nombre %}
+                        <div>
+                            <strong>{{ factura.empleado_nombre }} {{ factura.empleado_apellido }}</strong>
+                            <br><small class="text-muted">{{ factura.tipo_contrato or 'Contrato' }}</small>
+                        </div>
+                    {% else %}
+                        <span class="text-muted">Sin asignar</span>
+                    {% endif %}
+                </td>
+                <td class="text-right">Q{{ "{:,.2f}".format(factura.subtotal or 0) }}</td>
+                <td class="text-right">Q{{ "{:,.2f}".format(factura.iva or 0) }}</td>
+                <td class="text-right">
+                    <strong class="text-success">Q{{ "{:,.2f}".format(factura.total or 0) }}</strong>
+                </td>
+                <td>
+                    {% if factura.estado == 'PAGADA' %}
+                        <span class="badge badge-success">{{ factura.estado }}</span>
+                    {% elif factura.estado == 'PENDIENTE' %}
+                        <span class="badge badge-warning">{{ factura.estado }}</span>
+                    {% elif factura.estado == 'VENCIDA' %}
+                        <span class="badge badge-danger">{{ factura.estado }}</span>
+                    {% else %}
+                        <span class="badge badge-secondary">{{ factura.estado or 'SIN ESTADO' }}</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <div class="table-actions">
+                        <a href="{{ url_for('ver_factura', id=factura.id or factura.factura_id or factura.id_factura) }}" 
+                           class="btn-action btn-view" title="Ver Detalles">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="{{ url_for('editar_factura', id=factura.id or factura.factura_id or factura.id_factura) }}" 
+                           class="btn-action btn-edit" title="Editar">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <form action="{{ url_for('eliminar_factura', id=factura.id or factura.factura_id or factura.id_factura) }}" 
+                              method="POST" class="inline-form" 
+                              onsubmit="return confirm('¿Estás seguro de eliminar esta factura?');">
+                            <button type="submit" class="btn-action btn-danger" title="Eliminar">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                        <button class="btn btn-sm btn-success btn-imprimir" 
+                                data-factura-id="{{ factura.id or factura.factura_id or factura.id_factura }}" 
+                                title="Imprimir">
+                            <i class="fas fa-print"></i>
+                        </button>
+                        {% if factura.estado == 'PENDIENTE' %}
+                        <button class="btn btn-sm btn-warning btn-registrar-pago" 
+                                data-factura-id="{{ factura.id or factura.factura_id or factura.id_factura }}" 
+                                title="Registrar Pago">
+                            <i class="fas fa-coins"></i>
+                        </button>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="8" class="text-center text-muted p-8">
+                    <i class="fas fa-file-invoice fa-3x mb-4 text-gray-300"></i>
+                    <p class="text-lg">No hay facturas registradas</p>
+                    <a href="{{ url_for('crear_factura') }}" class="btn btn-primary mt-4">
+                        <i class="fas fa-plus"></i> Crear Primera Factura
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+// Búsqueda en tiempo real
+document.getElementById('searchFacturas').addEventListener('input', function(e) {
+    const searchTerm = e.target.value.toLowerCase();
+    const rows = document.querySelectorAll('#tablFacturas tbody tr');
+    
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(searchTerm) ? '' : 'none';
+    });
+});
+
+// Event listeners para botones de imprimir
+document.addEventListener('DOMContentLoaded', function() {
+    // Botones de imprimir
+    document.querySelectorAll('.btn-imprimir').forEach(button => {
+        button.addEventListener('click', function() {
+            const facturaId = this.dataset.facturaId;
+            window.open(`/facturas/${facturaId}/imprimir`, '_blank');
+        });
+    });
+    
+    // Botones de registrar pago
+    document.querySelectorAll('.btn-registrar-pago').forEach(button => {
+        button.addEventListener('click', function() {
+            const facturaId = this.dataset.facturaId;
+            const monto = prompt('Ingrese el monto del pago:');
+            if (monto && !isNaN(monto)) {
+                alert(`Pago de Q${monto} registrado para la factura ${facturaId}`);
+                location.reload();
+            }
+        });
+    });
+});
+</script>
+
+<style>
+.text-right {
+    text-align: right;
+}
+
+.flex {
+    display: flex;
+}
+
+.gap-3 {
+    gap: var(--spacing-3);
+}
+
+@media (max-width: 768px) {
+    .table-tools {
+        flex-direction: column;
+        gap: var(--spacing-3);
+    }
+    
+    .table-search {
+        max-width: none;
+    }
+    
+    .table-actions {
+        flex-direction: column;
+        gap: var(--spacing-1);
+    }
+    
+    .dashboard-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+</style>
+{% endblock %}

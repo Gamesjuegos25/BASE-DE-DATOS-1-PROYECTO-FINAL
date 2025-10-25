@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block title %}Asignar Permiso{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h2><i class="bi bi-person-gear"></i> Asignar/Revocar Permiso</h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Inicio</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('listar_permisos') }}">Permisos</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('ver_permiso', id=permiso.id_permiso) }}">Permiso #{{ permiso.id_permiso }}</a></li>
+                    <li class="breadcrumb-item active">Asignar</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-shield-lock"></i> {{ permiso.modulo_permiso }}
+                        {% if permiso.nivel_acceso_permiso %}
+                        - <span class="badge bg-light text-dark">{{ permiso.nivel_acceso_permiso }}</span>
+                        {% endif %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">
+                        Gestiona qué usuarios tienen acceso a este permiso. Puedes asignar el permiso a nuevos usuarios 
+                        o revocarlo de usuarios que ya lo tienen.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Asignar a nuevos usuarios -->
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="bi bi-person-plus"></i> Asignar a Usuario</h5>
+                </div>
+                <div class="card-body">
+                    {% if usuarios_sin_permiso %}
+                    <form method="POST">
+                        <input type="hidden" name="accion" value="asignar">
+                        
+                        <div class="mb-3">
+                            <label for="usuario_id" class="form-label">Seleccionar Usuario</label>
+                            <select class="form-select" id="usuario_id" name="usuario_id" required>
+                                <option value="">-- Seleccionar --</option>
+                                {% for usuario in usuarios_sin_permiso %}
+                                <option value="{{ usuario.id_usuario }}">
+                                    {{ usuario.nombre_usuario }} - {{ usuario.correo_usuario }} ({{ usuario.rol_usuario }})
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">
+                                Usuarios que aún no tienen este permiso
+                            </div>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-check-circle"></i> Asignar Permiso
+                            </button>
+                        </div>
+                    </form>
+                    {% else %}
+                    <div class="alert alert-info mb-0">
+                        <i class="bi bi-info-circle"></i> 
+                        Todos los usuarios ya tienen este permiso asignado.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Usuarios con el permiso -->
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="bi bi-people"></i> Usuarios con Permiso</h5>
+                </div>
+                <div class="card-body">
+                    {% if usuarios_con_permiso %}
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Usuario</th>
+                                    <th>Rol</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for usuario in usuarios_con_permiso %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ usuario.nombre_usuario }}</strong><br>
+                                        <small class="text-muted">{{ usuario.correo_usuario }}</small>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary">{{ usuario.rol_usuario }}</span>
+                                    </td>
+                                    <td>
+                                        <form method="POST" onsubmit="return confirm('¿Revocar permiso de {{ usuario.nombre_usuario }}?');">
+                                            <input type="hidden" name="accion" value="revocar">
+                                            <input type="hidden" name="usuario_id" value="{{ usuario.id_usuario }}">
+                                            <button type="submit" class="btn btn-sm btn-danger" title="Revocar permiso">
+                                                <i class="bi bi-x-circle"></i> Revocar
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="text-muted small mb-0 mt-2">
+                        <i class="bi bi-info-circle"></i> Total: {{ usuarios_con_permiso|length }} usuario(s)
+                    </p>
+                    {% else %}
+                    <div class="alert alert-warning mb-0">
+                        <i class="bi bi-exclamation-triangle"></i> 
+                        Ningún usuario tiene este permiso asignado todavía.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="card bg-light border-0">
+                <div class="card-body">
+                    <h6 class="card-title"><i class="bi bi-info-circle"></i> Información sobre Asignación de Permisos</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="small mb-0">
+                                <li><strong>Asignar:</strong> Otorga el permiso a un usuario que no lo tiene</li>
+                                <li><strong>Revocar:</strong> Quita el permiso de un usuario que lo tiene</li>
+                                <li>Los cambios se aplican inmediatamente</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="small mb-0">
+                                <li>Un usuario puede tener múltiples permisos simultáneamente</li>
+                                <li>La revocación no elimina el permiso, solo la asignación</li>
+                                <li>Los usuarios pueden recibir el mismo permiso múltiples veces</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-3">
+        <div class="col-md-12 text-center">
+            <a href="{{ url_for('ver_permiso', id=permiso.id_permiso) }}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Volver al Permiso
+            </a>
+            <a href="{{ url_for('listar_permisos') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-list"></i> Ver Todos los Permisos
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <!-- CSS específico para páginas de detalle -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/detail-page.css') }}">
+    
+    <!-- CSS para páginas de detalle -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/detail-page.css') }}">{% endblock %}
+
+{% block title %}Detalle Actividad{% endblock %}
+{% block content %}
+<div class="page-header">
+  <nav class="breadcrumb">
+    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+    <span class="breadcrumb-separator">/</span>
+    <a href="{{ url_for('listar_actividades') }}">Actividades</a>
+    <span class="breadcrumb-separator">/</span>
+    <span>Detalle</span>
+  </nav>
+  <h1 class="page-title">📋 {{ actividad.nombre or 'Actividad' }} <small class="text-vanilla-600">ID: {{ actividad.id or actividad.actividad_id }}</small></h1>
+</div>
+
+<div class="detail-card">
+  <div class="stat-module-content">
+    <dl class="detail-list">
+      <dt>Nombre</dt>
+      <dd>{{ actividad.nombre or 'N/D' }}</dd>
+      
+      <dt>Descripción</dt>
+      <dd>{{ actividad.descripcion or 'Sin descripción' }}</dd>
+      
+      <dt>Fecha Programada</dt>
+      <dd>
+        {% if actividad.fecha_programada %}
+          {{ actividad.fecha_programada.strftime('%d/%m/%Y') if actividad.fecha_programada.strftime else actividad.fecha_programada }}
+        {% else %}
+          <span class="text-vanilla-600">No programada</span>
+        {% endif %}
+      </dd>
+    </dl>
+  </div>
+  <div class="stat-module-actions" style="display:flex; gap: 0.5rem;">
+    <a class="btn btn btn btn-warm-secondary" href="{{ url_for('listar_actividades') }}">Volver</a>
+    <a class="btn btn btn btn-warm-primary" href="{{ url_for('editar_actividad', id=(actividad.id or actividad.actividad_id)) }}">Editar</a>
+    <form action="{{ url_for('eliminar_actividad', id=(actividad.id or actividad.actividad_id)) }}" method="post" class="inline-form" onsubmit="return confirm('¿Eliminar esta actividad?');">
+      <button class="btn btn btn btn-warm-danger" type="submit">Eliminar</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

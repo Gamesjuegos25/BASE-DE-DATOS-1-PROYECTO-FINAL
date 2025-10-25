@@ -1,0 +1,400 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <!-- CSS para formularios -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/form-pages.css') }}">{% endblock %}
+
+
+{% block title %}Editar Empleado - Sistema ERP{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/create-forms.css') }}">
+
+
+<div class="page-header">
+    <div class="header-content">
+        <div class="header-left">
+            <h1 class="page-title">
+                <i class="fas fa-user-edit"></i>
+                Editar Empleado
+            </h1>
+            <p class="page-subtitle">Modificar información de {{ empleado.nombre_empleado }} {{ empleado.apellido_empleado or '' }}</p>
+        </div>
+        <div class="header-actions">
+            <a href="{{ url_for('listar_empleados') }}" class="btn btn btn btn-warm-secondary">
+                <i class="fas fa-arrow-left"></i>
+                Volver a Empleados
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="form-max-w-7xl mx-auto px-6">
+    <div class="form-card">
+        <div class="create-form-max-w-7xl mx-auto px-6">
+<form method="POST" class="modern-form" id="empleadoEditForm">
+            <!-- Información Personal -->
+            <div class="form-section">
+                <div class="section-header">
+                    <i class="fas fa-user"></i>
+                    <h3>Información Personal</h3>
+                </div>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-id-stat-card"></i>
+                            Nombres
+                        </label>
+                        <input class="form-input" type="text" 
+                               id="nombre" 
+                               name="nombre" 
+                               class="form-input"
+                               value="{{ empleado.nombre_empleado or '' }}"
+                               required>
+                        <div class="form-hint">Nombres del empleado</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-user-tag"></i>
+                            Apellidos
+                        </label>
+                        <input class="form-input" type="text" 
+                               id="apellido" 
+                               name="apellido" 
+                               class="form-input"
+                               value="{{ empleado.apellido_empleado or '' }}"
+                               required>
+                        <div class="form-hint">Apellidos del empleado</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-briefcase"></i>
+                            Cargo/Posición
+                        </label>
+                        <select class="form-select" id="tipo" name="tipo" class="form-select" required onchange="actualizarSalario()">
+                            <option value="">Seleccionar cargo...</option>
+                            <option value="ARQUITECTO" data-salario="9500.00" {{ 'selected' if empleado.tipo_empleado == 'ARQUITECTO' else '' }}>
+                                🏗️ Arquitecto - Q9,500.00/mes
+                            </option>
+                            <option value="INGENIERO" data-salario="8500.00" {{ 'selected' if empleado.tipo_empleado == 'INGENIERO' else '' }}>
+                                🎓 Ingeniero - Q8,500.00/mes
+                            </option>
+                            <option value="ADMINISTRADOR" data-salario="7200.00" {{ 'selected' if empleado.tipo_empleado == 'ADMINISTRADOR' else '' }}>
+                                👔 Administrador - Q7,200.00/mes
+                            </option>
+                            <option value="SUPERVISOR" data-salario="6200.00" {{ 'selected' if empleado.tipo_empleado == 'SUPERVISOR' else '' }}>
+                                👷‍♂️ Supervisor - Q6,200.00/mes
+                            </option>
+                            <option value="ADMINISTRATIVO" data-salario="4800.00" {{ 'selected' if empleado.tipo_empleado == 'ADMINISTRATIVO' else '' }}>
+                                📋 Administrativo - Q4,800.00/mes
+                            </option>
+                            <option value="ALMACENISTA" data-salario="4200.00" {{ 'selected' if empleado.tipo_empleado == 'ALMACENISTA' else '' }}>
+                                📦 Almacenista - Q4,200.00/mes
+                            </option>
+                            <option value="CONDUCTOR" data-salario="3800.00" {{ 'selected' if empleado.tipo_empleado == 'CONDUCTOR' else '' }}>
+                                🚛 Conductor - Q3,800.00/mes
+                            </option>
+                            <option value="OBRERO_ESPECIALIZADO" data-salario="3500.00" {{ 'selected' if empleado.tipo_empleado == 'OBRERO_ESPECIALIZADO' else '' }}>
+                                🔧 Obrero Especializado - Q3,500.00/mes
+                            </option>
+                            <option value="OPERARIO" data-salario="3200.00" {{ 'selected' if empleado.tipo_empleado == 'OPERARIO' else '' }}>
+                                ⚒️ Operario - Q3,200.00/mes
+                            </option>
+                            <option value="OBRERO" data-salario="2800.00" {{ 'selected' if empleado.tipo_empleado == 'OBRERO' else '' }}>
+                                👷 Obrero - Q2,800.00/mes
+                            </option>
+                            <option value="SEGURIDAD" data-salario="2600.00" {{ 'selected' if empleado.tipo_empleado == 'SEGURIDAD' else '' }}>
+                                🛡️ Seguridad - Q2,600.00/mes
+                            </option>
+                        </select>
+                        <div class="form-hint">
+                            <i class="fas fa-info-circle text-prussian-blue-700"></i>
+                            El salario se actualiza automáticamente al cambiar el cargo
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Información Laboral -->
+            <div class="form-section">
+                <div class="section-header">
+                    <i class="fas fa-money-bill-wave"></i>
+                    <h3>Información Laboral</h3>
+                </div>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-coins"></i>
+                            Salario Mensual (Q)
+                            <span class="badge badge badge-success" id="salarioAutomatico" style="display: none;">
+                                <i class="fas fa-magic"></i> Automático
+                            </span>
+                        </label>
+                        <input class="form-input" type="number" 
+                               id="salario" 
+                               name="salario" 
+                               class="form-input"
+                               step="0.01" 
+                               min="0"
+                               value="{{ empleado.salario_fijo_empleado if empleado.salario_fijo_empleado else '' }}"
+                               readonly>
+                        <div class="form-hint">
+                            <i class="fas fa-magic"></i>
+                            Salario asignado automáticamente según el cargo
+                        </div>
+                        <div class="salary-preview" id="salarioPreview" style="display: none;">
+                            <div class="form-card">
+                                <div class="preview-header">
+                                    <i class="fas fa-calculator"></i>
+                                    <strong>Desglose Salarial</strong>
+                                </div>
+                                <div class="preview-content">
+                                    <div class="salary-item">
+                                        <span>Salario Mensual:</span>
+                                        <span id="salarioMensual">Q0.00</span>
+                                    </div>
+                                    <div class="salary-item">
+                                        <span>Salario Anual:</span>
+                                        <span id="salarioAnual">Q0.00</span>
+                                    </div>
+                                    <div class="salary-item highlight">
+                                        <span>Con Bono 14:</span>
+                                        <span id="salarioConBono">Q0.00</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Información de Contacto -->
+            <div class="form-section">
+                <div class="section-header">
+                    <i class="fas fa-address-book"></i>
+                    <h3>Información de Contacto</h3>
+                </div>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-phone"></i>
+                            Teléfono
+                        </label>
+                        <input class="form-input" type="tel" 
+                               id="telefono" 
+                               name="telefono" 
+                               class="form-input"
+                               placeholder="1234-5678"
+                               value="{{ empleado.telefono or '' }}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-envelope"></i>
+                            Email
+                        </label>
+                        <input class="form-input" type="email" 
+                               id="email" 
+                               name="email" 
+                               class="form-input"
+                               placeholder="empleado@constructora.com"
+                               value="{{ empleado.email or '' }}">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">
+                            <i class="fas fa-calendar-plus"></i>
+                            Fecha de Ingreso
+                        </label>
+                        <input class="form-input" type="date" 
+                               id="fecha_ingreso" 
+                               name="fecha_ingreso" 
+                               class="form-input"
+                               value="{{ empleado.fecha_ingreso.strftime('%Y-%m-%d') if empleado.fecha_ingreso else '' }}">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn btn btn-warm-primary">
+                    <i class="fas fa-save"></i>
+                    Guardar Cambios
+                </button>
+                <a href="{{ url_for('listar_empleados') }}" class="btn btn btn btn-warm-secondary">
+                    <i class="fas fa-times"></i>
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+.salary-preview {
+    margin-top: 15px;
+    animation: slideDown 0.3s ease-in-out;
+}
+
+.preview-card {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: 2px solid #28a745;
+    border-radius: 10px;
+    padding: 15px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.preview-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #28a745;
+    font-weight: 600;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #dee2e6;
+    padding-bottom: 8px;
+}
+
+.salary-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 0;
+}
+
+.salary-item.highlight {
+    background-color: #28a745;
+    color: white;
+    margin: 5px -10px;
+    padding: 8px 10px;
+    border-radius: 5px;
+    font-weight: 600;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.form-input[readonly] {
+    background-color: #f8f9fa;
+    cursor: not-allowed;
+    color: #28a745;
+    font-weight: 600;
+}
+</style>
+
+<script>
+// Función para actualizar el salario automáticamente
+function actualizarSalario() {
+    const tipoSelect = document.getElementById('tipo');
+    const salarioInput = document.getElementById('salario');
+    const salarioAutomatico = document.getElementById('salarioAutomatico');
+    const salarioPreview = document.getElementById('salarioPreview');
+    const salarioMensual = document.getElementById('salarioMensual');
+    const salarioAnual = document.getElementById('salarioAnual');
+    const salarioConBono = document.getElementById('salarioConBono');
+    
+    const selectedOption = tipoSelect.options[tipoSelect.selectedIndex];
+    
+    if (selectedOption && selectedOption.dataset.salario) {
+        const salario = parseFloat(selectedOption.dataset.salario);
+        
+        // Actualizar el campo de salario
+        salarioInput.value = salario.toFixed(2);
+        
+        // Mostrar badge de automático
+        salarioAutomatico.style.display = 'inline-block';
+        
+        // Calcular y mostrar desglose
+        const salarioAnualCalc = salario * 12;
+        const salarioConBonoCalc = salarioAnualCalc + salario; // Bono 14
+        
+        salarioMensual.textContent = `Q${salario.toLocaleString('es-GT', {minimumFractionDigits: 2})}`;
+        salarioAnual.textContent = `Q${salarioAnualCalc.toLocaleString('es-GT', {minimumFractionDigits: 2})}`;
+        salarioConBono.textContent = `Q${salarioConBonoCalc.toLocaleString('es-GT', {minimumFractionDigits: 2})}`;
+        
+        // Mostrar preview con animación
+        salarioPreview.style.display = 'block';
+        
+    } else {
+        // Limpiar cuando no hay selección
+        salarioInput.value = '';
+        salarioAutomatico.style.display = 'none';
+        salarioPreview.style.display = 'none';
+    }
+}
+
+// Validación del formulario
+document.getElementById('empleadoEditForm').addEventListener('submit', function(e) {
+    const nombre = document.getElementById('nombre').value.trim();
+    const apellido = document.getElementById('apellido').value.trim();
+    const tipo = document.getElementById('tipo').value;
+    const salario = document.getElementById('salario').value;
+    
+    if (!nombre) {
+        e.preventDefault();
+        alert('❌ El nombre del empleado es obligatorio');
+        document.getElementById('nombre').focus();
+        return false;
+    }
+    
+    if (!apellido) {
+        e.preventDefault();
+        alert('❌ El apellido del empleado es obligatorio');
+        document.getElementById('apellido').focus();
+        return false;
+    }
+    
+    if (!tipo) {
+        e.preventDefault();
+        alert('❌ Debe seleccionar un cargo para el empleado');
+        document.getElementById('tipo').focus();
+        return false;
+    }
+    
+    if (!salario || parseFloat(salario) <= 0) {
+        e.preventDefault();
+        alert('❌ El salario debe ser mayor a 0. Seleccione un cargo válido.');
+        document.getElementById('tipo').focus();
+        return false;
+    }
+    
+    // Confirmación con información del empleado
+    const tipoTexto = document.getElementById('tipo').options[document.getElementById('tipo').selectedIndex].text;
+    if (!confirm(`✅ ¿Confirmar actualización del empleado?\n\n👤 Nombre: ${nombre} ${apellido}\n💼 Cargo: ${tipoTexto}\n💰 Salario: Q${parseFloat(salario).toLocaleString('es-GT', {minimumFractionDigits: 2})}/mes`)) {
+        e.preventDefault();
+        return false;
+    }
+    
+    return true;
+});
+
+// Inicializar salario al cargar la página
+document.addEventListener('DOMContentLoaded', function() {
+    const tipoSelect = document.getElementById('tipo');
+    if (tipoSelect.value) {
+        actualizarSalario();
+    }
+});
+
+// Efectos visuales
+document.getElementById('tipo').addEventListener('change', function() {
+    const option = this.options[this.selectedIndex];
+    if (option.value) {
+        // Efecto visual en el select
+        this.style.borderColor = '#28a745';
+        this.style.boxShadow = '0 0 5px rgba(40, 167, 69, 0.3)';
+        
+        setTimeout(() => {
+            this.style.borderColor = '';
+            this.style.boxShadow = '';
+        }, 2000);
+    }
+});
+</script>
+{% endblock %}

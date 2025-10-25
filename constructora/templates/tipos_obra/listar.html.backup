@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Tipos de Obra{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div class="header-content">
+    <div>
+      <h1>Tipos de Obra</h1>
+      <p>Catálogo de tipos con precios y descripciones fijas</p>
+    </div>
+    <div class="header-actions">
+      <a href="{{ url_for('tipos_obra_nuevo') }}" class="btn btn-primary"><i class="fas fa-plus"></i> Nuevo Tipo</a>
+      <a href="{{ url_for('tipos_obra_listar', todos='1' if not mostrar_todos else None) }}" class="btn btn-secondary">
+        {% if mostrar_todos %}<i class="fas fa-filter"></i> Solo activos{% else %}<i class="fas fa-list"></i> Ver todos{% endif %}
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="table-container">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Unidad</th>
+          <th>Rango</th>
+          <th>Precio base</th>
+          <th>Activo</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for t in tipos %}
+        <tr>
+          <td>
+            <div class="obra-name">{{ t.nombre_tipo }}</div>
+            {% if t.descripcion_base %}<div class="obra-desc">{{ t.descripcion_base }}</div>{% endif %}
+            {% if t.notas %}<div class="obra-desc"><em>{{ t.notas }}</em></div>{% endif %}
+          </td>
+          <td>{{ t.unidad_medida or '-' }}</td>
+          <td>{{ t.rango_precio or '-' }}</td>
+          <td>{{ 'Q{:,.2f}'.format(t.precio_base) if t.precio_base is not none else '-' }}</td>
+          <td>
+            {% if t.activo %}
+            <span class="status-badge status-en-progreso">Activo</span>
+            {% else %}
+            <span class="status-badge status-pausado">Inactivo</span>
+            {% endif %}
+          </td>
+          <td class="actions-cell">
+            <div class="table-actions">
+              <a class="btn-action btn-edit" href="{{ url_for('tipos_obra_editar', id=t.id_tipo_obra or t.id) }}" title="Editar"><i class="fas fa-edit"></i></a>
+              {% if t.activo %}
+              <form action="{{ url_for('tipos_obra_desactivar', id=t.id_tipo_obra or t.id) }}" method="post" onsubmit="return confirm('¿Desactivar este tipo?');">
+                <button class="btn-action btn-danger" type="submit" title="Desactivar"><i class="fas fa-ban"></i></button>
+              </form>
+              {% else %}
+              <form action="{{ url_for('tipos_obra_activar', id=t.id_tipo_obra or t.id) }}" method="post" onsubmit="return confirm('¿Activar este tipo?');">
+                <button class="btn-action btn-view" type="submit" title="Activar"><i class="fas fa-check"></i></button>
+              </form>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

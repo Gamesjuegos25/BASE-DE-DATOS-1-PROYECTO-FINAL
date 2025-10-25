@@ -1,0 +1,386 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <!-- CSS específico para páginas de detalle -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/detail-page.css') }}">
+    
+    <!-- CSS para páginas de detalle -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/detail-page.css') }}">{% endblock %}
+
+{% block title %}Detalle Proyecto{% endblock %}
+{% block content %}
+<div class="page-header">
+  <nav class="breadcrumb">
+    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+    <span class="breadcrumb-separator">/</span>
+    <a href="{{ url_for('listar_proyectos') }}">Proyectos</a>
+    <span class="breadcrumb-separator">/</span>
+    <span>Detalle</span>
+  </nav>
+  <h1 class="page-title">📋 {{ proyecto.nombre or 'Proyecto' }} <small class="text-vanilla-600">ID: {{ proyecto.id or proyecto.proyecto_id }}</small></h1>
+</div>
+
+<div class="flex flex-wrap -mx-2">
+  <div class="flex-1 px-2-md-8">
+    <div class="detail-card">
+      <div class="stat-stat-header">
+        <h4 style="color: var(--prussian-blue-600); margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: var(--spacing-sm);"><i class="fas fa-project-diagram text-xanthous"></i>Información del Proyecto</h4>
+      </div>
+      <div class="stat-module-content">
+        <dl class="flex flex-wrap -mx-2">
+          <dt class="flex-1 px-2-sm-4"><i class="fas fa-tag"></i> Nombre del Proyecto</dt>
+          <dd class="flex-1 px-2-sm-8">
+            <strong>{{ proyecto.nombre or 'N/D' }}</strong>
+          </dd>
+          
+          <dt class="flex-1 px-2-sm-4"><i class="fas fa-info-circle text-prussian-blue-700"></i> Estado</dt>
+          <dd class="flex-1 px-2-sm-8">
+            {% set estado_class = {
+              'ACTIVO': 'success',
+              'PLANIFICACION': 'warning', 
+              'COMPLETADO': 'info',
+              'PAUSADO': 'secondary',
+              'CANCELADO': 'danger'
+            } %}
+            <span class="status-badge-detail {{ estado_class.get(proyecto.estado, 'secondary') }}">
+              {{ proyecto.estado or 'PLANIFICACION' }}
+            </span>
+          </dd>
+          
+          <dt class="flex-1 px-2-sm-4"><i class="fas fa-calendar-alt"></i> Fecha de Inicio</dt>
+          <dd class="flex-1 px-2-sm-8">
+            {% if proyecto.fecha_inicio %}
+              <strong class="text-prussian-blue-700">{{ proyecto.fecha_inicio.strftime('%d/%m/%Y') }}</strong>
+            {% else %}
+              <span class="text-vanilla-600">Sin definir</span>
+            {% endif %}
+          </dd>
+          
+          <dt class="flex-1 px-2-sm-4"><i class="fas fa-calendar-check"></i> Fecha de Finalización</dt>
+          <dd class="flex-1 px-2-sm-8">
+            {% if proyecto.fecha_fin %}
+              <strong class="text-orange-wheel">{{ proyecto.fecha_fin.strftime('%d/%m/%Y') }}</strong>
+            {% else %}
+              <span class="text-vanilla-600">Sin definir</span>
+            {% endif %}
+          </dd>
+          
+          {% if proyecto.fecha_inicio and proyecto.fecha_fin %}
+            <dt class="flex-1 px-2-sm-4"><i class="fas fa-clock"></i> Duración</dt>
+            <dd class="flex-1 px-2-sm-8">
+              <strong class="text-prussian-blue">{{ (proyecto.fecha_fin - proyecto.fecha_inicio).days }} días</strong>
+            </dd>
+          {% endif %}
+        </dl>
+      </div>
+    </div>
+    
+    <!-- Equipo Asignado al Proyecto -->
+    <div class="detail-card">
+      <div class="stat-stat-header">
+        <h4 style="color: var(--prussian-blue-600); margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: var(--spacing-sm);"><i class="fas fa-users-cog text-orange-wheel text-xanthous"></i>Equipo del Proyecto</h4>
+      </div>
+      <div class="stat-module-content">
+        <div class="flex flex-wrap -mx-2">
+          <!-- Arquitecto Asignado -->
+          <div class="flex-1 px-2-md-6 mb-3">
+            <h6 class="text-xanthous-600"><i class="fas fa-drafting-compass"></i> Arquitecto Principal</h6>
+            {% if asignaciones.arquitectos %}
+              {% for arq in asignaciones.arquitectos %}
+                <div class="detail-card">
+                  <h6 class="mb-1">🎨 {{ arq.nombre_empleado }} {{ arq.apellido_empleado }}</h6>
+                  <small class="text-vanilla-600">{{ arq.tipo_empleado }}</small>
+                  {% if arq.responsabilidad %}
+                    <p class="mb-1"><strong>Responsabilidad:</strong> {{ arq.responsabilidad }}</p>
+                  {% endif %}
+                  {% if arq.telefono %}
+                    <small><i class="fas fa-phone"></i> {{ arq.telefono }}</small><br>
+                  {% endif %}
+                  {% if arq.email %}
+                    <small><i class="fas fa-envelope"></i> {{ arq.email }}</small>
+                  {% endif %}
+                  <small class="text-vanilla-600">Asignado: {{ arq.fecha_asignacion.strftime('%d/%m/%Y') }}</small>
+                </div>
+              {% endfor %}
+            {% else %}
+              <p class="text-vanilla-600 mb-0"><i class="fas fa-exclamation-triangle text-fire-engine-red"></i> No hay arquitecto asignado</p>
+            {% endif %}
+          </div>
+          
+          <!-- Ingeniero Asignado -->
+          <div class="flex-1 px-2-md-6 mb-3">
+            <h6 class="text-prussian-blue"><i class="fas fa-hard-hat"></i> Ingeniero Principal</h6>
+            {% if asignaciones.ingenieros %}
+              {% for ing in asignaciones.ingenieros %}
+                <div class="detail-card">
+                  <h6 class="mb-1">⚙️ {{ ing.nombre_empleado }} {{ ing.apellido_empleado }}</h6>
+                  <small class="text-vanilla-600">{{ ing.tipo_empleado }}</small>
+                  {% if ing.responsabilidad %}
+                    <p class="mb-1"><strong>Responsabilidad:</strong> {{ ing.responsabilidad }}</p>
+                  {% endif %}
+                  {% if ing.telefono %}
+                    <small><i class="fas fa-phone"></i> {{ ing.telefono }}</small><br>
+                  {% endif %}
+                  {% if ing.email %}
+                    <small><i class="fas fa-envelope"></i> {{ ing.email }}</small>
+                  {% endif %}
+                  <small class="text-vanilla-600">Asignado: {{ ing.fecha_asignacion.strftime('%d/%m/%Y') }}</small>
+                </div>
+              {% endfor %}
+            {% else %}
+              <p class="text-vanilla-600 mb-0"><i class="fas fa-exclamation-triangle text-fire-engine-red"></i> No hay ingeniero asignado</p>
+            {% endif %}
+          </div>
+        </div>
+        
+        <!-- Otros Empleados -->
+        {% if asignaciones.empleados %}
+          {% set otros_empleados = asignaciones.empleados | selectattr('tipo_asignacion', 'ne', 'ARQUITECTO') | selectattr('tipo_asignacion', 'ne', 'INGENIERO') | list %}
+          {% if otros_empleados %}
+            <div class="flex-1 px-2-md-12">
+              <h6 class="text-prussian-blue-700"><i class="fas fa-users text-orange-wheel"></i> Otros Miembros del Equipo</h6>
+              <div class="table-max-w-7xl mx-auto px-6">
+                <table class="assignment-table">
+                  <thead>
+                    <tr>
+                      <th>Empleado</th>
+                      <th>Rol</th>
+                      <th>Especialidad</th>
+                      <th>Fecha Asignación</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for emp in otros_empleados %}
+                    <tr>
+                      <td><strong>{{ emp.nombre_empleado }} {{ emp.apellido_empleado }}</strong></td>
+                      <td><span class="status-badge-detail">{{ emp.tipo_asignacion }}</span></td>
+                      <td><small class="text-vanilla-600">{{ emp.tipo_empleado }}</small></td>
+                      <td><small>{{ emp.fecha_asignacion.strftime('%d/%m/%Y') }}</small></td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          {% endif %}
+        {% endif %}
+      </div>
+    </div>
+    
+    <!-- Obras Asignadas -->
+    <div class="detail-card">
+      <div class="stat-stat-header">
+        <h4 style="color: var(--prussian-blue-600); margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: var(--spacing-sm);"><i class="fas fa-building text-prussian-blue text-xanthous"></i>Obras Asignadas</h4>
+      </div>
+      <div class="stat-module-content">
+        {% if asignaciones.obras %}
+          {% for obra in asignaciones.obras %}
+            <div class="detail-card">
+              <div class="flex flex-wrap -mx-2">
+                <div class="flex-1 px-2-md-8">
+                  <h6 class="mb-1">🏗️ {{ obra.nombre_obra }}</h6>
+                  {% if obra.descripcion_obra %}
+                    <p class="mb-1">{{ obra.descripcion_obra }}</p>
+                  {% endif %}
+                  <div class="mb-2">
+                    <span class="status-badge-detail {{ 'success' if obra.estado_obra == 'Completada' else 'warning' if obra.estado_obra == 'En Progreso' else 'info' }}">
+                      {{ obra.estado_obra }}
+                    </span>
+                    {% if obra.tipo_obra %}
+                      <span class="status-badge-detail">{{ obra.tipo_obra }}</span>
+                    {% endif %}
+                  </div>
+                  {% if obra.ubicacion_obra %}
+                    <small class="text-vanilla-600"><i class="fas fa-map-marker-alt"></i> {{ obra.ubicacion_obra }}</small>
+                  {% endif %}
+                </div>
+                <div class="flex-1 px-2-md-4 text-right">
+                  {% if obra.valor_obra %}
+                    <h6 class="text-xanthous-600 mb-1">Q{{ "{:,.2f}".format(obra.valor_obra) }}</h6>
+                  {% endif %}
+                  <small class="text-vanilla-600">Asignada: {{ obra.fecha_asignacion.strftime('%d/%m/%Y') }}</small><br>
+                  <a href="{{ url_for('ver_obra', id=obra.id_obra) }}" class="btn btn-sm btn-outline-primary mt-1">
+                    <i class="fas fa-eye"></i> Ver Obra
+                  </a>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <p class="text-vanilla-600 mb-0"><i class="fas fa-exclamation-circle"></i> No hay obras asignadas a este proyecto</p>
+        {% endif %}
+      </div>
+    </div>
+    
+    <!-- Vehículos y Equipos -->
+    <div class="detail-card">
+      <div class="stat-stat-header">
+        <h4 style="color: var(--prussian-blue-600); margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: var(--spacing-sm);"><i class="fas fa-truck text-xanthous"></i>Vehículos y Equipos Asignados</h4>
+      </div>
+      <div class="stat-module-content">
+        {% if asignaciones.vehiculos %}
+          <div class="flex flex-wrap -mx-2">
+            {% for veh in asignaciones.vehiculos %}
+            <div class="flex-1 px-2-md-6 mb-3">
+              <div class="detail-card">
+                <h6 class="mb-1">🚚 {{ veh.placa_vehiculo }}</h6>
+                <p class="mb-1"><strong>{{ veh.tipo_vehiculo }}</strong></p>
+                <span class="status-badge-detail {{ 'success' if veh.estado_vehiculo == 'DISPONIBLE' else 'warning' }} mb-2">
+                  {{ veh.estado_vehiculo }}
+                </span>
+                {% if veh.proposito %}
+                  <p class="mb-1"><strong>Propósito:</strong> {{ veh.proposito }}</p>
+                {% endif %}
+                <small class="text-vanilla-600">Asignado: {{ veh.fecha_asignacion.strftime('%d/%m/%Y') }}</small>
+                {% if veh.fecha_fin_asignacion %}
+                  <br><small class="text-orange-wheel">Hasta: {{ veh.fecha_fin_asignacion.strftime('%d/%m/%Y') }}</small>
+                {% endif %}
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="text-vanilla-600 mb-0"><i class="fas fa-exclamation-circle"></i> No hay vehículos asignados a este proyecto</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  
+  <div class="flex-1 px-2-md-4">
+    <!-- Estadísticas del Proyecto -->
+    <div class="detail-card">
+      <div class="stat-stat-header">
+        <h4 style="color: var(--prussian-blue-600); margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: var(--spacing-sm);"><i class="fas fa-chart-pie text-xanthous"></i>Estadísticas</h4>
+      </div>
+      <div class="stat-module-content text-center">
+        <div class="flex flex-wrap -mx-2">
+          <div class="flex-1 px-2-6 mb-3">
+            <h3 class="text-prussian-blue">{{ asignaciones.estadisticas.total_obras }}</h3>
+            <small class="text-vanilla-600">Obras Asignadas</small>
+          </div>
+          <div class="flex-1 px-2-6 mb-3">
+            <h3 class="text-xanthous-600">{{ asignaciones.estadisticas.total_empleados }}</h3>
+            <small class="text-vanilla-600">Miembros Equipo</small>
+          </div>
+          <div class="flex-1 px-2-6 mb-3">
+            <h3 class="text-prussian-blue-700">{{ asignaciones.estadisticas.total_vehiculos }}</h3>
+            <small class="text-vanilla-600">Vehículos</small>
+          </div>
+          <div class="flex-1 px-2-6 mb-3">
+            <h3 class="text-orange-wheel">Q{{ "{:,.0f}".format(asignaciones.estadisticas.valor_total_obras) }}</h3>
+            <small class="text-vanilla-600">Valor Obras</small>
+          </div>
+        </div>
+        
+        <hr>
+        
+        <div class="flex flex-wrap -mx-2">
+          <div class="flex-1 px-2-6">
+            <h4 class="text-xanthous-600">{{ asignaciones.estadisticas.total_arquitectos }}</h4>
+            <small class="text-vanilla-600">Arquitectos</small>
+          </div>
+          <div class="flex-1 px-2-6">
+            <h4 class="text-prussian-blue">{{ asignaciones.estadisticas.total_ingenieros }}</h4>
+            <small class="text-vanilla-600">Ingenieros</small>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Acciones -->
+    <div class="detail-card">
+      <div class="stat-stat-header">
+        <h4 style="color: var(--prussian-blue-600); margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: var(--spacing-sm);"><i class="fas fa-cogs text-xanthous"></i>Acciones</h4>
+      </div>
+      <div class="stat-module-content">
+        <div class="flex flex-col gap-2">
+          <a class="btn btn btn btn-warm-primary" href="{{ url_for('editar_proyecto', id=(proyecto.id or proyecto.proyecto_id)) }}">
+            <i class="fas fa-edit"></i> Editar Proyecto
+          </a>
+          <a class="btn btn btn-accent" href="#">
+            <i class="fas fa-plus"></i> Asignar Recursos
+          </a>
+          <a class="btn btn btn btn-warm-primary" href="#">
+            <i class="fas fa-chart-line text-xanthous"></i> Ver Progreso
+          </a>
+          <a class="btn btn btn btn-warm-secondary" href="{{ url_for('listar_proyectos') }}">
+            <i class="fas fa-arrow-left"></i> Volver a Lista
+          </a>
+          <form action="{{ url_for('eliminar_proyecto', id=(proyecto.id or proyecto.proyecto_id)) }}" method="post" onsubmit="return confirm('¿Eliminar este proyecto?');" class="mt-2">
+            <button class="btn btn btn btn-warm-danger w-100" type="submit">
+              <i class="fas fa-trash"></i> Eliminar
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+/* Breadcrumb Navigation */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  font-size: 14px;
+}
+
+.breadcrumb a {
+  color: #007bff;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.breadcrumb a:hover {
+  color: #0056b3;
+  text-decoration: underline;
+}
+
+.breadcrumb-separator {
+  margin: 0 8px;
+  color: #6c757d;
+}
+
+.page-title {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 0;
+}
+
+.page-title small {
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+/* Card Styling */
+.card {
+  border: 1px solid #e3e6f0;
+  border-radius: 0.35rem;
+  box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+}
+
+.card-header {
+  background-color: #f8f9fc;
+  border-bottom: 1px solid #e3e6f0;
+  padding: 1rem 1.25rem;
+}
+
+.card-header h5 {
+  color: #5a5c69;
+  margin: 0;
+}
+
+/* Badge Colors */
+.badge {
+  font-size: 0.875rem;
+  padding: 0.375rem 0.75rem;
+}
+
+/* Gap Utilities */
+.gap-2 > * + * {
+  margin-top: 0.5rem;
+}
+</style>
+{% endblock %}

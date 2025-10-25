@@ -1,0 +1,840 @@
+{% extends "base.html" %}
+
+{% block title %}Materiales - ERP Constructora
+<script>
+// Mejoras JavaScript automáticas para tablas
+document.addEventListener('DOMContentLoaded', function() {
+    // Aplicar efectos de hover a filas de tabla
+    const tableRows = document.querySelectorAll('.data-table-enhanced tbody tr, table tbody tr');
+    tableRows.forEach((row, index) => {
+        row.style.animationDelay = `${index * 0.1}s`;
+        row.classList.add('fade-in-up');
+        
+        row.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+            this.style.boxShadow = '0 4px 15px rgba(247, 127, 0, 0.2)';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = 'none';
+        });
+    });
+    
+    // Mejorar botones de acción con tooltips
+    const actionButtons = document.querySelectorAll('.btn-action-enhanced, .action-buttons a, .action-buttons button');
+    actionButtons.forEach(button => {
+        if (!button.querySelector('.custom-tooltip')) {
+            button.addEventListener('mouseenter', function() {
+                const title = this.getAttribute('title');
+                if (title) {
+                    const tooltip = document.createElement('div');
+                    tooltip.className = 'custom-tooltip';
+                    tooltip.textContent = title;
+                    tooltip.style.cssText = `
+                        position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+                        background: var(--prussian-blue-700); color: var(--vanilla);
+                        padding: 4px 8px; border-radius: 4px; font-size: 0.7rem;
+                        white-space: nowrap; z-index: 1000; margin-bottom: 5px;
+                    `;
+                    this.style.position = 'relative';
+                    this.appendChild(tooltip);
+                }
+            });
+            
+            button.addEventListener('mouseleave', function() {
+                const tooltip = this.querySelector('.custom-tooltip');
+                if (tooltip) tooltip.remove();
+            });
+        }
+    });
+    
+    // Contador animado para números
+    const statNumbers = document.querySelectorAll('.stat-number-enhanced, .stat-number');
+    statNumbers.forEach(stat => {
+        const finalNumber = parseInt(stat.textContent) || 0;
+        if (finalNumber > 0) {
+            let currentNumber = 0;
+            const increment = Math.max(1, Math.ceil(finalNumber / 20));
+            const timer = setInterval(() => {
+                currentNumber += increment;
+                if (currentNumber >= finalNumber) {
+                    currentNumber = finalNumber;
+                    clearInterval(timer);
+                }
+                stat.textContent = currentNumber;
+            }, 100);
+        }
+    });
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/enhanced-tables.css') }}">
+
+<div class="page-container"><div class="page-header fade-in-up">
+    <nav class="breadcrumb">
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+        <span class="breadcrumb-separator">/</span>
+        <span>Materiales</span>
+    </nav>
+    <h1 class="page-title">🧱 Gestión de Materiales</h1>
+    <p class="page-subtitle">Control de inventario y materiales de construcción</p>
+</div>
+
+<!-- Estadísticas de Materiales -->
+<div class="dashboard-grid mb-8">
+    <div class="stat-stat-card fade-in-up">
+        <div class="stat-header">
+            <div class="stat-title">Total Materiales</div>
+            <div class="stat-icon primary">
+                <i class="fas fa-boxes text-vanilla-100"></i>
+            </div>
+        </div>
+        <div class="stat-value">{{ materiales|length or 0 }}</div>
+        <div class="stat-change positive">
+            <i class="fas fa-cube"></i>
+            <span>En catálogo</span>
+        </div>
+    </div>
+    
+    <div class="stat-stat-card fade-in-up">
+        <div class="stat-header">
+            <div class="stat-title">Valor Total Inventario</div>
+            <div class="stat-icon success">
+                <i class="fas fa-coins"></i>
+            </div>
+        </div>
+        <div class="stat-value">Q{{ "{:,.0f}".format(materiales|map(attribute='precio_unitario')|sum or 0) }}</div>
+        <div class="stat-change positive">
+            <i class="fas fa-chart-line text-xanthous"></i>
+            <span>Valor estimado</span>
+        </div>
+    </div>
+    
+    <div class="stat-stat-card fade-in-up">
+        <div class="stat-header">
+            <div class="stat-title">Stock Bajo</div>
+            <div class="stat-icon warning">
+                <i class="fas fa-exclamation-triangle text-fire-engine-red"></i>
+            </div>
+        </div>
+        <div class="stat-value">
+            {% set bajo_stock = [] %}
+            {% for mat in materiales %}
+                {% if (mat.stock_actual or 0) < (mat.stock_minimo or 0) %}
+                    {% set _ = bajo_stock.append(mat) %}
+                {% endif %}
+            {% endfor %}
+            {{ bajo_stock|length }}
+        </div>
+        <div class="stat-change warning">
+            <i class="fas fa-alert"></i>
+            <span>Requieren reposición</span>
+        </div>
+    </div>
+    
+    <div class="stat-stat-card fade-in-up">
+        <div class="stat-header">
+            <div class="stat-title">Categorías</div>
+            <div class="stat-icon info">
+                <i class="fas fa-tags"></i>
+            </div>
+        </div>
+        <div class="stat-value">{{ materiales|map(attribute='categoria')|unique|list|length or 0 }}</div>
+        <div class="stat-change">
+            <i class="fas fa-layer-group"></i>
+            <span>Diferentes</span>
+        </div>
+    </div>
+</div>
+
+<!-- Filtros y Búsqueda -->
+<div class="filter-section mb-6">
+    <div class="filter-grid">
+        <div class="filter-group">
+            <label for="searchMateriales" class="filter-label">Buscar Material</label>
+            <div class="search-box">
+                <i class="search-icon fas fa-search"></i>
+                <input type="text" 
+                       id="searchMateriales" 
+                       class="form-control-enhanced" 
+                       placeholder="Buscar por nombre, código o descripción...">
+            </div>
+        </div>
+        
+        <div class="filter-group">
+            <label for="filterCategoria" class="filter-label">Categoría</label>
+            <select id="filterCategoria" class="form-control form-select">
+                <option value="">Todas las categorías</option>
+                {% for categoria in materiales|map(attribute='categoria')|unique %}
+                <option value="{{ categoria }}">{{ categoria }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="filter-group">
+            <label for="filterEstado" class="filter-label">Estado</label>
+            <select id="filterEstado" class="form-control form-select">
+                <option value="">Todos los estados</option>
+                <option value="Activo">Activo</option>
+                <option value="Inactivo">Inactivo</option>
+                <option value="Descontinuado">Descontinuado</option>
+            </select>
+        </div>
+        
+        <div class="filter-group">
+            <label for="filterStock" class="filter-label">Stock</label>
+            <select id="filterStock" class="form-control form-select">
+                <option value="">Todos</option>
+                <option value="bajo">Stock Bajo</option>
+                <option value="normal">Stock Normal</option>
+                <option value="alto">Stock Alto</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<!-- Tabla de Materiales -->
+<div class="table-max-w-7xl mx-auto px-6">
+    <div class="table-header">
+        <h2 class="table-title">📦 Inventario de Materiales</h2>
+        <div class="table-tools">
+            <div class="view-toggle">
+                <button class="btn btn-sm btn btn btn-warm-secondary" id="viewTable" onclick="cambiarVista('table')">
+                    <i class="fas fa-table"></i> Tabla
+                </button>
+                <button class="btn btn-sm btn-outline-secondary" id="viewGrid" onclick="cambiarVista('grid')">
+                    <i class="fas fa-th"></i> Tarjetas
+                </button>
+            </div>
+            <div class="flex gap-2">
+                <button class="btn btn-outline-primary" onclick="exportarMateriales()">
+                    <i class="fas fa-download"></i> Exportar
+                </button>
+                <a href="{{ url_for('crear_material') }}" class="btn btn btn btn-warm-primary">
+                    <i class="fas fa-plus"></i> Nuevo Material
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Vista de Tabla -->
+    <div id="vistaTabla">
+        <div class="table-wrapper fade-in-up"><div class="table-container-responsive"><table class="data-table-enhanced" id="tablaMateriales">
+            <thead><tr>
+                    <th>Material</th>
+                    <th>Categoría</th>
+                    <th>Precio</th>
+                    <th>Stock</th>
+                    <th>Proveedor</th>
+                    <th><i class="fas fa-tasks"></i> Estado</th>
+                    <th class="text-center"><i class="fas fa-cogs"></i> Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for material in materiales %}
+                <tr data-categoria="{{ material.categoria or '' }}" 
+                    data-estado="{{ material.estado or '' }}"
+                    data-stock-status="{{ 'bajo' if (material.stock_actual or 0) < (material.stock_minimo or 0) else 'normal' }}">
+                    <td>
+                        <div class="material-info">
+                            <div class="material-icon bg-gradient-warm-primary text-white">
+                                {% if material.categoria == 'Concreto y Cemento' %}🏗️
+                                {% elif material.categoria == 'Acero y Metales' %}⚙️
+                                {% elif material.categoria == 'Maderas' %}🪵
+                                {% elif material.categoria == 'Pinturas y Acabados' %}🎨
+                                {% else %}📦
+                                {% endif %}
+                            </div>
+                            <div>
+                                <div class="font-semibold">{{ material.nombre or 'Sin nombre' }}</div>
+                                <div class="text-sm text-vanilla-600">
+                                    {% if material.codigo_material %}
+                                        Código: {{ material.codigo_material }}
+                                    {% else %}
+                                        ID: {{ material.id_material }}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge badge badge-primary">{{ material.categoria or 'Sin categoría' }}</span>
+                    </td>
+                    <td class="text-right">
+                        <div class="price-info">
+                            <strong class="text-xanthous-600">Q{{ "{:,.2f}".format(material.precio_unitario or 0) }}</strong>
+                            <div class="text-sm text-vanilla-600">por {{ material.unidad_medida or 'unidad' }}</div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="stock-info">
+                            {% set stock_actual = material.stock_actual or 0 %}
+                            {% set stock_minimo = material.stock_minimo or 0 %}
+                            
+                            <div class="stock-number">
+                                <strong class="{{ 'text-fire-engine-red' if stock_actual < stock_minimo else 'text-xanthous-600' }}">
+                                    {{ stock_actual }}
+                                </strong>
+                                <span class="text-vanilla-600">/ {{ stock_minimo }} mín</span>
+                            </div>
+                            
+                            <div class="stock-bar">
+                                {% set porcentaje = (stock_actual / (stock_minimo or 1)) * 100 if stock_minimo > 0 else 100 %}
+                                <div class="stock-fill {{ 'bg-gradient-warm-danger text-white' if porcentaje < 100 else 'bg-xanthous-200 text-white' }}" 
+                                     style="width: {{ porcentaje if porcentaje <= 100 else 100 }}%"></div>
+                            </div>
+                        </td>
+                    <td>
+                        {% if material.proveedor_nombre %}
+                            <div class="text-sm">
+                                <div class="font-medium">{{ material.proveedor_nombre }}</div>
+                                <div class="text-vanilla-600">Proveedor principal</div>
+                            </div>
+                        {% else %}
+                            <span class="text-vanilla-600">Sin proveedor</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if material.estado == 'Activo' %}
+                            <span class="badge badge badge-success">{{ material.estado }}</span>
+                        {% elif material.estado == 'Inactivo' %}
+                            <span class="badge badge badge-secondary">{{ material.estado }}</span>
+                        {% elif material.estado == 'Descontinuado' %}
+                            <span class="badge badge badge-danger">{{ material.estado }}</span>
+                        {% else %}
+                            <span class="badge badge badge-secondary">{{ material.estado or 'Sin estado' }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="table-actions">
+                            <button class="btn btn-sm btn btn btn-warm-primary" onclick="verMaterial({{ material.id_material }})" title="Ver Detalles">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-sm btn btn btn-warm-secondary" onclick="editarMaterial({{ material.id_material }})" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn btn btn-warm-primary" onclick="ajustarStock({{ material.id_material }})" title="Ajustar Stock">
+                                <i class="fas fa-boxes text-vanilla-100"></i>
+                            </button>
+                            <button class="btn btn-sm btn btn btn-warm-secondary" onclick="verMovimientos({{ material.id_material }})" title="Historial">
+                                <i class="fas fa-history"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" class="text-center text-vanilla-600 p-8">
+                        <i class="fas fa-box-open fa-3x mb-6 text-gray-300"></i>
+                        <p class="text-lg">No hay materiales registrados</p>
+                        <a href="{{ url_for('crear_material') }}" class="btn btn btn btn-warm-primary mt-6">
+                            <i class="fas fa-plus"></i> Crear Primer Material
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table></div></div></div></div>
+    
+    <!-- Vista de Tarjetas -->
+    <div id="vistaGrid" style="display: none;">
+        <div class="materials-grid">
+            {% for material in materiales %}
+            <div class="material-stat-card fade-in-up" 
+                 data-categoria="{{ material.categoria or '' }}" 
+                 data-estado="{{ material.estado or '' }}"
+                 data-stock-status="{{ 'bajo' if (material.stock_actual or 0) < (material.stock_minimo or 0) else 'normal' }}">
+                
+                <div class="material-stat-stat-header">
+                    <div class="material-stat-card-icon fade-in-up">
+                        {% if material.categoria == 'Concreto y Cemento' %}🏗️
+                        {% elif material.categoria == 'Acero y Metales' %}⚙️
+                        {% elif material.categoria == 'Maderas' %}🪵
+                        {% elif material.categoria == 'Pinturas y Acabados' %}🎨
+                        {% else %}📦
+                        {% endif %}
+                    </div>
+                    <div class="material-stat-card-status fade-in-up">
+                        {% if material.estado == 'Activo' %}
+                            <span class="badge badge badge-success">{{ material.estado }}</span>
+                        {% elif material.estado == 'Inactivo' %}
+                            <span class="badge badge badge-secondary">{{ material.estado }}</span>
+                        {% elif material.estado == 'Descontinuado' %}
+                            <span class="badge badge badge-danger">{{ material.estado }}</span>
+                        {% else %}
+                            <span class="badge badge badge-secondary">{{ material.estado or 'Sin estado' }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="material-stat-module-content">
+                    <h4 class="material-stat-card-title">{{ material.nombre or 'Sin nombre' }}</h4>
+                    <p class="material-stat-card-category">{{ material.categoria or 'Sin categoría' }}</p>
+                    
+                    <div class="material-stat-card-price fade-in-up">
+                        <strong>Q{{ "{:,.2f}".format(material.precio_unitario or 0) }}</strong>
+                        <span>por {{ material.unidad_medida or 'unidad' }}</span>
+                    </div>
+                    
+                    <div class="material-stat-card-stock fade-in-up">
+                        {% set stock_actual = material.stock_actual or 0 %}
+                        {% set stock_minimo = material.stock_minimo or 0 %}
+                        
+                        <div class="stock-info">
+                            <span class="{{ 'text-fire-engine-red' if stock_actual < stock_minimo else 'text-xanthous-600' }}">
+                                Stock: {{ stock_actual }}
+                            </span>
+                            <span class="text-vanilla-600">/ {{ stock_minimo }} mín</span>
+                        </div>
+                        
+                        <div class="stock-bar">
+                            {% set porcentaje = (stock_actual / (stock_minimo or 1)) * 100 if stock_minimo > 0 else 100 %}
+                            <div class="stock-fill {{ 'bg-gradient-warm-danger text-white' if porcentaje < 100 else 'bg-xanthous-200 text-white' }}" 
+                                 style="width: {{ porcentaje if porcentaje <= 100 else 100 }}%"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="material-stat-card-actions fade-in-up">
+                    <button class="btn btn-sm btn btn btn-warm-primary" onclick="verMaterial({{ material.id_material }})">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="btn btn-sm btn btn btn-warm-secondary" onclick="editarMaterial({{ material.id_material }})">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-sm btn btn btn-warm-primary" onclick="ajustarStock({{ material.id_material }})">
+                        <i class="fas fa-boxes text-vanilla-100"></i>
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Modal para Ajustar Stock -->
+<div class="modal-overlay" id="modalAjustarStock" style="display: none;">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title">Ajustar Stock de Material</h3>
+            <button class="btn btn-warm-primary" class="modal-close" onclick="cerrarModal('modalAjustarStock')">×</button>
+        </div>
+        <div class="modal-body">
+            <form id="formAjustarStock">
+                <div class="form-group-enhanced">
+                    <label class="form-label-enhanced">Material</label>
+                    <input type="text" id="materialNombre" class="form-control-enhanced" readonly>
+                </div>
+                
+                <div class="form-grid">
+                    <div class="form-group-enhanced">
+                        <label class="form-label-enhanced">Stock Actual</label>
+                        <input type="number" id="stockActual" class="form-control-enhanced" readonly>
+                    </div>
+                    <div class="form-group-enhanced">
+                        <label class="form-label-enhanced">Stock Mínimo</label>
+                        <input type="number" id="stockMinimo" class="form-control-enhanced">
+                    </div>
+                </div>
+                
+                <div class="form-group-enhanced">
+                    <label class="form-label-enhanced">Tipo de Movimiento</label>
+                    <select id="tipoMovimiento" class="form-control form-select">
+                        <option value="entrada">Entrada (Compra/Recepción)</option>
+                        <option value="salida">Salida (Uso/Consumo)</option>
+                        <option value="ajuste">Ajuste de Inventario</option>
+                    </select>
+                </div>
+                
+                <div class="form-group-enhanced">
+                    <label class="form-label-enhanced">Cantidad</label>
+                    <input type="number" id="cantidad" class="form-control-enhanced" placeholder="0" min="0" step="0.01">
+                </div>
+                
+                <div class="form-group-enhanced">
+                    <label class="form-label-enhanced">Observaciones</label>
+                    <textarea id="observaciones" class="form-control-enhanced" rows="3" placeholder="Motivo del ajuste..."></textarea>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn btn btn-warm-secondary" onclick="cerrarModal('modalAjustarStock')">Cancelar</button>
+            <button class="btn btn btn btn-warm-primary" onclick="guardarAjusteStock()">
+                <i class="fas fa-save"></i> Guardar Ajuste
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+// Variables globales
+let materialSeleccionado = null;
+let vistaActual = 'table';
+
+// Función para cambiar vista
+function cambiarVista(vista) {
+    vistaActual = vista;
+    
+    if (vista === 'table') {
+        document.getElementById('vistaTabla').style.display = 'block';
+        document.getElementById('vistaGrid').style.display = 'none';
+        document.getElementById('viewTable').classList.add('btn-secondary');
+        document.getElementById('viewTable').classList.remove('btn-outline-secondary');
+        document.getElementById('viewGrid').classList.add('btn-outline-secondary');
+        document.getElementById('viewGrid').classList.remove('btn-secondary');
+    } else {
+        document.getElementById('vistaTabla').style.display = 'none';
+        document.getElementById('vistaGrid').style.display = 'block';
+        document.getElementById('viewGrid').classList.add('btn-secondary');
+        document.getElementById('viewGrid').classList.remove('btn-outline-secondary');
+        document.getElementById('viewTable').classList.add('btn-outline-secondary');
+        document.getElementById('viewTable').classList.remove('btn-secondary');
+    }
+}
+
+// Filtros en tiempo real
+document.getElementById('searchMateriales').addEventListener('input', filtrarMateriales);
+document.getElementById('filterCategoria').addEventListener('change', filtrarMateriales);
+document.getElementById('filterEstado').addEventListener('change', filtrarMateriales);
+document.getElementById('filterStock').addEventListener('change', filtrarMateriales);
+
+function filtrarMateriales() {
+    const searchTerm = document.getElementById('searchMateriales').value.toLowerCase();
+    const categoriaFilter = document.getElementById('filterCategoria').value;
+    const estadoFilter = document.getElementById('filterEstado').value;
+    const stockFilter = document.getElementById('filterStock').value;
+    
+    // Filtrar tabla
+    const rows = document.querySelectorAll('#tablaMateriales tbody tr');
+    rows.forEach(row => {
+        const texto = row.textContent.toLowerCase();
+        const categoria = row.getAttribute('data-categoria') || '';
+        const estado = row.getAttribute('data-estado') || '';
+        const stockStatus = row.getAttribute('data-stock-status') || '';
+        
+        const matchesSearch = texto.includes(searchTerm);
+        const matchesCategoria = !categoriaFilter || categoria === categoriaFilter;
+        const matchesEstado = !estadoFilter || estado === estadoFilter;
+        const matchesStock = !stockFilter || stockStatus === stockFilter;
+        
+        row.style.display = matchesSearch && matchesCategoria && matchesEstado && matchesStock ? '' : 'none';
+    });
+    
+    // Filtrar tarjetas
+    const cards = document.querySelectorAll('.material-card');
+    cards.forEach(card => {
+        const texto = card.textContent.toLowerCase();
+        const categoria = card.getAttribute('data-categoria') || '';
+        const estado = card.getAttribute('data-estado') || '';
+        const stockStatus = card.getAttribute('data-stock-status') || '';
+        
+        const matchesSearch = texto.includes(searchTerm);
+        const matchesCategoria = !categoriaFilter || categoria === categoriaFilter;
+        const matchesEstado = !estadoFilter || estado === estadoFilter;
+        const matchesStock = !stockFilter || stockStatus === stockFilter;
+        
+        card.style.display = matchesSearch && matchesCategoria && matchesEstado && matchesStock ? '' : 'none';
+    });
+}
+
+// Funciones de material
+function verMaterial(id) {
+    window.location.href = `/materiales/${id}`;
+}
+
+function editarMaterial(id) {
+    window.location.href = `/materiales/${id}/editar`;
+}
+
+function ajustarStock(id) {
+    materialSeleccionado = id;
+    
+    // Cargar datos del material (simulado)
+    document.getElementById('materialNombre').value = 'Cemento Portland CPC-30';
+    document.getElementById('stockActual').value = '150';
+    document.getElementById('stockMinimo').value = '100';
+    
+    document.getElementById('modalAjustarStock').style.display = 'flex';
+}
+
+function guardarAjusteStock() {
+    const cantidad = document.getElementById('cantidad').value;
+    const tipo = document.getElementById('tipoMovimiento').value;
+    
+    if (!cantidad || parseFloat(cantidad) <= 0) {
+        alert('Ingresa una cantidad válida');
+        return;
+    }
+    
+    // Aquí iría la llamada AJAX para guardar
+    alert(`Ajuste de stock guardado: ${tipo} de ${cantidad} unidades`);
+    cerrarModal('modalAjustarStock');
+    location.reload();
+}
+
+function verMovimientos(id) {
+    window.location.href = `/materiales/${id}/movimientos`;
+}
+
+function exportarMateriales() {
+    alert('Exportando lista de materiales...');
+}
+
+function cerrarModal(modalId) {
+    document.getElementById(modalId).style.display = 'none';
+    materialSeleccionado = null;
+}
+</script>
+
+<style>
+.filter-section {
+    background: white;
+    padding: var(--spacing-4);
+    border-radius: var(--border-radius-lg);
+    border: 1px solid var(--color-gray-200);
+    margin-bottom: var(--spacing-6);
+}
+
+.filter-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: var(--spacing-4);
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-2);
+}
+
+.filter-label {
+    font-weight: 600;
+    color: var(--color-text-primary);
+    font-size: var(--font-size-sm);
+}
+
+.search-box {
+    position: relative;
+}
+
+.search-icon {
+    position: absolute;
+    left: var(--spacing-3);
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-text-secondary);
+}
+
+.search-box input {
+    padding-left: 2.5rem;
+}
+
+.view-toggle {
+    display: flex;
+    gap: var(--spacing-1);
+}
+
+.material-info {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+}
+
+.material-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--border-radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: white;
+}
+
+.price-info {
+    text-align: right;
+}
+
+.stock-info .stock-number {
+    margin-bottom: var(--spacing-1);
+}
+
+.stock-bar {
+    width: 100%;
+    height: 4px;
+    background-color: var(--color-gray-200);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.stock-fill {
+    height: 100%;
+    transition: width 0.3s ease;
+}
+
+.materials-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--spacing-4);
+}
+
+.material-card {
+    background: white;
+    border: 1px solid var(--color-gray-200);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-4);
+    transition: all 0.2s ease;
+}
+
+.material-card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+}
+
+.material-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-3);
+}
+
+.material-card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--border-radius);
+    background: var(--color-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+.material-card-title {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    margin-bottom: var(--spacing-1);
+    color: var(--color-text-primary);
+}
+
+.material-card-category {
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--spacing-3);
+}
+
+.material-card-price {
+    margin-bottom: var(--spacing-3);
+}
+
+.material-card-price strong {
+    display: block;
+    font-size: var(--font-size-xl);
+    color: var(--color-success);
+}
+
+.material-card-price span {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+}
+
+.material-card-stock {
+    margin-bottom: var(--spacing-4);
+}
+
+.material-card-actions {
+    display: flex;
+    gap: var(--spacing-2);
+    justify-content: center;
+}
+
+@media (max-width: 768px) {
+    .filter-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .materials-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .table-tools {
+        flex-direction: column;
+        gap: var(--spacing-3);
+    }
+    
+    .view-toggle {
+        justify-content: center;
+    }
+}
+</style>
+
+<script>
+// Mejoras JavaScript automáticas para tablas
+document.addEventListener('DOMContentLoaded', function() {
+    // Aplicar efectos de hover a filas de tabla
+    const tableRows = document.querySelectorAll('.data-table-enhanced tbody tr, table tbody tr');
+    tableRows.forEach((row, index) => {
+        row.style.animationDelay = `${index * 0.1}s`;
+        row.classList.add('fade-in-up');
+        
+        row.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+            this.style.boxShadow = '0 4px 15px rgba(247, 127, 0, 0.2)';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = 'none';
+        });
+    });
+    
+    // Mejorar botones de acción con tooltips
+    const actionButtons = document.querySelectorAll('.btn-action-enhanced, .action-buttons a, .action-buttons button');
+    actionButtons.forEach(button => {
+        if (!button.querySelector('.custom-tooltip')) {
+            button.addEventListener('mouseenter', function() {
+                const title = this.getAttribute('title');
+                if (title) {
+                    const tooltip = document.createElement('div');
+                    tooltip.className = 'custom-tooltip';
+                    tooltip.textContent = title;
+                    tooltip.style.cssText = `
+                        position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+                        background: var(--prussian-blue-700); color: var(--vanilla);
+                        padding: 4px 8px; border-radius: 4px; font-size: 0.7rem;
+                        white-space: nowrap; z-index: 1000; margin-bottom: 5px;
+                    `;
+                    this.style.position = 'relative';
+                    this.appendChild(tooltip);
+                }
+            });
+            
+            button.addEventListener('mouseleave', function() {
+                const tooltip = this.querySelector('.custom-tooltip');
+                if (tooltip) tooltip.remove();
+            });
+        }
+    });
+    
+    // Contador animado para números
+    const statNumbers = document.querySelectorAll('.stat-number-enhanced, .stat-number');
+    statNumbers.forEach(stat => {
+        const finalNumber = parseInt(stat.textContent) || 0;
+        if (finalNumber > 0) {
+            let currentNumber = 0;
+            const increment = Math.max(1, Math.ceil(finalNumber / 20));
+            const timer = setInterval(() => {
+                currentNumber += increment;
+                if (currentNumber >= finalNumber) {
+                    currentNumber = finalNumber;
+                    clearInterval(timer);
+                }
+                stat.textContent = currentNumber;
+            }, 100);
+        }
+    });
+});
+</script>
+{% endblock %}

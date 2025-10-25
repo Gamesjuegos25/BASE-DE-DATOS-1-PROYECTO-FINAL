@@ -1,0 +1,272 @@
+{% extends "base.html" %}
+
+{% block title %}Gestión de Equipos - Sistema ERP{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="header-content">
+        <div class="header-left">
+            <h1 class="page-title">
+                <i class="fas fa-tools"></i>
+                Gestión de Equipos
+            </h1>
+            <p class="page-subtitle">Control y mantenimiento de equipos de construcción</p>
+        </div>
+        <div class="header-actions">
+            <a href="{{ url_for('crear_equipo') }}" class="btn btn-primary">
+                <i class="fas fa-plus"></i>
+                Nuevo Equipo
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Estadísticas de Equipos -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon bg-blue">
+            <i class="fas fa-tools"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ equipos|length }}</div>
+            <div class="stat-label">Total Equipos</div>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon bg-green">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ equipos|selectattr('estado', 'equalto', 'Disponible')|list|length }}</div>
+            <div class="stat-label">Disponibles</div>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon bg-orange">
+            <i class="fas fa-cog"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ equipos|selectattr('estado', 'equalto', 'En Uso')|list|length }}</div>
+            <div class="stat-label">En Uso</div>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon bg-red">
+            <i class="fas fa-wrench"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ equipos|selectattr('estado', 'equalto', 'Mantenimiento')|list|length }}</div>
+            <div class="stat-label">Mantenimiento</div>
+        </div>
+    </div>
+</div>
+
+<!-- Filtros -->
+<div class="filters-container">
+    <div class="filter-group">
+        <select id="filtroTipo" class="filter-select" onchange="filtrarEquipos()">
+            <option value="">Todos los tipos</option>
+            <option value="Herramienta Manual">Herramientas Manuales</option>
+            <option value="Herramienta Eléctrica">Herramientas Eléctricas</option>
+            <option value="Maquinaria Pesada">Maquinaria Pesada</option>
+            <option value="Equipo de Medición">Equipos de Medición</option>
+            <option value="Equipo de Seguridad">Equipos de Seguridad</option>
+        </select>
+    </div>
+    
+    <div class="filter-group">
+        <select id="filtroEstado" class="filter-select" onchange="filtrarEquipos()">
+            <option value="">Todos los estados</option>
+            <option value="Disponible">Disponible</option>
+            <option value="En Uso">En Uso</option>
+            <option value="Mantenimiento">En Mantenimiento</option>
+            <option value="Fuera de Servicio">Fuera de Servicio</option>
+        </select>
+    </div>
+    
+    <div class="search-group">
+        <input type="text" 
+               id="buscarEquipo" 
+               class="search-input" 
+               placeholder="Buscar equipo..."
+               onkeyup="filtrarEquipos()">
+        <i class="fas fa-search search-icon"></i>
+    </div>
+</div>
+
+<!-- Lista de Equipos -->
+<div class="data-table-container">
+    <div class="table-header">
+        <div class="table-title">
+            <h3>Lista de Equipos</h3>
+            <span class="record-count">{{ equipos|length }} registros</span>
+        </div>
+        <div class="table-actions">
+            <button class="btn btn-outline" onclick="programarMantenimiento()">
+                <i class="fas fa-calendar-alt"></i>
+                Prog. Mantenimiento
+            </button>
+        </div>
+    </div>
+    
+    <div class="table-responsive">
+        <table class="data-table" id="tablaEquipos">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Equipo</th>
+                    <th>Tipo</th>
+                    <th>Estado</th>
+                    <th>Ubicación</th>
+                    <th>Último Mantenimiento</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for equipo in equipos %}
+                <tr data-tipo="{{ equipo.tipo or '' }}" 
+                    data-estado="{{ equipo.estado or '' }}" 
+                    data-nombre="{{ equipo.nombre or '' }}">
+                    <td>{{ equipo.id_equipo or 'N/A' }}</td>
+                    <td>
+                        <div class="equipment-info">
+                            <div class="equipment-icon">
+                                {% if equipo.tipo == 'Herramienta Manual' %}
+                                    <i class="fas fa-hammer"></i>
+                                {% elif equipo.tipo == 'Herramienta Eléctrica' %}
+                                    <i class="fas fa-bolt"></i>
+                                {% elif equipo.tipo == 'Maquinaria Pesada' %}
+                                    <i class="fas fa-tractor"></i>
+                                {% elif equipo.tipo == 'Equipo de Medición' %}
+                                    <i class="fas fa-ruler"></i>
+                                {% else %}
+                                    <i class="fas fa-tools"></i>
+                                {% endif %}
+                            </div>
+                            <div class="equipment-details">
+                                <strong>{{ equipo.nombre or 'Sin nombre' }}</strong>
+                                {% if equipo.marca %}
+                                <div class="equipment-brand">{{ equipo.marca }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="type-badge type-{{ equipo.tipo|lower|replace(' ', '-') if equipo.tipo else 'general' }}">
+                            {{ equipo.tipo or 'No especificado' }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if equipo.estado == 'Disponible' %}
+                            <span class="status-badge status-success">
+                                <i class="fas fa-circle"></i>
+                                Disponible
+                            </span>
+                        {% elif equipo.estado == 'En Uso' %}
+                            <span class="status-badge status-warning">
+                                <i class="fas fa-cog"></i>
+                                En Uso
+                            </span>
+                        {% elif equipo.estado == 'Mantenimiento' %}
+                            <span class="status-badge status-info">
+                                <i class="fas fa-wrench"></i>
+                                Mantenimiento
+                            </span>
+                        {% else %}
+                            <span class="status-badge status-danger">
+                                <i class="fas fa-times-circle"></i>
+                                Fuera de Servicio
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if equipo.ubicacion %}
+                            <span class="location-badge">
+                                <i class="fas fa-map-marker-alt"></i>
+                                {{ equipo.ubicacion }}
+                            </span>
+                        {% else %}
+                            <span class="text-muted">No especificada</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if equipo.ultimo_mantenimiento %}
+                            <span class="date-info">{{ equipo.ultimo_mantenimiento }}</span>
+                        {% else %}
+                            <span class="text-muted">Sin registro</span>
+                        {% endif %}
+                    </td>
+                    <td class="actions-cell">
+                        <div class="table-actions">
+                            <a class="btn-action btn-view" 
+                               title="Ver detalles"
+                               href="{{ url_for('ver_equipo', id=equipo.id_equipo) }}">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a class="btn-action btn-edit" 
+                               title="Editar"
+                               href="{{ url_for('editar_equipo', id=equipo.id_equipo) }}">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form action="{{ url_for('eliminar_equipo', id=equipo.id_equipo) }}" 
+                                  method="post" 
+                                  onsubmit="return confirm('¿Eliminar este equipo?');">
+                                <button class="btn-action btn-danger" title="Eliminar" type="submit">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" class="empty-state">
+                        <div class="empty-content">
+                            <i class="fas fa-tools"></i>
+                            <h3>No hay equipos registrados</h3>
+                            <p>Comienza agregando el primer equipo para las obras</p>
+                            <a href="{{ url_for('crear_equipo') }}" class="btn btn-primary">
+                                <i class="fas fa-plus"></i>
+                                Agregar Primer Equipo
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+function filtrarEquipos() {
+    const filtroTipo = document.getElementById('filtroTipo').value.toLowerCase();
+    const filtroEstado = document.getElementById('filtroEstado').value.toLowerCase();
+    const busqueda = document.getElementById('buscarEquipo').value.toLowerCase();
+    const filas = document.querySelectorAll('#tablaEquipos tbody tr');
+    
+    filas.forEach(fila => {
+        const tipo = fila.getAttribute('data-tipo').toLowerCase();
+        const estado = fila.getAttribute('data-estado').toLowerCase();
+        const nombre = fila.getAttribute('data-nombre').toLowerCase();
+        
+        const cumpleTipo = !filtroTipo || tipo.includes(filtroTipo);
+        const cumpleEstado = !filtroEstado || estado.includes(filtroEstado);
+        const cumpleBusqueda = !busqueda || nombre.includes(busqueda);
+        
+        if (cumpleTipo && cumpleEstado && cumpleBusqueda) {
+            fila.style.display = '';
+        } else {
+            fila.style.display = 'none';
+        }
+    });
+}
+
+function programarMantenimiento() {
+    alert('Programar mantenimiento preventivo (por implementar)');
+}
+</script>
+{% endblock %}

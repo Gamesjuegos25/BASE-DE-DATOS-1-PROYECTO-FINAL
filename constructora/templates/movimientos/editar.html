@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <!-- CSS para formularios -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/form-pages.css') }}">{% endblock %}
+
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/create-forms.css') }}">
+
+
+<div class="dashboard-header">
+  <h1><i class="fas fa-edit"></i> Editar Movimiento #{{ movimiento.id_movimiento_material or movimiento.id }}</h1>
+  <a href="{{ url_for('ver_movimiento_material', id=movimiento.id_movimiento_material or movimiento.id) }}" class="btn btn btn btn-warm-secondary"><i class="fas fa-arrow-left"></i> Volver</a>
+</div>
+
+<div class="create-form-max-w-7xl mx-auto px-6">
+<form method="post" class="form-stat-card">
+  <div class="form-flex flex-wrap -mx-2">
+    <div class="form-group flex-1 px-2-md-3">
+      <label for="tipo_movimiento">Tipo de movimiento *</label>
+      <select class="form-select" required>
+        {% set tipo_actual = movimiento.tipo_movimiento %}
+        {% for tipo in ['Entrada', 'Salida', 'Ajuste', 'Transferencia'] %}
+        <option value="{{ tipo }}" {% if tipo_actual == tipo %}selected{% endif %}>{{ tipo }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-group flex-1 px-2-md-3">
+      <label for="cantidad">Cantidad *</label>
+      <input class="form-input" required min="1" value="{{ movimiento.cantidad or 0 }}" />
+    </div>
+    <div class="form-group flex-1 px-2-md-3">
+      <label for="id_material">Material (opcional)</label>
+      <select class="form-select">
+        <option value="">Sin material</option>
+        {% for mat in materiales %}
+        <option value="{{ mat.id_material or mat.id }}" {% if movimiento.id_material and movimiento.id_material == (mat.id_material or mat.id) %}selected{% endif %}>
+          {{ mat.nombre }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-group flex-1 px-2-md-3">
+      <label for="fecha_movimiento">Fecha</label>
+      <input class="form-input" value="{{ movimiento.fecha_movimiento|default('', true) }}" />
+    </div>
+  </div>
+  <div class="form-flex flex-wrap -mx-2">
+    <div class="form-group flex-1 px-2-md-6">
+      <label for="origen">Origen</label>
+      <input class="form-input" value="{{ movimiento.origen_movimiento or '' }}" placeholder="Ej: Bodega principal" />
+    </div>
+    <div class="form-group flex-1 px-2-md-6">
+      <label for="destino">Destino</label>
+      <input class="form-input" value="{{ movimiento.destino_movimiento or '' }}" placeholder="Ej: Obra A" />
+    </div>
+  </div>
+  <div class="form-actions">
+    <button type="submit" class="btn btn btn btn-warm-primary"><i class="fas fa-save"></i> Guardar</button>
+    <a href="{{ url_for('ver_movimiento_material', id=movimiento.id_movimiento_material or movimiento.id) }}" class="btn btn btn btn-warm-secondary">Cancelar</a>
+  </div>
+</form>
+</div>
+
+{% endblock %}

@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-header">
+    <div class="header-content">
+        <div class="header-left">
+            <h1 class="page-title">
+                <i class="fas fa-list"></i>
+                Gestión de Avances
+            </h1>
+            <p class="page-subtitle">Control y administración de avances</p>
+        </div>
+        <div class="header-actions">
+            <a href="{{ url_for('crear_avance') }}" class="btn btn-primary">
+                <i class="fas fa-plus"></i>
+                Nuevo Avance
+            </a>
+        </div>
+</div>
+
+<!-- Estadísticas del Módulo -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon bg-blue">
+            <i class="fas fa-list"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ datos|length or 0 }}</div>
+            <div class="stat-label">Total Registros</div>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon bg-green">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ datos|length or 0 }}</div>
+            <div class="stat-label">Activos</div>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon bg-orange">
+            <i class="fas fa-clock"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">0</div>
+            <div class="stat-label">Pendientes</div>
+        </div>
+    </div>
+</div>
+
+</div>
+
+
+<div class="dashboard-header">
+    <h1><i class="fas fa-chart-line"></i> Avances de Obra</h1>
+    <a class="btn btn-primary" href="{{ url_for('crear_avance') }}">
+        <i class="fas fa-plus"></i> Nuevo Avance
+    </a>
+</div>
+
+<div class="table-container">
+    {% if avances %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Fecha</th>
+                <th>% Físico</th>
+                <th>% Financiero</th>
+                <th>Obra</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for a in avances %}
+            <tr>
+                <td>{{ a.id_avance }}</td>
+                <td>{{ a.fecha_avance }}</td>
+                <td>{{ a.porcentaje_fisico_avance }}%</td>
+                <td>{{ a.porcentaje_financiero_avance }}%</td>
+                <td>{{ a.nombre_obra or 'Sin obra' }}</td>
+                <td class="table-actions">
+                    <a class="btn btn-sm btn-view" href="{{ url_for('ver_avance', id=a.id_avance) }}">
+                        <i class="fas fa-eye"></i> Ver
+                    </a>
+                    <a class="btn btn-sm btn-edit" href="{{ url_for('editar_avance', id=a.id_avance) }}">
+                        <i class="fas fa-edit"></i> Editar
+                    </a>
+                    <form class="inline-form" method="post" action="{{ url_for('eliminar_avance', id=a.id_avance) }}" onsubmit="return confirm('¿Eliminar este avance?');">
+                        <button class="btn btn-sm btn-danger" type="submit">
+                            <i class="fas fa-trash"></i> Eliminar
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="empty-state">
+        <i class="fas fa-inbox"></i>
+        <p>No hay avances registrados</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

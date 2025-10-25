@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sistema-unificado.css') }}">
+
+    <!-- CSS específico para páginas de detalle -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/detail-page.css') }}">
+    {% endblock %}
+
+{% block title %}Detalles de Compra - Sistema Constructora{% endblock %}
+
+{% block content %}
+<div class="page-container animate-fade-in">
+    <!-- Header de página -->
+    <div class="page-header">
+        <div class="breadcrumb-nav">
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <span class="breadcrumb-separator">/</span>
+            <a href="{{ url_for('listar_compras') }}">Compras</a>
+            <span class="breadcrumb-separator">/</span>
+            <span>Detalles</span>
+        </div>
+        <h1 class="page-title">
+            <i class="fas fa-info-circle text-xanthous"></i>
+            Detalles del Compra
+        </h1>
+        <p class="page-subtitle">Información completa del registro seleccionado</p>
+    </div>
+
+    {% if compra %}
+    <!-- Información principal -->
+    <div class="grid-container cols-2">
+        <!-- Card de información básica -->
+        <div class="detail-card">
+            <div class="detail-card">
+                <h2 class="card-title">
+                    <i class="fas fa-id-card"></i>
+                    Información Básica
+                </h2>
+            </div>
+            <div class="detail-card">
+                <div class="grid-container">
+                    <div>
+                        <strong>ID:</strong>
+                        <span class="status-badge-detail info">{{ compra.id or 'N/A' }}</span>
+                    </div>
+                    <div>
+                        <strong>Nombre:</strong>
+                        <span>{{ compra.nombre or 'Sin nombre' }}</span>
+                    </div>
+                    <div>
+                        <strong>Estado:</strong>
+                        <span class="status-badge-detail success">Activo</span>
+                    </div>
+                    <div>
+                        <strong>Fecha de Creación:</strong>
+                        <span>{{ compra.fecha_creacion or 'N/A' }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card de descripción -->
+        <div class="detail-card">
+            <div class="detail-card">
+                <h2 class="card-title">
+                    <i class="fas fa-align-left"></i>
+                    Descripción
+                </h2>
+            </div>
+            <div class="detail-card">
+                <p>{{ compra.descripcion or 'Sin descripción disponible' }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Acciones -->
+    <div class="detail-card">
+        <div class="detail-card">
+            <h2 class="card-title">
+                <i class="fas fa-cogs"></i>
+                Acciones Disponibles
+            </h2>
+        </div>
+        <div class="detail-card">
+            <div class="flex gap-4">
+                <a href="{{ url_for('editar_compras', id=compra.id) }}" class="btn btn-warning">
+                    <i class="fas fa-edit"></i>
+                    Editar Compra
+                </a>
+                <a href="{{ url_for('listar_compras') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i>
+                    Volver a Lista
+                </a>
+                <button type="button" class="btn btn-danger" onclick="confirmarEliminacion()">
+                    <i class="fas fa-trash"></i>
+                    Eliminar Registro
+                </button>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-error">
+        <i class="fas fa-exclamation-triangle"></i>
+        No se encontró el registro solicitado.
+    </div>
+    {% endif %}
+</div>
+
+<script>
+function confirmarEliminacion() {
+    if (confirm('¿Estás seguro de que deseas eliminar este registro?')) {
+        fetch('{{ url_for("eliminar_compras", id=compra.id) }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                window.location.href = '{{ url_for("listar_compras") }}';
+            } else {
+                alert('Error al eliminar el registro');
+            }
+        });
+    }
+}
+</script>
+{% endblock %}

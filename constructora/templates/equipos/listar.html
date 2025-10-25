@@ -1,65 +1,413 @@
 {% extends "base.html" %}
 
-{% block title %}Equipos - Sistema Constructora{% endblock %}
+{% block head %}
+    <!-- CSS para páginas de listado -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/list-pages.css') }}">{% endblock %}
+
+
+{% block title %}Gestión de Equipos - Sistema ERP
+<script>
+// Mejoras JavaScript automáticas para tablas
+document.addEventListener('DOMContentLoaded', function() {
+    // Aplicar efectos de hover a filas de tabla
+    const tableRows = document.querySelectorAll('.data-table-enhanced tbody tr, table tbody tr');
+    tableRows.forEach((row, index) => {
+        row.style.animationDelay = `${index * 0.1}s`;
+        row.classList.add('fade-in-up');
+        
+        row.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+            this.style.boxShadow = '0 4px 15px rgba(247, 127, 0, 0.2)';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = 'none';
+        });
+    });
+    
+    // Mejorar botones de acción con tooltips
+    const actionButtons = document.querySelectorAll('.btn-action-enhanced, .action-buttons a, .action-buttons button');
+    actionButtons.forEach(button => {
+        if (!button.querySelector('.custom-tooltip')) {
+            button.addEventListener('mouseenter', function() {
+                const title = this.getAttribute('title');
+                if (title) {
+                    const tooltip = document.createElement('div');
+                    tooltip.className = 'custom-tooltip';
+                    tooltip.textContent = title;
+                    tooltip.style.cssText = `
+                        position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+                        background: var(--prussian-blue-700); color: var(--vanilla);
+                        padding: 4px 8px; border-radius: 4px; font-size: 0.7rem;
+                        white-space: nowrap; z-index: 1000; margin-bottom: 5px;
+                    `;
+                    this.style.position = 'relative';
+                    this.appendChild(tooltip);
+                }
+            });
+            
+            button.addEventListener('mouseleave', function() {
+                const tooltip = this.querySelector('.custom-tooltip');
+                if (tooltip) tooltip.remove();
+            });
+        }
+    });
+    
+    // Contador animado para números
+    const statNumbers = document.querySelectorAll('.stat-number-enhanced, .stat-number');
+    statNumbers.forEach(stat => {
+        const finalNumber = parseInt(stat.textContent) || 0;
+        if (finalNumber > 0) {
+            let currentNumber = 0;
+            const increment = Math.max(1, Math.ceil(finalNumber / 20));
+            const timer = setInterval(() => {
+                currentNumber += increment;
+                if (currentNumber >= finalNumber) {
+                    currentNumber = finalNumber;
+                    clearInterval(timer);
+                }
+                stat.textContent = currentNumber;
+            }, 100);
+        }
+    });
+});
+</script>
+{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="header-section">
-        <h1>⚒️ Gestión de Equipos</h1>
-        <a href="{{ url_for('crear_equipo') }}" class="btn-primary">
-            ➕ Nuevo Equipo
-        </a>
-    </div>
-    
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="alert alert-{{ category }}">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-    
-    {% if equipos %}
-        <div class="table-container">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nombre</th>
-                        <th>Tipo</th>
-                        <th>Estado</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for equipo in equipos %}
-                    <tr>
-                        <td>{{ equipo.id or equipo.equipo_id or 'N/A' }}</td>
-                        <td><strong>{{ equipo.nombre or 'Sin nombre' }}</strong></td>
-                        <td>{{ equipo.tipo or 'No especificado' }}</td>
-                        <td>
-                            <span class="badge badge-success">{{ equipo.estado or 'Disponible' }}</span>
-                        </td>
-                        <td>
-                            <button class="btn-sm btn-secondary">👁️ Ver</button>
-                            <button class="btn-sm btn-primary">✏️ Editar</button>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/enhanced-tables.css') }}">
+
+<div class="page-container"><div class="page-header fade-in-up">
+    <div class="header-content">
+        <div class="header-left">
+            <h1 class="page-title">
+                <i class="fas fa-tools text-xanthous-100"></i>
+                Gestión de Equipos
+            </h1>
+            <p class="page-subtitle">Control y mantenimiento de equipos de construcción</p>
         </div>
-    {% else %}
-        <div class="empty-state">
-            <div class="empty-icon">⚒️</div>
-            <h3>No hay equipos registrados</h3>
-            <p>Comienza agregando el primer equipo para las obras.</p>
-            <a href="{{ url_for('crear_equipo') }}" class="btn-primary">
-                ➕ Agregar Primer Equipo
+        <div class="header-actions">
+            <a href="{{ url_for('crear_equipo') }}" class="btn btn btn btn-warm-primary">
+                <i class="fas fa-plus"></i>
+                Nuevo Equipo
             </a>
         </div>
-    {% endif %}
+    </div>
 </div>
+
+<!-- Estadísticas de Equipos -->
+<div class="stats-grid">
+    <div class="stat-stat-card fade-in-up">
+        <div class="stat-icon bg-blue">
+            <i class="fas fa-tools text-xanthous-100"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ equipos|length }}</div>
+            <div class="stat-label">Total Equipos</div>
+        </div>
+    </div>
+    
+    <div class="stat-stat-card fade-in-up">
+        <div class="stat-icon bg-green">
+            <i class="fas fa-check-circle text-xanthous-600"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ equipos|selectattr('estado', 'equalto', 'Disponible')|list|length }}</div>
+            <div class="stat-label">Disponibles</div>
+        </div>
+    </div>
+    
+    <div class="stat-stat-card fade-in-up">
+        <div class="stat-icon bg-orange">
+            <i class="fas fa-cog"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ equipos|selectattr('estado', 'equalto', 'En Uso')|list|length }}</div>
+            <div class="stat-label">En Uso</div>
+        </div>
+    </div>
+    
+    <div class="stat-stat-card fade-in-up">
+        <div class="stat-icon bg-red">
+            <i class="fas fa-wrench"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ equipos|selectattr('estado', 'equalto', 'Mantenimiento')|list|length }}</div>
+            <div class="stat-label">Mantenimiento</div>
+        </div>
+    </div>
+</div>
+
+<!-- Filtros -->
+<div class="filters-max-w-7xl mx-auto px-6">
+    <div class="filter-group">
+        <select class="form-control form-warm" id="filtroTipo" class="filter-select" onchange="filtrarEquipos()">
+            <option value="">Todos los tipos</option>
+            <option value="Herramienta Manual">Herramientas Manuales</option>
+            <option value="Herramienta Eléctrica">Herramientas Eléctricas</option>
+            <option value="Maquinaria Pesada">Maquinaria Pesada</option>
+            <option value="Equipo de Medición">Equipos de Medición</option>
+            <option value="Equipo de Seguridad">Equipos de Seguridad</option>
+        </select>
+    </div>
+    
+    <div class="filter-group">
+        <select class="form-control form-warm" id="filtroEstado" class="filter-select" onchange="filtrarEquipos()">
+            <option value="">Todos los estados</option>
+            <option value="Disponible">Disponible</option>
+            <option value="En Uso">En Uso</option>
+            <option value="Mantenimiento">En Mantenimiento</option>
+            <option value="Fuera de Servicio">Fuera de Servicio</option>
+        </select>
+    </div>
+    
+    <div class="search-group">
+        <input class="form-control form-warm" type="text" 
+               id="buscarEquipo" 
+               class="search-input" 
+               placeholder="Buscar equipo..."
+               onkeyup="filtrarEquipos()">
+        <i class="fas fa-search search-icon"></i>
+    </div>
+</div>
+
+<!-- Lista de Equipos -->
+<div class="list-table-container">
+    <div class="list-table-container">
+        <div class="list-table-container">
+            <h3>Lista de Equipos</h3>
+            <span class="record-count">{{ equipos|length }} registros</span>
+        </div>
+        <div class="list-table-container">
+            <button class="btn btn-outline" onclick="programarMantenimiento()">
+                <i class="fas fa-calendar-alt"></i>
+                Prog. Mantenimiento
+            </button>
+        </div>
+    </div>
+    
+    <div class="list-table-container">
+        <table class="data-table" id="tablaEquipos">
+            <thead><tr>
+                    <th>ID</th>
+                    <th>Equipo</th>
+                    <th>Tipo</th>
+                    <th><i class="fas fa-tasks"></i> Estado</th>
+                    <th>Ubicación</th>
+                    <th>Último Mantenimiento</th>
+                    <th class="text-center"><i class="fas fa-cogs"></i> Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for equipo in equipos %}
+                <tr data-tipo="{{ equipo.tipo or '' }}" 
+                    data-estado="{{ equipo.estado or '' }}" 
+                    data-nombre="{{ equipo.nombre or '' }}">
+                    <td>{{ equipo.id_equipo or 'N/A' }}</td>
+                    <td>
+                        <div class="equipment-info">
+                            <div class="equipment-icon">
+                                {% if equipo.tipo == 'Herramienta Manual' %}
+                                    <i class="fas fa-hammer text-orange-wheel"></i>
+                                {% elif equipo.tipo == 'Herramienta Eléctrica' %}
+                                    <i class="fas fa-bolt"></i>
+                                {% elif equipo.tipo == 'Maquinaria Pesada' %}
+                                    <i class="fas fa-tractor"></i>
+                                {% elif equipo.tipo == 'Equipo de Medición' %}
+                                    <i class="fas fa-ruler"></i>
+                                {% else %}
+                                    <i class="fas fa-tools text-xanthous-100"></i>
+                                {% endif %}
+                            </div>
+                            <div class="equipment-details">
+                                <strong>{{ equipo.nombre or 'Sin nombre' }}</strong>
+                                {% if equipo.marca %}
+                                <div class="equipment-brand">{{ equipo.marca }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="type-badge type-{{ equipo.tipo|lower|replace(' ', '-') if equipo.tipo else 'general' }}">
+                            {{ equipo.tipo or 'No especificado' }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if equipo.estado == 'Disponible' %}
+                            <span class="status-badge status-success">
+                                <i class="fas fa-circle"></i>
+                                Disponible
+                            </span>
+                        {% elif equipo.estado == 'En Uso' %}
+                            <span class="status-badge status-warning">
+                                <i class="fas fa-cog"></i>
+                                En Uso
+                            </span>
+                        {% elif equipo.estado == 'Mantenimiento' %}
+                            <span class="status-badge status-info">
+                                <i class="fas fa-wrench"></i>
+                                Mantenimiento
+                            </span>
+                        {% else %}
+                            <span class="status-badge status-danger">
+                                <i class="fas fa-times-circle"></i>
+                                Fuera de Servicio
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if equipo.ubicacion %}
+                            <span class="location-badge">
+                                <i class="fas fa-map-marker-alt"></i>
+                                {{ equipo.ubicacion }}
+                            </span>
+                        {% else %}
+                            <span class="text-vanilla-600">No especificada</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if equipo.ultimo_mantenimiento %}
+                            <span class="date-info">{{ equipo.ultimo_mantenimiento }}</span>
+                        {% else %}
+                            <span class="text-vanilla-600">Sin registro</span>
+                        {% endif %}
+                    </td>
+                    <td class="actions-cell">
+                        <div class="list-table-container">
+                            <a class="btn-action btn-view" 
+                               title="Ver detalles"
+                               href="{{ url_for('ver_equipo', id=equipo.id_equipo) }}">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a class="btn-action btn-edit" 
+                               title="Editar"
+                               href="{{ url_for('editar_equipo', id=equipo.id_equipo) }}">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form action="{{ url_for('eliminar_equipo', id=equipo.id_equipo) }}" 
+                                  method="post" 
+                                  onsubmit="return confirm('¿Eliminar este equipo?');">
+                                <button class="btn-action btn btn btn-warm-danger" title="Eliminar" type="submit">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" class="empty-state">
+                        <div class="empty-content">
+                            <i class="fas fa-tools text-xanthous-100"></i>
+                            <h3>No hay equipos registrados</h3>
+                            <p>Comienza agregando el primer equipo para las obras</p>
+                            <a href="{{ url_for('crear_equipo') }}" class="btn btn btn btn-warm-primary">
+                                <i class="fas fa-plus"></i>
+                                Agregar Primer Equipo
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table></div></div></div></div>
+</div>
+
+<script>
+function filtrarEquipos() {
+    const filtroTipo = document.getElementById('filtroTipo').value.toLowerCase();
+    const filtroEstado = document.getElementById('filtroEstado').value.toLowerCase();
+    const busqueda = document.getElementById('buscarEquipo').value.toLowerCase();
+    const filas = document.querySelectorAll('#tablaEquipos tbody tr');
+    
+    filas.forEach(fila => {
+        const tipo = fila.getAttribute('data-tipo').toLowerCase();
+        const estado = fila.getAttribute('data-estado').toLowerCase();
+        const nombre = fila.getAttribute('data-nombre').toLowerCase();
+        
+        const cumpleTipo = !filtroTipo || tipo.includes(filtroTipo);
+        const cumpleEstado = !filtroEstado || estado.includes(filtroEstado);
+        const cumpleBusqueda = !busqueda || nombre.includes(busqueda);
+        
+        if (cumpleTipo && cumpleEstado && cumpleBusqueda) {
+            fila.style.display = '';
+        } else {
+            fila.style.display = 'none';
+        }
+    });
+}
+
+function programarMantenimiento() {
+    alert('Programar mantenimiento preventivo (por implementar)');
+}
+</script>
+
+<script>
+// Mejoras JavaScript automáticas para tablas
+document.addEventListener('DOMContentLoaded', function() {
+    // Aplicar efectos de hover a filas de tabla
+    const tableRows = document.querySelectorAll('.data-table-enhanced tbody tr, table tbody tr');
+    tableRows.forEach((row, index) => {
+        row.style.animationDelay = `${index * 0.1}s`;
+        row.classList.add('fade-in-up');
+        
+        row.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+            this.style.boxShadow = '0 4px 15px rgba(247, 127, 0, 0.2)';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = 'none';
+        });
+    });
+    
+    // Mejorar botones de acción con tooltips
+    const actionButtons = document.querySelectorAll('.btn-action-enhanced, .action-buttons a, .action-buttons button');
+    actionButtons.forEach(button => {
+        if (!button.querySelector('.custom-tooltip')) {
+            button.addEventListener('mouseenter', function() {
+                const title = this.getAttribute('title');
+                if (title) {
+                    const tooltip = document.createElement('div');
+                    tooltip.className = 'custom-tooltip';
+                    tooltip.textContent = title;
+                    tooltip.style.cssText = `
+                        position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+                        background: var(--prussian-blue-700); color: var(--vanilla);
+                        padding: 4px 8px; border-radius: 4px; font-size: 0.7rem;
+                        white-space: nowrap; z-index: 1000; margin-bottom: 5px;
+                    `;
+                    this.style.position = 'relative';
+                    this.appendChild(tooltip);
+                }
+            });
+            
+            button.addEventListener('mouseleave', function() {
+                const tooltip = this.querySelector('.custom-tooltip');
+                if (tooltip) tooltip.remove();
+            });
+        }
+    });
+    
+    // Contador animado para números
+    const statNumbers = document.querySelectorAll('.stat-number-enhanced, .stat-number');
+    statNumbers.forEach(stat => {
+        const finalNumber = parseInt(stat.textContent) || 0;
+        if (finalNumber > 0) {
+            let currentNumber = 0;
+            const increment = Math.max(1, Math.ceil(finalNumber / 20));
+            const timer = setInterval(() => {
+                currentNumber += increment;
+                if (currentNumber >= finalNumber) {
+                    currentNumber = finalNumber;
+                    clearInterval(timer);
+                }
+                stat.textContent = currentNumber;
+            }, 100);
+        }
+    });
+});
+</script>
 {% endblock %}

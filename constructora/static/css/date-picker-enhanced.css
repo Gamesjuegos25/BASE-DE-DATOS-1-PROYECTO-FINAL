@@ -1,0 +1,201 @@
+/* ========================================
+   📅 ESTILOS PARA DATE PICKER MEJORADOS
+   ======================================== */
+
+/* Contenedor del date picker */
+.date-picker-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+/* Input de fecha */
+.date-picker-input {
+    width: 100%;
+    padding-right: 2.5rem !important;
+    cursor: pointer;
+}
+
+/* Ícono del calendario */
+.date-picker-icon {
+    position: absolute;
+    right: 0.75rem;
+    color: var(--xanthous, #F9B233);
+    pointer-events: none;
+    z-index: 2;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+}
+
+/* Efectos hover */
+.date-picker-container:hover .date-picker-icon {
+    color: var(--prussian-blue, #1E3A5F);
+    transform: scale(1.1);
+}
+
+.date-picker-input:focus + .date-picker-icon {
+    color: var(--prussian-blue, #1E3A5F);
+}
+
+/* Personalización del calendar picker nativo */
+.date-picker-input::-webkit-calendar-picker-indicator {
+    opacity: 0;
+    cursor: pointer;
+    width: 2rem;
+    height: 100%;
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+/* Para Firefox */
+.date-picker-input::-moz-calendar-picker {
+    opacity: 0;
+}
+
+/* Estilos específicos para diferentes navegadores */
+.date-picker-input {
+    -webkit-appearance: none;
+    -moz-appearance: textfield;
+}
+
+/* Mejoras visuales adicionales */
+.date-picker-input:focus {
+    box-shadow: 0 0 0 3px rgba(249, 178, 51, 0.2);
+}
+
+/* Placeholder personalizado para fechas */
+.date-picker-input::placeholder {
+    color: var(--vanilla-600, #94a3b8);
+    font-style: italic;
+}
+
+/* Estado de error */
+.date-picker-input:invalid {
+    border-color: var(--fire-engine-red, #DC2626);
+}
+
+.date-picker-input:invalid + .date-picker-icon {
+    color: var(--fire-engine-red, #DC2626);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .date-picker-icon {
+        right: 0.5rem;
+        font-size: 0.9rem;
+    }
+}
+
+/* ========================================
+   🎨 DATETIME PICKER PARA INCIDENTES
+   ======================================== */
+
+/* Contenedor para datetime-local */
+.datetime-picker-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.datetime-picker-input {
+    width: 100%;
+    padding-right: 2.5rem !important;
+    cursor: pointer;
+}
+
+.datetime-picker-icon {
+    position: absolute;
+    right: 0.75rem;
+    color: var(--fire-engine-red, #DC2626);
+    pointer-events: none;
+    z-index: 2;
+    font-size: 1rem;
+}
+
+/* ========================================
+   📋 ESTILOS PARA FORMULARIOS CON FECHAS
+   ======================================== */
+
+/* Grupo de fechas lado a lado */
+.fecha-grupo {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+@media (max-width: 768px) {
+    .fecha-grupo {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Indicador de fecha requerida */
+.fecha-requerida::after {
+    content: " *";
+    color: var(--fire-engine-red, #DC2626);
+    font-weight: bold;
+}
+
+/* Validación visual */
+.date-picker-input:valid {
+    border-color: var(--forest-green, #059669);
+}
+
+.date-picker-input:valid + .date-picker-icon {
+    color: var(--forest-green, #059669);
+}
+
+/* ========================================
+   🌐 SOPORTE PARA DIFERENTES IDIOMAS
+   ======================================== */
+
+/* Formato de fecha en español */
+.date-picker-input[lang="es"] {
+    text-align: center;
+}
+
+/* ========================================
+   ♿ ACCESIBILIDAD
+   ======================================== */
+
+/* Mejorar contraste para usuarios con discapacidades visuales */
+@media (prefers-contrast: high) {
+    .date-picker-icon {
+        color: #000;
+    }
+    
+    .date-picker-input:focus + .date-picker-icon {
+        color: #000;
+    }
+}
+
+/* Reducir movimiento para usuarios sensibles */
+@media (prefers-reduced-motion: reduce) {
+    .date-picker-icon {
+        transition: none;
+    }
+    
+    .date-picker-container:hover .date-picker-icon {
+        transform: none;
+    }
+}
+
+/* ========================================
+   📱 MOBILE OPTIMIZATIONS
+   ======================================== */
+
+@media (max-width: 480px) {
+    .date-picker-container {
+        margin-bottom: 0.5rem;
+    }
+    
+    .date-picker-input {
+        font-size: 16px; /* Evita zoom en iOS */
+        padding: 0.75rem;
+    }
+    
+    .date-picker-icon {
+        right: 0.5rem;
+    }
+}

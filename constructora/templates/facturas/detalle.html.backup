@@ -1,0 +1,312 @@
+{% extends "base.html" %}
+{% block title %}Detalle Factura{% endblock %}
+{% block content %}
+<div class="page-header">
+  <nav class="breadcrumb">
+    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+    <span class="breadcrumb-separator">/</span>
+    <a href="{{ url_for('listar_facturas') }}">Facturas</a>
+    <span class="breadcrumb-separator">/</span>
+    <span>Detalle</span>
+  </nav>
+  <h1 class="page-title">📄 {{ factura.numero_factura or 'Factura' }} <small class="text-muted">{{ factura.serie_factura or '' }}</small></h1>
+</div>
+
+<div class="row">
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-file-invoice-dollar"></i> Información de la Factura</h5>
+      </div>
+      <div class="card-body">
+        <dl class="row">
+          <dt class="col-sm-4"><i class="fas fa-hashtag"></i> Número</dt>
+          <dd class="col-sm-8">
+            <strong class="text-primary">{{ factura.numero_factura or 'N/D' }}</strong>
+            {% if factura.serie_factura %}
+              <small class="text-muted"> - Serie: {{ factura.serie_factura }}</small>
+            {% endif %}
+          </dd>
+          
+          <dt class="col-sm-4"><i class="fas fa-calendar-alt"></i> Emisión</dt>
+          <dd class="col-sm-8">
+            {% if factura.fecha_emision %}
+              {{ factura.fecha_emision.strftime('%d/%m/%Y') if factura.fecha_emision is not string else factura.fecha_emision }}
+            {% else %}
+              <span class="text-muted">Sin fecha</span>
+            {% endif %}
+          </dd>
+          
+          <dt class="col-sm-4"><i class="fas fa-calendar-times"></i> Vencimiento</dt>
+          <dd class="col-sm-8">
+            {% if factura.fecha_vencimiento %}
+              {% set vence_pronto = (factura.fecha_vencimiento - now()).days < 7 if factura.fecha_vencimiento is not string else false %}
+              <span class="{% if vence_pronto %}text-danger{% else %}text-info{% endif %}">
+                {{ factura.fecha_vencimiento.strftime('%d/%m/%Y') if factura.fecha_vencimiento is not string else factura.fecha_vencimiento }}
+              </span>
+            {% else %}
+              <span class="text-muted">Sin fecha</span>
+            {% endif %}
+          </dd>
+          
+          <dt class="col-sm-4"><i class="fas fa-info-circle"></i> Estado</dt>
+          <dd class="col-sm-8">
+            {% set estado_class = {
+              'PAGADA': 'success',
+              'PENDIENTE': 'warning', 
+              'VENCIDA': 'danger',
+              'CANCELADA': 'secondary'
+            } %}
+            <span class="badge badge-{{ estado_class.get(factura.estado, 'secondary') }}">
+              {{ factura.estado or 'SIN ESTADO' }}
+            </span>
+          </dd>
+          
+          <dt class="col-sm-4"><i class="fas fa-credit-card"></i> Método Pago</dt>
+          <dd class="col-sm-8">
+            <span class="badge badge-info">{{ factura.metodo_pago or 'No especificado' }}</span>
+          </dd>
+          
+          {% if factura.fecha_pago %}
+          <dt class="col-sm-4"><i class="fas fa-check-circle"></i> Fecha Pago</dt>
+          <dd class="col-sm-8">
+            <strong class="text-success">{{ factura.fecha_pago.strftime('%d/%m/%Y') if factura.fecha_pago is not string else factura.fecha_pago }}</strong>
+            {% if factura.referencia_pago %}
+              <br><small class="text-muted">Ref: {{ factura.referencia_pago }}</small>
+            {% endif %}
+          </dd>
+          {% endif %}
+        </dl>
+      </div>
+    </div>
+    
+    {% if factura.observaciones %}
+    <div class="card mt-3">
+      <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-comment-alt"></i> Observaciones</h5>
+      </div>
+      <div class="card-body">
+        <p class="mb-0">{{ factura.observaciones }}</p>
+      </div>
+    </div>
+    {% endif %}
+    
+    {% if detalles %}
+    <div class="card mt-3">
+      <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-list"></i> Detalles de la Factura</h5>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-sm">
+            <thead>
+              <tr>
+                <th>Descripción</th>
+                <th>Cantidad</th>
+                <th>Precio Unit.</th>
+                <th>Subtotal</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for detalle in detalles %}
+              <tr>
+                <td>{{ detalle.descripcion }}</td>
+                <td>{{ detalle.cantidad }}</td>
+                <td>Q{{ "{:,.2f}".format(detalle.precio_unitario or 0) }}</td>
+                <td>Q{{ "{:,.2f}".format(detalle.subtotal or 0) }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+    
+    {% if pagos %}
+    <div class="card mt-3">
+      <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-money-check-alt"></i> Pagos Registrados</h5>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-sm">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Monto</th>
+                <th>Método</th>
+                <th>Referencia</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for pago in pagos %}
+              <tr>
+                <td>{{ pago.fecha_pago.strftime('%d/%m/%Y') if pago.fecha_pago else 'N/A' }}</td>
+                <td>Q{{ "{:,.2f}".format(pago.monto or 0) }}</td>
+                <td>{{ pago.metodo_pago or 'N/D' }}</td>
+                <td>{{ pago.referencia or '-' }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+  
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-calculator"></i> Resumen Financiero</h5>
+      </div>
+      <div class="card-body text-center">
+        <div class="financial-summary">
+          <div class="mb-3">
+            <small class="text-muted">Subtotal:</small><br>
+            <strong class="h5">Q{{ "{:,.2f}".format(factura.subtotal or 0) }}</strong>
+          </div>
+          
+          {% if factura.descuento and factura.descuento > 0 %}
+          <div class="mb-3">
+            <small class="text-muted">Descuento:</small><br>
+            <strong class="text-warning">-Q{{ "{:,.2f}".format(factura.descuento) }}</strong>
+          </div>
+          {% endif %}
+          
+          <div class="mb-3">
+            <small class="text-muted">IVA (12%):</small><br>
+            <strong class="text-info">Q{{ "{:,.2f}".format(factura.iva or 0) }}</strong>
+          </div>
+          
+          <hr>
+          
+          <div class="mb-3">
+            <small class="text-muted">TOTAL:</small><br>
+            <strong class="h3 text-success">Q{{ "{:,.2f}".format(factura.total or 0) }}</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    {% if factura.nombre_cliente %}
+    <div class="card mt-3">
+      <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-user"></i> Cliente</h5>
+      </div>
+      <div class="card-body">
+        <div class="text-center">
+          <h6 class="text-dark">{{ factura.nombre_cliente }} {{ factura.apellido_cliente or '' }}</h6>
+          {% if factura.documento_cliente %}
+            <small class="text-muted">{{ factura.documento_cliente }}</small>
+          {% endif %}
+          {% if factura.telefono_cliente %}
+            <div class="mt-2">
+              <a href="tel:{{ factura.telefono_cliente }}" class="btn btn-sm btn-outline-success">
+                <i class="fas fa-phone"></i> {{ factura.telefono_cliente }}
+              </a>
+            </div>
+          {% endif %}
+          {% if factura.email_cliente %}
+            <div class="mt-2">
+              <a href="mailto:{{ factura.email_cliente }}" class="btn btn-sm btn-outline-info">
+                <i class="fas fa-envelope"></i> Email
+              </a>
+            </div>
+          {% endif %}
+          {% if factura.direccion_cliente %}
+            <div class="mt-2">
+              <small class="text-muted"><i class="fas fa-map-marker-alt"></i> {{ factura.direccion_cliente }}</small>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+    
+    {% if factura.nombre_obra %}
+    <div class="card mt-3">
+      <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-building"></i> Proyecto</h5>
+      </div>
+      <div class="card-body text-center">
+        <h6 class="text-primary">{{ factura.nombre_obra }}</h6>
+        {% if factura.ubicacion_obra %}
+          <small class="text-muted"><i class="fas fa-map-marker-alt"></i> {{ factura.ubicacion_obra }}</small>
+        {% endif %}
+        {% if factura.monto_total_contrato %}
+          <div class="mt-2">
+            <small class="text-muted">Valor Contrato:</small><br>
+            <strong class="text-success">Q{{ "{:,.2f}".format(factura.monto_total_contrato) }}</strong>
+          </div>
+        {% endif %}
+        <div class="mt-3">
+          <a href="{{ url_for('ver_obra', id=factura.id_obra) }}" class="btn btn-sm btn-outline-primary">
+            <i class="fas fa-eye"></i> Ver Proyecto
+          </a>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+    
+    <div class="card mt-3">
+      <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-cogs"></i> Acciones</h5>
+      </div>
+      <div class="card-body">
+        <div class="d-flex flex-column gap-2">
+          <a class="btn btn-primary" href="{{ url_for('editar_factura', id=factura.id_factura) }}">
+            <i class="fas fa-edit"></i> Editar Factura
+          </a>
+          <a class="btn btn-success" href="#">
+            <i class="fas fa-file-pdf"></i> Generar PDF
+          </a>
+          <a class="btn btn-info" href="#">
+            <i class="fas fa-print"></i> Imprimir
+          </a>
+          {% if factura.estado == 'PENDIENTE' %}
+          <a class="btn btn-warning" href="#">
+            <i class="fas fa-money-bill-wave"></i> Registrar Pago
+          </a>
+          {% endif %}
+          <a class="btn btn-secondary" href="{{ url_for('listar_facturas') }}">
+            <i class="fas fa-arrow-left"></i> Volver a Lista
+          </a>
+          <form action="{{ url_for('eliminar_factura', id=factura.id_factura) }}" method="post" onsubmit="return confirm('¿Eliminar esta factura?');" class="mt-2">
+            <button class="btn btn-danger w-100" type="submit">
+              <i class="fas fa-trash"></i> Eliminar
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.financial-summary .h3 {
+  font-size: 1.8rem;
+}
+
+.financial-summary .h5 {
+  font-size: 1.25rem;
+}
+
+.card-header h5 {
+  color: #495057;
+}
+
+.badge {
+  font-size: 0.9rem;
+}
+
+.gap-2 > * + * {
+  margin-top: 0.5rem;
+}
+
+.table-responsive {
+  border-radius: 0.375rem;
+}
+</style>
+{% endblock %}

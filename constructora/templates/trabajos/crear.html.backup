@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sistema-unificado.css') }}">
+{% endblock %}
+
+
+
+{%extends "base.html"%}
+
+{%block title%}Nuevo Trabajo - Sistema Constructora{%endblock%}
+
+{%block content%}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/create-forms.css') }}">
+
+<div class="create-form-max-w-7xl mx-auto px-6">
+    <!-- Header de página estilo detalle -->
+    <div class="create-page-header">
+        <nav class="breadcrumb">
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <span class="breadcrumb-separator">/</span>
+            <a href="{{ url_for('listar_trabajos') }}">Trabajos</a>
+            <span class="breadcrumb-separator">/</span>
+            <span>Nuevo</span>
+        </nav>
+        <h1 class="create-page-title">
+            <i class="fas fa-hard-hat"></i>
+            Crear Nuevo Trabajo
+        </h1>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-6-fluid">
+        <form method="POST" action="{{ url_for('crear_trabajo') }}" id="create-trabajo-form" class="needs-validation" novalidate>
+            <div class="create-form-flex flex-wrap -mx-2">
+                <!-- Información General -->
+                <div class="form-card">
+                    <div class="stat-stat-header">
+                        <h5><i class="fas fa-info-circle text-prussian-blue-700"></i> Información del Trabajo</h5>
+                    </div>
+                    <div class="stat-module-content">
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-align-left"></i>Descripción del Trabajo<span class="required">*</span>
+                            </label>
+                            <textarea class="form-textarea" id="descripcion" name="descripcion" rows="4" 
+                                      placeholder="Ej: Instalación de sistema eléctrico completo" 
+                                      required>{{ request.form.descripcion if request.form else '' }}</textarea>
+                            <div class="invalid-feedback">
+                                Por favor, ingrese la descripción del trabajo.
+                            </div>
+                        </div>
+
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-dollar-sign text-xanthous"></i>Precio Unitario
+                            </label>
+                            <input class="form-input" id="precio_unitario" name="precio_unitario" 
+                                   placeholder="0.00" 
+                                   value="{{ request.form.precio_unitario if request.form else '' }}">
+                            <div class="invalid-feedback">
+                                Por favor, ingrese un precio válido.
+                            </div>
+                        </div>
+
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-ruler"></i>Unidad de Medida
+                            </label>
+                            <input class="form-input" id="unidad" name="unidad" 
+                                   placeholder="Ej: m², unidad, hora, kg" 
+                                   value="{{ request.form.unidad if request.form else '' }}">
+                            <div class="invalid-feedback">
+                                Por favor, ingrese la unidad de medida.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Botones de acción -->
+            <div class="form-actions mt-6">
+                <div class="flex justify-between">
+                    <a href="{{ url_for('listar_trabajos') }}" class="btn btn btn btn-warm-secondary">
+                        <i class="fas fa-times"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn btn btn btn-warm-primary">
+                        <i class="fas fa-save"></i> Guardar Trabajo
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// Validación de formularios Bootstrap
+(function() {
+    'use strict';
+    window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        var validation = Array.prototype.filter.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+})();
+</script>
+{%endblock%}

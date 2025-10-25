@@ -1,0 +1,124 @@
+<!-- templates/actividades/editar.html -->
+{% extends "base.html" %}
+
+{% block head %}
+    <!-- CSS para formularios -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/form-pages.css') }}">{% endblock %}
+
+
+{% block title %}Editar Actividad{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/create-forms.css') }}">
+
+
+<div class="dashboard-header">
+    <h1><i class="fas fa-edit"></i> Editar Actividad</h1>
+    <a href="{{ url_for('listar_actividades') }}" class="btn btn btn btn-warm-secondary">
+        <i class="fas fa-arrow-left"></i> Volver a Lista
+    </a>
+</div>
+
+<div class="form-max-w-7xl mx-auto px-6">
+    <div class="create-form-max-w-7xl mx-auto px-6">
+<form method="POST" class="form-stat-card">
+        <div class="form-section">
+            <h3><i class="fas fa-info-circle text-prussian-blue-700"></i> Información Básica</h3>
+            
+            <div class="form-group">
+                <label for="nombre">Nombre de la Actividad *</label>
+                <input class="form-input">
+                <small class="form-text">Nombre descriptivo de la actividad a realizar</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="descripcion">Descripción Detallada</label>
+                <textarea class="form-textarea" rows="4">{{ actividad.descripcion or '' }}</textarea>
+                <small class="form-text">Detalles técnicos y procedimientos de la actividad</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="fecha_programada">Fecha Programada</label>
+                <input class="form-input">
+                <small class="form-text">Fecha estimada para ejecutar esta actividad</small>
+            </div>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn btn btn btn-warm-primary">
+                <i class="fas fa-save"></i> Actualizar Actividad
+            </button>
+            <a href="{{ url_for('ver_actividad', id=(actividad.id or actividad.actividad_id)) }}" class="btn btn btn btn-warm-secondary">
+                <i class="fas fa-times"></i> Cancelar
+            </a>
+        </div>
+    </form>
+</div>
+
+<style>
+.form-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.form-card {
+    background: white;
+    border-radius: 10px;
+    padding: 2rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.form-section {
+    margin-bottom: 2rem;
+}
+
+.form-section h3 {
+    color: #2c3e50;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #3498db;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #e3e6ea;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #3498db;
+}
+
+.form-text {
+    color: #6c757d;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.form-actions {
+    text-align: center;
+    padding-top: 2rem;
+    border-top: 1px solid #e3e6ea;
+}
+
+.form-actions .btn {
+    margin: 0 0.5rem;
+    padding: 0.75rem 2rem;
+}
+</style>
+{% endblock %}

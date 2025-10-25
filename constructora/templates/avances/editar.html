@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <!-- CSS para formularios -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/form-pages.css') }}">{% endblock %}
+
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/create-forms.css') }}">
+
+
+<div class="dashboard-header">
+    <h1><i class="fas fa-edit"></i> Editar Avance #{{ avance.id_avance or avance.id }}</h1>
+    <a class="btn btn btn btn-warm-secondary" href="{{ url_for('ver_avance', id=avance.id_avance or avance.id) }}">
+        <i class="fas fa-arrow-left"></i> Volver
+    </a>
+</div>
+
+<div class="create-form-max-w-7xl mx-auto px-6">
+<form method="post" class="form-stat-card">
+    <div class="form-flex flex-wrap -mx-2">
+        <div class="form-group flex-1 px-2-md-4">
+            <label for="fecha_avance">Fecha</label>
+            <input class="form-input" value="{{ avance.fecha_avance|default('', true) }}" />
+        </div>
+        <div class="form-group flex-1 px-2-md-4">
+            <label for="porcentaje_fisico">% Físico</label>
+            <input class="form-input" value="{{ avance.porcentaje_fisico_avance }}" />
+        </div>
+        <div class="form-group flex-1 px-2-md-4">
+            <label for="porcentaje_financiero">% Financiero</label>
+            <input class="form-input" value="{{ avance.porcentaje_financiero_avance }}" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="obra_id">Obra (opcional)</label>
+        <select class="form-select">
+            <option value="">Sin obra</option>
+            {% for o in obras %}
+            {% set oid = o.id_obra or o.id %}
+            <option value="{{ oid }}" {% if avance.id_obra and avance.id_obra == oid %}selected{% endif %}>
+                {{ o.nombre_obra or o.nombre }}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-actions">
+        <button class="btn btn btn btn-warm-primary" type="submit"><i class="fas fa-save"></i> Guardar</button>
+        <a class="btn btn btn btn-warm-secondary" href="{{ url_for('ver_avance', id=avance.id_avance or avance.id) }}">Cancelar</a>
+    </div>
+</form>
+</div>
+
+{% endblock %}

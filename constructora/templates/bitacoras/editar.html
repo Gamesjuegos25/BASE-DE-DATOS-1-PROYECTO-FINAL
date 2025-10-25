@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <!-- CSS para formularios -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/form-pages.css') }}">{% endblock %}
+
+{% block title %}Editar Bitácora{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/create-forms.css') }}">
+
+
+<div class="page-header">
+  <nav class="breadcrumb">
+    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+    <span class="breadcrumb-separator">/</span>
+    <a href="{{ url_for('listar_bitacoras') }}">Bitácoras</a>
+    <span class="breadcrumb-separator">/</span>
+    <span>Editar</span>
+  </nav>
+  <div class="form-header"><div class="form-header-content"><h1 class="form-title"><i class="fas fa-edit"></i>✏️ Editar Bitácora</h1></div></div>
+</div>
+
+<div class="form-card">
+  <div class="create-form-max-w-7xl mx-auto px-6">
+<form action="{{ url_for('editar_bitacora', id=(bitacora.id or bitacora.bitacora_id or bitacora.id_bitacora)) }}" method="post">
+    <div class="stat-module-content">
+      <div class="form-group">
+        <label for="fecha_bitacora">Fecha de Registro</label>
+        <input class="form-input" 
+               id="fecha_bitacora" 
+               name="fecha_bitacora" 
+               value="{% if bitacora.fecha_bitacora %}{{ bitacora.fecha_bitacora.strftime('%Y-%m-%d') if bitacora.fecha_bitacora.strftime else bitacora.fecha_bitacora }}{% endif %}">
+      </div>
+      
+      <div class="form-group">
+        <label for="obra_id">Obra Asociada</label>
+        <select class="form-select" id="obra_id" name="obra_id">
+          <option value="">General / Sin obra específica</option>
+          {% for obra in obras %}
+          <option value="{{ obra.id_obra }}" 
+                  {% if obra.id_obra == bitacora.id_obra %}selected{% endif %}>
+            {{ obra.nombre_obra or obra.nombre }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label for="observaciones">Observaciones *</label>
+        <textarea class="form-textarea" 
+                  id="observaciones" 
+                  name="observaciones" 
+                  rows="8" 
+                  required 
+                  placeholder="Describe las actividades, eventos o situaciones relevantes del día...">{{ bitacora.observaciones_bitacora or '' }}</textarea>
+        <small class="form-text text-vanilla-600">Registra de forma detallada los eventos y observaciones importantes.</small>
+      </div>
+    </div>
+    <div class="stat-module-actions">
+      <button type="submit" class="btn-form primary">Actualizar Bitácora</button>
+      <a href="{{ url_for('ver_bitacora', id=(bitacora.id or bitacora.bitacora_id or bitacora.id_bitacora)) }}" class="btn btn btn btn-warm-secondary">Cancelar</a>
+    </div>
+  </form>
+</div>
+
+<style>
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #495057;
+}
+
+.form-control {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #495057;
+  background-color: #fff;
+  border: 1px solid #ced4da;
+  border-radius: 0.375rem;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-control:focus {
+  border-color: #80bdff;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+textarea.form-control {
+  min-height: calc(1.5em + 0.75rem + 2px);
+  resize: vertical;
+}
+
+.form-text {
+  display: block;
+  margin-top: 0.25rem;
+}
+
+.text-muted {
+  color: #6c757d;
+}
+
+.card-footer {
+  display: flex;
+  gap: 0.5rem;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-top: 1px solid #dee2e6;
+}
+</style>
+{% endblock %}

@@ -1,135 +1,133 @@
 {% extends "base.html" %}
 
+{% block head %}
+    <!-- CSS para formularios -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/form-pages.css') }}">{% endblock %}
+
+
 {% block title %}Nuevo Proveedor - Sistema Constructora{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="header-section">
-        <h1>🏪 Nuevo Proveedor</h1>
-        <a href="{{ url_for('listar_proveedores') }}" class="btn-secondary">
-            ⬅️ Volver a Proveedores
-        </a>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/create-forms.css') }}">
+
+<div class="create-form-max-w-7xl mx-auto px-6">
+    <div class="create-page-header">
+        <nav class="breadcrumb">
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <span class="breadcrumb-separator">/</span>
+            <a href="{{ url_for('listar_proveedores') }}">Proveedores</a>
+            <span class="breadcrumb-separator">/</span>
+            <span>Nuevo</span>
+        </nav>
+        <h1 class="create-page-title">
+            <i class="fas fa-industry"></i>
+            Crear Nuevo Proveedor
+        </h1>
     </div>
-    
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="alert alert-{{ category }}">
-                    {{ message }}
+
+    <div class="max-w-7xl mx-auto px-6-fluid">
+        <form method="POST" action="{{ url_for('crear_proveedor') }}" id="create-proveedor-form" class="needs-validation" novalidate>
+            <div class="create-form-flex flex-wrap -mx-2">
+                <div class="form-card">
+                    <div class="stat-stat-header">
+                        <h5><i class="fas fa-building text-prussian-blue"></i> Información de la Empresa</h5>
+                    </div>
+                    <div class="stat-module-content">
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-tag"></i>Nombre del Proveedor<span class="required">*</span>
+                            </label>
+                            <input class="form-input" id="nombre_proveedor" name="nombre_proveedor" 
+                                   placeholder="Ej: Materiales El Constructor S.A.S." required>
+                        </div>
+
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-id-stat-card"></i>NIT
+                            </label>
+                            <input class="form-input" id="nit_proveedor" name="nit_proveedor" 
+                                   placeholder="Ej: 123456789-1">
+                        </div>
+
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-list"></i>Tipo de Proveedor<span class="required">*</span>
+                            </label>
+                            <select class="form-select" id="tipo_proveedor" name="tipo_proveedor" required>
+                                <option value="">Seleccionar tipo...</option>
+                                <option value="MATERIALES">🏗️ Materiales de Construcción</option>
+                                <option value="EQUIPOS">🔧 Equipos y Maquinaria</option>
+                                <option value="SERVICIOS">🛠️ Servicios Especializados</option>
+                                <option value="TRANSPORTE">🚚 Transporte y Logística</option>
+                                <option value="OTRO">❓ Otro</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-    
-    <div class="form-container">
-        <form method="POST" class="form-modern">
-            <div class="form-section">
-                <h3>🏢 Información de la Empresa</h3>
-                
-                <div class="form-group">
-                    <label for="nombre">Nombre del Proveedor *</label>
-                    <input type="text" 
-                           id="nombre" 
-                           name="nombre" 
-                           required 
-                           placeholder="Ej: Distribuidora de Materiales S.A."
-                           value="{{ request.form.nombre if request.form else '' }}">
+
+                <div class="form-card">
+                    <div class="stat-stat-header">
+                        <h5><i class="fas fa-address-book"></i> Información de Contacto</h5>
+                    </div>
+                    <div class="stat-module-content">
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-phone"></i>Teléfono
+                            </label>
+                            <input class="form-input" id="telefono_proveedor" name="telefono_proveedor" 
+                                   placeholder="Ej: +57 1 234 5678">
+                        </div>
+
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-envelope"></i>Email
+                            </label>
+                            <input class="form-input" id="email_proveedor" name="email_proveedor" 
+                                   placeholder="contacto@proveedor.com">
+                        </div>
+
+                        <div class="create-form-group">
+                            <label class="form-label">
+                                <i class="fas fa-map-marker-alt"></i>Dirección
+                            </label>
+                            <input class="form-input" id="direccion_proveedor" name="direccion_proveedor" 
+                                   placeholder="Dirección completa">
+                        </div>
+                    </div>
                 </div>
-                
-                <div class="form-group">
-                    <label for="contacto">Información de Contacto</label>
-                    <textarea id="contacto" 
-                              name="contacto" 
-                              rows="3"
-                              placeholder="Teléfono, email, dirección, persona de contacto...">{{ request.form.contacto if request.form else '' }}</textarea>
-                    <small class="form-help">Incluye teléfono, email, dirección y persona de contacto</small>
-                </div>
-            </div>
-            
-            <div class="form-section">
-                <h3>📋 Información Adicional (Opcional)</h3>
-                
-                <div class="form-group">
-                    <label for="tipo_proveedor">Tipo de Proveedor</label>
-                    <select id="tipo_proveedor" name="tipo_proveedor">
-                        <option value="">Seleccionar tipo...</option>
-                        <option value="Materiales" {{ 'selected' if request.form and request.form.tipo_proveedor == 'Materiales' else '' }}>🧱 Materiales de Construcción</option>
-                        <option value="Herramientas" {{ 'selected' if request.form and request.form.tipo_proveedor == 'Herramientas' else '' }}>🔧 Herramientas y Equipos</option>
-                        <option value="Servicios" {{ 'selected' if request.form and request.form.tipo_proveedor == 'Servicios' else '' }}>⚙️ Servicios Especializados</option>
-                        <option value="Transporte" {{ 'selected' if request.form and request.form.tipo_proveedor == 'Transporte' else '' }}>🚛 Transporte y Logística</option>
-                        <option value="Maquinaria" {{ 'selected' if request.form and request.form.tipo_proveedor == 'Maquinaria' else '' }}>🏗️ Maquinaria Pesada</option>
-                        <option value="Consultoria" {{ 'selected' if request.form and request.form.tipo_proveedor == 'Consultoria' else '' }}>💼 Consultoría</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="ruc">RUC/NIT</label>
-                    <input type="text" 
-                           id="ruc" 
-                           name="ruc" 
-                           placeholder="Ej: 12345678-9"
-                           value="{{ request.form.ruc if request.form else '' }}">
-                </div>
-                
-                <div class="form-group">
-                    <label for="telefono">Teléfono Principal</label>
-                    <input type="tel" 
-                           id="telefono" 
-                           name="telefono" 
-                           placeholder="Ej: 2234-5678"
-                           value="{{ request.form.telefono if request.form else '' }}">
-                </div>
-                
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" 
-                           id="email" 
-                           name="email" 
-                           placeholder="Ej: ventas@proveedor.com"
-                           value="{{ request.form.email if request.form else '' }}">
-                </div>
-                
-                <div class="form-group">
-                    <label for="direccion">Dirección</label>
-                    <textarea id="direccion" 
-                              name="direccion" 
-                              rows="2"
-                              placeholder="Dirección completa del proveedor">{{ request.form.direccion if request.form else '' }}</textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="notas">Notas/Observaciones</label>
-                    <textarea id="notas" 
-                              name="notas" 
-                              rows="2"
-                              placeholder="Información adicional, condiciones especiales, etc.">{{ request.form.notas if request.form else '' }}</textarea>
-                </div>
-            </div>
-            
-            <div class="form-actions">
-                <button type="submit" class="btn-primary">
-                    ✅ Crear Proveedor
-                </button>
-                <a href="{{ url_for('listar_proveedores') }}" class="btn-secondary">
-                    ❌ Cancelar
-                </a>
             </div>
         </form>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-6-fluid">
+        <div class="form-card">
+            <div class="create-form-actions">
+                <a href="{{ url_for('listar_proveedores') }}" class="create-btn create-btn btn btn-warm-secondary">
+                    <i class="fas fa-times"></i>Cancelar
+                </a>
+                <button type="submit" form="create-proveedor-form" class="create-btn create-btn btn btn-warm-primary">
+                    <i class="fas fa-industry"></i>Crear Proveedor
+                </button>
+            </div>
+        </div>
     </div>
 </div>
 
 <script>
-// Validación del formulario
-document.querySelector('form').addEventListener('submit', function(e) {
-    const nombre = document.getElementById('nombre').value.trim();
-    
-    if (!nombre) {
-        alert('El nombre del proveedor es obligatorio');
-        e.preventDefault();
-        return false;
-    }
-    
-    return true;
-});
+(function() {
+    'use strict';
+    window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        var validation = Array.prototype.filter.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+})();
 </script>
 {% endblock %}

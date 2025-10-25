@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+{% block title %}Detalle Proveedor{% endblock %}
+{% block content %}
+<div class="page-header">
+  <nav class="breadcrumb">
+    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+    <span class="breadcrumb-separator">/</span>
+    <a href="{{ url_for('listar_proveedores') }}">Proveedores</a>
+    <span class="breadcrumb-separator">/</span>
+    <span>Detalle</span>
+  </nav>
+  <h1 class="page-title">🏢 {{ proveedor.nombre or 'Proveedor' }} <small class="text-muted">ID: {{ proveedor.id_proveedor }}</small></h1>
+</div>
+
+<div class="row">
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-building"></i> Información de la Empresa</h5>
+      </div>
+      <div class="card-body">
+        <dl class="row">
+          <dt class="col-sm-4"><i class="fas fa-tag"></i> Nombre Comercial</dt>
+          <dd class="col-sm-8">
+            <strong>{{ proveedor.nombre or 'N/D' }}</strong>
+          </dd>
+          
+          <dt class="col-sm-4"><i class="fas fa-industry"></i> Tipo de Proveedor</dt>
+          <dd class="col-sm-8">
+            <span class="badge badge-primary">{{ proveedor.tipo or 'Comercial' }}</span>
+          </dd>
+          
+          <dt class="col-sm-4"><i class="fas fa-info-circle"></i> Estado</dt>
+          <dd class="col-sm-8">
+            {% set estado_class = {
+              'Activo': 'success',
+              'Inactivo': 'secondary',
+              'Suspendido': 'danger'
+            } %}
+            <span class="badge badge-{{ estado_class.get(proveedor.estado, 'success') }}">
+              {{ proveedor.estado or 'Activo' }}
+            </span>
+          </dd>
+          
+          <dt class="col-sm-4"><i class="fas fa-map-marker-alt"></i> Dirección</dt>
+          <dd class="col-sm-8">
+            {% if proveedor.direccion %}
+              <i class="fas fa-location-arrow text-primary"></i> {{ proveedor.direccion }}
+            {% else %}
+              <span class="text-muted">No disponible</span>
+            {% endif %}
+          </dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-address-book"></i> Información de Contacto</h5>
+      </div>
+      <div class="card-body">
+        <div class="contact-info">
+          <div class="mb-3">
+            <small class="text-muted">Teléfono Principal:</small><br>
+            {% if proveedor.contacto %}
+              <a href="tel:{{ proveedor.contacto }}" class="btn btn-outline-primary btn-sm">
+                <i class="fas fa-phone"></i> {{ proveedor.contacto }}
+              </a>
+            {% else %}
+              <span class="text-muted">No disponible</span>
+            {% endif %}
+          </div>
+          
+          <div class="mb-3">
+            <small class="text-muted">Email Comercial:</small><br>
+            {% if proveedor.email %}
+              <a href="mailto:{{ proveedor.email }}" class="btn btn-outline-info btn-sm">
+                <i class="fas fa-envelope"></i> {{ proveedor.email }}
+              </a>
+            {% else %}
+              <span class="text-muted">No disponible</span>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card mt-3">
+      <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-chart-bar"></i> Estadísticas</h5>
+      </div>
+      <div class="card-body text-center">
+        <div class="stats-info">
+          <div class="mb-3">
+            <h4 class="text-info mb-1">0</h4>
+            <small class="text-muted">Materiales Suministrados</small>
+          </div>
+          
+          <div class="mb-3">
+            <h4 class="text-success mb-1">Q0.00</h4>
+            <small class="text-muted">Total Facturado</small>
+          </div>
+          
+          <div class="mb-2">
+            <h4 class="text-warning mb-1">0</h4>
+            <small class="text-muted">Órdenes Pendientes</small>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card mt-3">
+      <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-cogs"></i> Acciones</h5>
+      </div>
+      <div class="card-body">
+        <div class="d-flex flex-column gap-2">
+          <a class="btn btn-primary" href="{{ url_for('editar_proveedor', id=proveedor.id_proveedor) }}">
+            <i class="fas fa-edit"></i> Editar Proveedor
+          </a>
+          <a class="btn btn-info" href="{{ url_for('listar_materiales') }}?proveedor={{ proveedor.id_proveedor }}">
+            <i class="fas fa-boxes"></i> Ver Materiales
+          </a>
+          <a class="btn btn-success" href="{{ url_for('crear_material') }}?proveedor={{ proveedor.id_proveedor }}">
+            <i class="fas fa-plus"></i> Agregar Material
+          </a>
+          <a class="btn btn-secondary" href="{{ url_for('listar_proveedores') }}">
+            <i class="fas fa-arrow-left"></i> Volver a Lista
+          </a>
+          <form action="{{ url_for('eliminar_proveedor', id=proveedor.id_proveedor) }}" method="post" onsubmit="return confirm('¿Eliminar este proveedor?');" class="mt-2">
+            <button class="btn btn-danger w-100" type="submit">
+              <i class="fas fa-trash"></i> Eliminar
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.contact-info .btn {
+  width: 100%;
+  text-align: left;
+}
+
+.stats-info h4 {
+  font-size: 1.8rem;
+  font-weight: bold;
+}
+
+.card-header h5 {
+  color: #495057;
+}
+
+.badge {
+  font-size: 0.9rem;
+}
+
+.gap-2 > * + * {
+  margin-top: 0.5rem;
+}
+</style>
+{% endblock %}

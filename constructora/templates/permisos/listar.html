@@ -1,0 +1,289 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <!-- CSS para páginas de listado -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/list-pages.css') }}"></div>
+{% endblock %}
+
+
+{% block title %}Permisos de Acceso</div>
+
+<script>
+// Mejoras JavaScript automáticas para tablas
+document.addEventListener('DOMContentLoaded', function() {
+    // Aplicar efectos de hover a filas de tabla
+    const tableRows = document.querySelectorAll('.data-table-enhanced tbody tr, table tbody tr');
+    tableRows.forEach((row, index) => {
+        row.style.animationDelay = `${index * 0.1}s`;
+        row.classList.add('fade-in-up');
+        
+        row.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+            this.style.boxShadow = '0 4px 15px rgba(247, 127, 0, 0.2)';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = 'none';
+        });
+    });
+    
+    // Mejorar botones de acción con tooltips
+    const actionButtons = document.querySelectorAll('.btn-action-enhanced, .action-buttons a, .action-buttons button');
+    actionButtons.forEach(button => {
+        if (!button.querySelector('.custom-tooltip')) {
+            button.addEventListener('mouseenter', function() {
+                const title = this.getAttribute('title');
+                if (title) {
+                    const tooltip = document.createElement('div');
+                    tooltip.className = 'custom-tooltip';
+                    tooltip.textContent = title;
+                    tooltip.style.cssText = `
+                        position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+                        background: var(--prussian-blue-700); color: var(--vanilla);
+                        padding: 4px 8px; border-radius: 4px; font-size: 0.7rem;
+                        white-space: nowrap; z-index: 1000; margin-bottom: 5px;
+                    `;
+                    this.style.position = 'relative';
+                    this.appendChild(tooltip);
+                }
+            });
+            
+            button.addEventListener('mouseleave', function() {
+                const tooltip = this.querySelector('.custom-tooltip');
+                if (tooltip) tooltip.remove();
+            });
+        }
+    });
+    
+    // Contador animado para números
+    const statNumbers = document.querySelectorAll('.stat-number-enhanced, .stat-number');
+    statNumbers.forEach(stat => {
+        const finalNumber = parseInt(stat.textContent) || 0;
+        if (finalNumber > 0) {
+            let currentNumber = 0;
+            const increment = Math.max(1, Math.ceil(finalNumber / 20));
+            const timer = setInterval(() => {
+                currentNumber += increment;
+                if (currentNumber >= finalNumber) {
+                    currentNumber = finalNumber;
+                    clearInterval(timer);
+                }
+                stat.textContent = currentNumber;
+            }, 100);
+        }
+    });
+});
+</script>
+</div>
+</div>
+{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/enhanced-tables.css') }}">
+
+<div class="max-w-7xl mx-auto px-6-fluid">
+    <div class="flex flex-wrap -mx-2 mb-6">
+        <div class="flex-1 px-2-md-6">
+            <h2><i class="bi bi-shield-lock"></i> Permisos de Acceso</h2>
+            <p class="text-vanilla-600">Gestión de permisos del sistema y asignación a usuarios</p>
+        </div>
+        <div class="flex-1 px-2-md-6 text-end">
+            <a href="{{ url_for('crear_permiso') }}" class="btn btn btn-accent">
+                <i class="bi bi-plus-circle"></i> Crear Permiso
+            </a>
+        </div>
+    </div>
+
+    {% if permisos %}
+    <div class="stat-card shadow-sm fade-in-up">
+        <div class="stat-module-content">
+            <div class="list-table-container">
+                <div class="list-table-container"><div class="list-table-container"><table class="data-table-enhanced table">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Módulo</th>
+                            <th>Nivel de Acceso</th>
+                            <th>Usuarios Asignados</th>
+                            <th class="text-center"><i class="fas fa-cogs"></i> Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for permiso in permisos %}
+                        <tr>
+                            <td><strong>#{{ permiso.id_permiso }}</strong></td>
+                            <td>
+                                <span class="status-badge">{{ permiso.modulo_permiso }}</span>
+                            </td>
+                            <td>
+                                {% if permiso.nivel_acceso_permiso %}
+                                    <span class="status-badge">
+                                        {{ permiso.nivel_acceso_permiso }}
+                                    </span>
+                                {% else %}
+                                    <span class="text-vanilla-600">Sin nivel</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="status-badge">
+                                    {{ permiso.usuarios_asignados }} usuario(s)
+                                </span>
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="{{ url_for('ver_permiso', id=permiso.id_permiso) }}" class="btn btn-outline-info transition-all hover:scale-110 hover:-translate-y-1" title="Ver detalle">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="{{ url_for('editar_permiso', id=permiso.id_permiso) }}" class="btn btn-outline-warning transition-all hover:scale-110 hover:-translate-y-1" title="Editar">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a href="{{ url_for('asignar_permiso', id=permiso.id_permiso) }}" class="btn btn-outline-success transition-all hover:scale-110 hover:-translate-y-1" title="Asignar usuarios">
+                                        <i class="bi bi-person-plus"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-outline-danger" 
+                                            onclick="confirmarEliminacion({{ permiso.id_permiso }})" title="Eliminar">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="5" class="text-vanilla-600 text-center">
+                                <small>Total de permisos: {{ permisos|length }}</small>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table></div></div></div></div>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert alert-info">
+        <i class="bi bi-info-circle"></i> 
+        No hay permisos registrados. 
+        <a href="{{ url_for('crear_permiso') }}" class="alert-link">Crear el primero</a>
+    </div>
+    {% endif %}
+
+    <div class="stat-card mt-6 bg-vanilla-800 border-0 fade-in-up">
+        <div class="stat-module-content">
+            <h6 class="stat-card-title"><i class="bi bi-info-circle"></i> Información sobre Permisos</h6>
+            <ul class="mb-0 small text-vanilla-600">
+                <li><strong>Módulo:</strong> Área o sección del sistema (Obras, Empleados, Reportes, etc.)</li>
+                <li><strong>Nivel de Acceso:</strong> Tipo de permisos (Lectura, Escritura, Admin, etc.)</li>
+                <li><strong>Asignación:</strong> Los permisos se asignan individualmente a usuarios</li>
+                <li><strong>Cascade:</strong> Al eliminar un permiso, se revocan automáticamente todas las asignaciones</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmación de eliminación -->
+<div class="modal fade" id="modalEliminar" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-gradient-warm-danger text-white text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-exclamation-triangle"></i> Confirmar Eliminación
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro que desea eliminar este permiso?</p>
+                <p class="text-fire-engine-red"><strong>Advertencia:</strong> Se revocarán todas las asignaciones a usuarios.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn btn btn-warm-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="formEliminar" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn btn btn-warm-danger">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function confirmarEliminacion(id) {
+    const form = document.getElementById('formEliminar');
+    form.action = `/permisos/${id}/eliminar`;
+    const modal = new bootstrap.Modal(document.getElementById('modalEliminar'));
+    modal.show();
+}
+</script>
+</div>
+
+<script>
+// Mejoras JavaScript automáticas para tablas
+document.addEventListener('DOMContentLoaded', function() {
+    // Aplicar efectos de hover a filas de tabla
+    const tableRows = document.querySelectorAll('.data-table-enhanced tbody tr, table tbody tr');
+    tableRows.forEach((row, index) => {
+        row.style.animationDelay = `${index * 0.1}s`;
+        row.classList.add('fade-in-up');
+        
+        row.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+            this.style.boxShadow = '0 4px 15px rgba(247, 127, 0, 0.2)';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = 'none';
+        });
+    });
+    
+    // Mejorar botones de acción con tooltips
+    const actionButtons = document.querySelectorAll('.btn-action-enhanced, .action-buttons a, .action-buttons button');
+    actionButtons.forEach(button => {
+        if (!button.querySelector('.custom-tooltip')) {
+            button.addEventListener('mouseenter', function() {
+                const title = this.getAttribute('title');
+                if (title) {
+                    const tooltip = document.createElement('div');
+                    tooltip.className = 'custom-tooltip';
+                    tooltip.textContent = title;
+                    tooltip.style.cssText = `
+                        position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+                        background: var(--prussian-blue-700); color: var(--vanilla);
+                        padding: 4px 8px; border-radius: 4px; font-size: 0.7rem;
+                        white-space: nowrap; z-index: 1000; margin-bottom: 5px;
+                    `;
+                    this.style.position = 'relative';
+                    this.appendChild(tooltip);
+                }
+            });
+            
+            button.addEventListener('mouseleave', function() {
+                const tooltip = this.querySelector('.custom-tooltip');
+                if (tooltip) tooltip.remove();
+            });
+        }
+    });
+    
+    // Contador animado para números
+    const statNumbers = document.querySelectorAll('.stat-number-enhanced, .stat-number');
+    statNumbers.forEach(stat => {
+        const finalNumber = parseInt(stat.textContent) || 0;
+        if (finalNumber > 0) {
+            let currentNumber = 0;
+            const increment = Math.max(1, Math.ceil(finalNumber / 20));
+            const timer = setInterval(() => {
+                currentNumber += increment;
+                if (currentNumber >= finalNumber) {
+                    currentNumber = finalNumber;
+                    clearInterval(timer);
+                }
+                stat.textContent = currentNumber;
+            }, 100);
+        }
+    });
+});
+</script>
+</div>
+</div>
+{% endblock %}

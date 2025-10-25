@@ -1,0 +1,593 @@
+{% extends "base.html" %}
+
+{% block title %}Crear Material - ERP Constructora{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <nav class="breadcrumb">
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+        <span class="breadcrumb-separator">/</span>
+        <a href="{{ url_for('listar_materiales') }}">Materiales</a>
+        <span class="breadcrumb-separator">/</span>
+        <span>Nuevo Material</span>
+    </nav>
+    <h1 class="page-title">🧱 Crear Nuevo Material</h1>
+    <p class="page-subtitle">Registra materiales para la gestión de inventario</p>
+</div>
+
+<div class="form-container">
+    <form method="POST" id="formMaterial" class="modern-form" novalidate>
+        <div class="form-section">
+            <h3 class="section-title">
+                <i class="fas fa-info-circle"></i>
+                Información Básica del Material
+            </h3>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="nombre" class="form-label required">Nombre del Material</label>
+                    <input type="text" 
+                           id="nombre" 
+                           name="nombre" 
+                           class="form-control" 
+                           placeholder="Ej: Cemento Portland CPC-30"
+                           required 
+                           maxlength="100">
+                    <div class="form-help">Nombre comercial o técnico del material</div>
+                    <div class="form-error" id="error-nombre"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="categoria" class="form-label required">Categoría</label>
+                    <select id="categoria" name="categoria" class="form-control form-select" required>
+                        <option value="">Seleccionar categoría</option>
+                        <option value="Concreto y Cemento">Concreto y Cemento</option>
+                        <option value="Acero y Metales">Acero y Metales</option>
+                        <option value="Agregados">Agregados (Arena, Grava)</option>
+                        <option value="Bloques y Ladrillos">Bloques y Ladrillos</option>
+                        <option value="Maderas">Maderas</option>
+                        <option value="Impermeabilizantes">Impermeabilizantes</option>
+                        <option value="Pinturas y Acabados">Pinturas y Acabados</option>
+                        <option value="Tuberías y Conexiones">Tuberías y Conexiones</option>
+                        <option value="Cables y Eléctricos">Cables y Eléctricos</option>
+                        <option value="Herramientas">Herramientas</option>
+                        <option value="Otros">Otros</option>
+                    </select>
+                    <div class="form-error" id="error-categoria"></div>
+                </div>
+            </div>
+            
+            <div class="form-grid grid-3">
+                <div class="form-group">
+                    <label for="unidad_medida" class="form-label required">Unidad de Medida</label>
+                    <select id="unidad_medida" name="unidad_medida" class="form-control form-select" required>
+                        <option value="">Seleccionar unidad</option>
+                        <option value="Kilogramo">Kilogramo (kg)</option>
+                        <option value="Tonelada">Tonelada (ton)</option>
+                        <option value="Metro">Metro (m)</option>
+                        <option value="Metro cuadrado">Metro cuadrado (m²)</option>
+                        <option value="Metro cúbico">Metro cúbico (m³)</option>
+                        <option value="Litro">Litro (L)</option>
+                        <option value="Pieza">Pieza (pza)</option>
+                        <option value="Saco">Saco</option>
+                        <option value="Bulto">Bulto</option>
+                        <option value="Rollo">Rollo</option>
+                        <option value="Caja">Caja</option>
+                    </select>
+                    <div class="form-error" id="error-unidad_medida"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="precio_unitario" class="form-label required">Precio Unitario</label>
+                    <div class="input-group">
+                        <span class="input-group-text">$</span>
+                        <input type="number" 
+                               id="precio_unitario" 
+                               name="precio_unitario" 
+                               class="form-control" 
+                               placeholder="0.00" 
+                               step="0.01" 
+                               min="0"
+                               required>
+                    </div>
+                    <div class="form-help">Precio por unidad de medida</div>
+                    <div class="form-error" id="error-precio_unitario"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="stock_minimo" class="form-label">Stock Mínimo</label>
+                    <input type="number" 
+                           id="stock_minimo" 
+                           name="stock_minimo" 
+                           class="form-control" 
+                           placeholder="0" 
+                           min="0">
+                    <div class="form-help">Cantidad mínima para alertas</div>
+                    <div class="form-error" id="error-stock_minimo"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h3 class="section-title">
+                <i class="fas fa-warehouse"></i>
+                Información de Inventario
+            </h3>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="id_proveedor" class="form-label">Proveedor Principal</label>
+                    <select id="id_proveedor" name="id_proveedor" class="form-control form-select">
+                        <option value="">Sin proveedor asignado</option>
+                        {% for proveedor in proveedores %}
+                        <option value="{{ proveedor.id_proveedor }}">{{ proveedor.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="form-help">Proveedor preferido para este material</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="codigo_material" class="form-label">Código del Material</label>
+                    <input type="text" 
+                           id="codigo_material" 
+                           name="codigo_material" 
+                           class="form-control" 
+                           placeholder="Ej: CEM-001, ACE-002"
+                           maxlength="20">
+                    <div class="form-help">Código interno para identificación</div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="descripcion" class="form-label">Descripción Detallada</label>
+                <textarea id="descripcion" 
+                          name="descripcion" 
+                          class="form-control" 
+                          placeholder="Descripción técnica, especificaciones, características especiales..."
+                          rows="4"
+                          maxlength="500"></textarea>
+                <div class="form-help">
+                    Especificaciones técnicas, resistencia, calidad, etc.
+                    <span class="char-count">0/500 caracteres</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h3 class="section-title">
+                <i class="fas fa-cogs"></i>
+                Configuración Adicional
+            </h3>
+            
+            <div class="form-grid grid-3">
+                <div class="form-group">
+                    <label for="peso_unitario" class="form-label">Peso Unitario (kg)</label>
+                    <input type="number" 
+                           id="peso_unitario" 
+                           name="peso_unitario" 
+                           class="form-control" 
+                           placeholder="0.00" 
+                           step="0.01" 
+                           min="0">
+                    <div class="form-help">Peso por unidad de medida</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="tiempo_entrega" class="form-label">Tiempo de Entrega (días)</label>
+                    <input type="number" 
+                           id="tiempo_entrega" 
+                           name="tiempo_entrega" 
+                           class="form-control" 
+                           placeholder="0" 
+                           min="0">
+                    <div class="form-help">Días promedio de entrega</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="estado" class="form-label required">Estado</label>
+                    <select id="estado" name="estado" class="form-control form-select" required>
+                        <option value="Activo" selected>Activo</option>
+                        <option value="Inactivo">Inactivo</option>
+                        <option value="Descontinuado">Descontinuado</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Checkboxes para propiedades especiales -->
+            <div class="form-group">
+                <label class="form-label">Propiedades Especiales</label>
+                <div class="checkbox-grid">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="propiedades" value="resistente_agua">
+                        <span class="checkmark"></span>
+                        Resistente al agua
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="propiedades" value="alta_resistencia">
+                        <span class="checkmark"></span>
+                        Alta resistencia
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="propiedades" value="ecologico">
+                        <span class="checkmark"></span>
+                        Ecológico
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="propiedades" value="ignifugo">
+                        <span class="checkmark"></span>
+                        Ignífugo
+                    </label>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Resumen de Material -->
+        <div class="form-section bg-gray-50">
+            <h3 class="section-title">
+                <i class="fas fa-receipt"></i>
+                Resumen del Material
+            </h3>
+            
+            <div class="material-summary" id="materialSummary">
+                <div class="summary-item">
+                    <strong>Nombre:</strong> <span id="summary-nombre">-</span>
+                </div>
+                <div class="summary-item">
+                    <strong>Categoría:</strong> <span id="summary-categoria">-</span>
+                </div>
+                <div class="summary-item">
+                    <strong>Precio:</strong> Q<span id="summary-precio">0.00</span> por <span id="summary-unidad">-</span>
+                </div>
+                <div class="summary-item">
+                    <strong>Proveedor:</strong> <span id="summary-proveedor">Sin asignar</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-actions">
+            <button type="button" class="btn btn-secondary" onclick="limpiarFormulario()">
+                <i class="fas fa-broom"></i> Limpiar
+            </button>
+            <button type="button" class="btn btn-info" onclick="vistaPrevia()">
+                <i class="fas fa-eye"></i> Vista Previa
+            </button>
+            <button type="submit" class="btn btn-primary" id="btnSubmit">
+                <i class="fas fa-save"></i> Crear Material
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+// Variables y elementos del formulario
+const form = document.getElementById('formMaterial');
+const submitBtn = document.getElementById('btnSubmit');
+
+// Validación en tiempo real
+document.querySelectorAll('.form-control').forEach(input => {
+    input.addEventListener('input', function() {
+        validarCampo(this);
+        actualizarResumen();
+    });
+    
+    input.addEventListener('blur', function() {
+        validarCampo(this);
+    });
+});
+
+// Contador de caracteres para descripción
+const descripcionTextarea = document.getElementById('descripcion');
+const charCount = document.querySelector('.char-count');
+
+descripcionTextarea.addEventListener('input', function() {
+    const length = this.value.length;
+    charCount.textContent = `${length}/500 caracteres`;
+    charCount.style.color = length > 450 ? 'var(--color-danger)' : 'var(--color-text-secondary)';
+});
+
+// Validación de campos individuales
+function validarCampo(campo) {
+    const valor = campo.value.trim();
+    const nombre = campo.name;
+    const errorElement = document.getElementById(`error-${nombre}`);
+    let esValido = true;
+    let mensaje = '';
+    
+    // Limpiar errores previos
+    campo.classList.remove('error');
+    if (errorElement) errorElement.textContent = '';
+    
+    // Validaciones específicas
+    switch (nombre) {
+        case 'nombre':
+            if (!valor) {
+                mensaje = 'El nombre del material es obligatorio';
+                esValido = false;
+            } else if (valor.length < 3) {
+                mensaje = 'El nombre debe tener al menos 3 caracteres';
+                esValido = false;
+            }
+            break;
+            
+        case 'categoria':
+            if (!valor) {
+                mensaje = 'Selecciona una categoría';
+                esValido = false;
+            }
+            break;
+            
+        case 'unidad_medida':
+            if (!valor) {
+                mensaje = 'Selecciona una unidad de medida';
+                esValido = false;
+            }
+            break;
+            
+        case 'precio_unitario':
+            if (!valor) {
+                mensaje = 'El precio es obligatorio';
+                esValido = false;
+            } else if (parseFloat(valor) <= 0) {
+                mensaje = 'El precio debe ser mayor a 0';
+                esValido = false;
+            }
+            break;
+            
+        case 'codigo_material':
+            if (valor && !/^[A-Z0-9-]+$/i.test(valor)) {
+                mensaje = 'El código solo puede contener letras, números y guiones';
+                esValido = false;
+            }
+            break;
+    }
+    
+    // Mostrar error si existe
+    if (!esValido) {
+        campo.classList.add('error');
+        if (errorElement) errorElement.textContent = mensaje;
+    }
+    
+    return esValido;
+}
+
+// Validación completa del formulario
+function validarFormulario() {
+    let formularioValido = true;
+    
+    // Validar campos requeridos
+    const camposRequeridos = ['nombre', 'categoria', 'unidad_medida', 'precio_unitario', 'estado'];
+    
+    camposRequeridos.forEach(campo => {
+        const elemento = document.getElementById(campo);
+        if (!validarCampo(elemento)) {
+            formularioValido = false;
+        }
+    });
+    
+    return formularioValido;
+}
+
+// Actualizar resumen en tiempo real
+function actualizarResumen() {
+    const nombre = document.getElementById('nombre').value || '-';
+    const categoria = document.getElementById('categoria').value || '-';
+    const precio = document.getElementById('precio_unitario').value || '0.00';
+    const unidad = document.getElementById('unidad_medida').value || '-';
+    const proveedorSelect = document.getElementById('id_proveedor');
+    const proveedor = proveedorSelect.options[proveedorSelect.selectedIndex]?.text || 'Sin asignar';
+    
+    document.getElementById('summary-nombre').textContent = nombre;
+    document.getElementById('summary-categoria').textContent = categoria;
+    document.getElementById('summary-precio').textContent = parseFloat(precio).toFixed(2);
+    document.getElementById('summary-unidad').textContent = unidad;
+    document.getElementById('summary-proveedor').textContent = proveedor;
+}
+
+// Función para limpiar formulario
+function limpiarFormulario() {
+    if (confirm('¿Estás seguro de que quieres limpiar todos los campos?')) {
+        form.reset();
+        
+        // Limpiar errores
+        document.querySelectorAll('.form-control').forEach(campo => {
+            campo.classList.remove('error');
+        });
+        document.querySelectorAll('.form-error').forEach(error => {
+            error.textContent = '';
+        });
+        
+        // Resetear contador de caracteres
+        charCount.textContent = '0/500 caracteres';
+        charCount.style.color = 'var(--color-text-secondary)';
+        
+        // Actualizar resumen
+        actualizarResumen();
+        
+        // Focus en primer campo
+        document.getElementById('nombre').focus();
+    }
+}
+
+// Vista previa del material
+function vistaPrevia() {
+    if (!validarFormulario()) {
+        alert('Por favor, completa todos los campos requeridos antes de ver la vista previa.');
+        return;
+    }
+    
+    const formData = new FormData(form);
+    let preview = 'VISTA PREVIA DEL MATERIAL\n\n';
+    
+    preview += `Nombre: ${formData.get('nombre')}\n`;
+    preview += `Categoría: ${formData.get('categoria')}\n`;
+    preview += `Unidad: ${formData.get('unidad_medida')}\n`;
+    preview += `Precio: Q${parseFloat(formData.get('precio_unitario')).toFixed(2)}\n`;
+    
+    if (formData.get('codigo_material')) {
+        preview += `Código: ${formData.get('codigo_material')}\n`;
+    }
+    
+    if (formData.get('descripcion')) {
+        preview += `Descripción: ${formData.get('descripcion')}\n`;
+    }
+    
+    alert(preview);
+}
+
+// Envío del formulario
+form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    if (!validarFormulario()) {
+        alert('Por favor, corrige los errores en el formulario.');
+        return;
+    }
+    
+    // Deshabilitar botón y mostrar loading
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creando...';
+    
+    // Simular envío (en producción sería una llamada real)
+    setTimeout(() => {
+        alert('Material creado exitosamente!');
+        // En producción: window.location.href = '/materiales';
+        
+        // Restaurar botón
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fas fa-save"></i> Crear Material';
+    }, 2000);
+});
+
+// Auto-generar código de material basado en categoría y nombre
+document.getElementById('categoria').addEventListener('change', function() {
+    generarCodigoAutomatico();
+});
+
+document.getElementById('nombre').addEventListener('input', function() {
+    generarCodigoAutomatico();
+});
+
+function generarCodigoAutomatico() {
+    const categoria = document.getElementById('categoria').value;
+    const nombre = document.getElementById('nombre').value;
+    const codigoInput = document.getElementById('codigo_material');
+    
+    if (categoria && nombre && !codigoInput.value) {
+        let prefix = '';
+        
+        switch (categoria) {
+            case 'Concreto y Cemento': prefix = 'CEM'; break;
+            case 'Acero y Metales': prefix = 'ACE'; break;
+            case 'Agregados': prefix = 'AGR'; break;
+            case 'Bloques y Ladrillos': prefix = 'BLO'; break;
+            case 'Maderas': prefix = 'MAD'; break;
+            case 'Impermeabilizantes': prefix = 'IMP'; break;
+            case 'Pinturas y Acabados': prefix = 'PIN'; break;
+            case 'Tuberías y Conexiones': prefix = 'TUB'; break;
+            case 'Cables y Eléctricos': prefix = 'ELE'; break;
+            case 'Herramientas': prefix = 'HER'; break;
+            default: prefix = 'MAT'; break;
+        }
+        
+        const numero = String(Math.floor(Math.random() * 1000)).padStart(3, '0');
+        codigoInput.value = `${prefix}-${numero}`;
+    }
+}
+
+// Inicializar
+document.addEventListener('DOMContentLoaded', function() {
+    actualizarResumen();
+    document.getElementById('nombre').focus();
+});
+</script>
+
+<style>
+.grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.checkbox-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-3);
+    margin-top: var(--spacing-2);
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    cursor: pointer;
+    padding: var(--spacing-2);
+    border-radius: var(--border-radius);
+    transition: background-color 0.2s ease;
+}
+
+.checkbox-label:hover {
+    background-color: var(--color-gray-50);
+}
+
+.checkbox-label input[type="checkbox"] {
+    display: none;
+}
+
+.checkmark {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--color-gray-300);
+    border-radius: 4px;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+.checkbox-label input[type="checkbox"]:checked + .checkmark {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+.checkbox-label input[type="checkbox"]:checked + .checkmark::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.material-summary {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-3);
+    padding: var(--spacing-4);
+    background: white;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--color-gray-200);
+}
+
+.summary-item {
+    padding: var(--spacing-2);
+}
+
+.char-count {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    float: right;
+}
+
+@media (max-width: 768px) {
+    .grid-3 {
+        grid-template-columns: 1fr;
+    }
+    
+    .checkbox-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .material-summary {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}

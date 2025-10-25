@@ -1,0 +1,613 @@
+{% extends "base.html" %}
+
+{% block title %}Lista de Obras - Sistema Constructora{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="header-content">
+        <div>
+            <h1>Lista de Obras</h1>
+            <p>Gestión y administración de todas las obras</p>
+        </div>
+        <div class="header-actions">
+            <a href="{{ url_for('crear_obra') }}" class="btn btn-primary">
+                <i class="fas fa-plus"></i>
+                Nueva Obra
+            </a>
+            <a href="{{ url_for('tipos_obra_listar') }}" class="btn btn-secondary">
+                <i class="fas fa-list"></i>
+                Tipos de Obra
+            </a>
+        </div>
+    </div>
+
+<!-- Estadísticas del Módulo -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon bg-blue">
+            <i class="fas fa-list"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ obras|length or 0 }}</div>
+            <div class="stat-label">Total Obras</div>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon bg-green">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ obras|length or 0 }}</div>
+            <div class="stat-label">Activos</div>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon bg-orange">
+            <i class="fas fa-clock"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">0</div>
+            <div class="stat-label">Pendientes</div>
+        </div>
+    </div>
+</div>
+
+</div>
+
+<!-- Filtros de búsqueda -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h3 class="card-title">Filtros de Búsqueda</h3>
+    </div>
+    
+    <form method="GET" class="search-form">
+        <div class="form-row">
+            <div class="form-group">
+                <label for="search" class="form-label">Buscar por nombre</label>
+                <input type="text" id="search" name="search" class="form-control" 
+                       value="{{ request.args.get('search', '') }}" 
+                       placeholder="Nombre de la obra...">
+            </div>
+            
+            <div class="form-group">
+                <label for="estado" class="form-label">Estado</label>
+                <select id="estado" name="estado" class="form-control">
+                    <option value="">Todos los estados</option>
+                    <option value="Planeación" {{ 'selected' if request.args.get('estado') == 'Planeación' }}>Planeación</option>
+                    <option value="En Progreso" {{ 'selected' if request.args.get('estado') == 'En Progreso' }}>En Progreso</option>
+                    <option value="Pausado" {{ 'selected' if request.args.get('estado') == 'Pausado' }}>Pausado</option>
+                    <option value="Completado" {{ 'selected' if request.args.get('estado') == 'Completado' }}>Completado</option>
+                    <option value="Cancelado" {{ 'selected' if request.args.get('estado') == 'Cancelado' }}>Cancelado</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">&nbsp;</label>
+                <div class="filter-buttons">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i>
+                        Buscar
+                    </button>
+                    <a href="{{ url_for('listar_obras') }}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i>
+                        Limpiar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Tabla de obras -->
+{% if obras %}
+<div class="data-table-container">
+    <div class="table-header">
+        <div class="table-title">
+            <h3>
+                <i class="fas fa-building"></i>
+                Obras Registradas
+                <span class="record-count">{{ obras|length }}</span>
+            </h3>
+        </div>
+        <div class="table-actions">
+            <a href="{{ url_for('crear_obra') }}" class="btn btn-success btn-sm">
+                <i class="fas fa-plus"></i>
+                Nueva Obra
+            </a>
+        </div>
+    </div>
+    
+    <div class="table-responsive">
+        <table class="table data-table">
+            <thead>
+                <tr>
+                    <th>Obra</th>
+                    <th class="d-none-sm">Cliente</th>
+                    <th>Estado</th>
+                    <th class="d-none-md">Fecha Inicio</th>
+                    <th class="d-none-lg">Fecha Fin</th>
+                    <th class="d-none-sm">Valor</th>
+                    <th class="text-center">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for obra in obras %}
+                <tr>
+                    <td>
+                        <div class="obra-name">{{ obra.nombre }}</div>
+                        {% if obra.descripcion %}
+                        <div class="obra-desc">{{ obra.descripcion[:60] }}{% if obra.descripcion|length > 60 %}...{% endif %}</div>
+                        {% endif %}
+                                                {% if obra.tipo_obra %}
+                                                <div class="obra-tipo">Tipo: <strong>{{ obra.tipo_obra }}</strong>
+                                                    {% if obra.es_precio_fijo %}<span class="badge badge-fixed">Fijo</span>{% endif %}
+                                                </div>
+                                                {% endif %}
+                    </td>
+                    <td class="d-none-sm">
+                        <div class="text-nowrap">
+                            <i class="fas fa-user-circle text-muted"></i>
+                            {{ obra.cliente or 'No asignado' }}
+                        </div>
+                    </td>
+                    <td>
+                        {% if obra.estado == 'Planeación' %}
+                        <span class="badge badge-warning">
+                        {% elif obra.estado == 'En Progreso' %}
+                        <span class="badge badge-info">
+                        {% elif obra.estado == 'Completado' %}
+                        <span class="badge badge-success">
+                        {% elif obra.estado == 'Pausado' %}
+                        <span class="badge badge-secondary">
+                        {% elif obra.estado == 'Cancelado' %}
+                        <span class="badge badge-danger">
+                        {% else %}
+                        <span class="badge badge-secondary">
+                        {% endif %}
+                            <i class="fas fa-circle"></i>
+                            {{ obra.estado or 'Sin estado' }}
+                        </span>
+                    </td>
+                    <td class="d-none-md text-nowrap">
+                        {% if obra.fecha_inicio %}
+                        <i class="fas fa-calendar-start text-muted"></i>
+                        {{ obra.fecha_inicio.strftime('%d/%m/%Y') }}
+                        {% else %}
+                        <span class="text-muted">No definida</span>
+                        {% endif %}
+                    </td>
+                    <td class="d-none-lg text-nowrap">
+                        {% if obra.fecha_fin %}
+                        <i class="fas fa-calendar-check text-muted"></i>
+                        {{ obra.fecha_fin.strftime('%d/%m/%Y') }}
+                        {% else %}
+                        <span class="text-muted">No definida</span>
+                        {% endif %}
+                    </td>
+                    <td class="d-none-sm font-weight-bold text-nowrap">
+                        <i class="fas fa-coins text-success"></i>
+                        Q{{ "{:,.0f}".format(obra.valor) if obra.valor else '0' }}
+                    </td>
+                    <td class="actions-cell">
+                        <div class="action-buttons">
+                            <a class="btn btn-sm btn-info" 
+                               title="Ver detalles"
+                               href="{{ url_for('ver_obra', id=(obra.id or obra.obra_id)) }}">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a class="btn btn-sm btn-warning" 
+                               title="Editar"
+                               href="{{ url_for('editar_obra', id=(obra.id or obra.obra_id)) }}">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form action="{{ url_for('eliminar_obra', id=(obra.id or obra.obra_id)) }}" 
+                                  method="post" 
+                                  style="display: inline;"
+                                  onsubmit="return confirm('¿Está seguro de eliminar esta obra?');">
+                                <button class="btn btn-sm btn-danger" title="Eliminar" type="submit">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="card">
+    <div class="empty-state">
+        <div class="empty-icon">
+            <i class="fas fa-building"></i>
+        </div>
+        <h3>No se encontraron obras</h3>
+        <p>No hay obras que coincidan con los criterios de búsqueda.</p>
+        <a href="{{ url_for('crear_obra') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i>
+            Crear Nueva Obra
+        </a>
+    </div>
+</div>
+{% endif %}
+
+<style>
+.page-header {
+    margin-bottom: 30px;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.page-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 8px;
+}
+
+.page-header p {
+    color: #6c757d;
+    font-size: 16px;
+}
+
+.search-form {
+    padding: 20px;
+}
+
+.filter-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.badge {
+    background-color: #6c757d;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.obra-name {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 4px;
+}
+
+.obra-desc {
+    font-size: 12px;
+    color: #6c757d;
+    font-style: italic;
+}
+.obra-tipo {
+    font-size: 12px;
+    color: #495057;
+    margin-top: 4px;
+}
+.badge-fixed {
+    background-color: #17a2b8;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 8px;
+    font-size: 10px;
+    margin-left: 6px;
+}
+
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.status-planeación {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.status-en-progreso {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+.status-pausado {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.status-completado {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.status-cancelado {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.status-unknown {
+    background-color: #e9ecef;
+    color: #6c757d;
+    border: 1px solid #ced4da;
+}
+
+.valor {
+    font-family: monospace;
+    font-weight: 600;
+    color: #28a745;
+}
+
+/* =================================
+   ESTILOS PARA TABLA RESPONSIVA
+   ================================= */
+.table-container {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+.table {
+    width: 100%;
+    margin-bottom: 0;
+    color: #495057;
+    border-collapse: collapse;
+}
+
+.table th {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    padding: 15px 12px;
+    border: none;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.table td {
+    padding: 15px 12px;
+    vertical-align: middle;
+    border-bottom: 1px solid #e9ecef;
+    font-size: 14px;
+}
+
+.table tbody tr:hover {
+    background-color: #f8f9fa;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.2s ease;
+}
+
+/* =================================
+   BOTONES DE ACCIÓN MEJORADOS
+   ================================= */
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.btn-sm {
+    padding: 8px 12px;
+    font-size: 12px;
+    min-width: 36px;
+    height: 32px;
+}
+
+.btn-info {
+    background: linear-gradient(45deg, #17a2b8, #138496);
+    color: white;
+}
+
+.btn-info:hover {
+    background: linear-gradient(45deg, #138496, #117a8b);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(23, 162, 184, 0.3);
+}
+
+.btn-warning {
+    background: linear-gradient(45deg, #ffc107, #e0a800);
+    color: #212529;
+}
+
+.btn-warning:hover {
+    background: linear-gradient(45deg, #e0a800, #d39e00);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(255, 193, 7, 0.3);
+}
+
+.btn-danger {
+    background: linear-gradient(45deg, #dc3545, #c82333);
+    color: white;
+}
+
+.btn-danger:hover {
+    background: linear-gradient(45deg, #c82333, #bd2130);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+}
+
+.btn i {
+    font-size: 14px;
+}
+
+/* =================================
+   RESPONSIVE DESIGN MEJORADO
+   ================================= */
+@media (max-width: 1200px) {
+    .table th:nth-child(4),
+    .table td:nth-child(4),
+    .table th:nth-child(5),
+    .table td:nth-child(5) {
+        display: none;
+    }
+}
+
+@media (max-width: 992px) {
+    .table th:nth-child(3),
+    .table td:nth-child(3) {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .header-content {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+    }
+    
+    .filter-buttons {
+        flex-direction: column;
+    }
+    
+    .table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .table {
+        min-width: 600px;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+        gap: 4px;
+    }
+    
+    .btn-sm {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 576px) {
+    .table th,
+    .table td {
+        padding: 10px 8px;
+        font-size: 12px;
+    }
+    
+    .obra-name {
+        font-size: 13px;
+    }
+    
+    .obra-desc {
+        font-size: 11px;
+    }
+    
+    .status-badge {
+        font-size: 10px;
+        padding: 3px 6px;
+    }
+}
+
+/* =================================
+   EMPTY STATE MEJORADO
+   ================================= */
+.empty-state {
+    text-align: center;
+    padding: 80px 20px;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    border-radius: 12px;
+}
+
+.empty-icon {
+    font-size: 72px;
+    color: #a0aec0;
+    margin-bottom: 24px;
+    opacity: 0.8;
+}
+
+.empty-state h3 {
+    color: #2d3748;
+    margin-bottom: 12px;
+    font-weight: 600;
+}
+
+.empty-state p {
+    color: #718096;
+    margin-bottom: 32px;
+    font-size: 16px;
+}
+
+/* =================================
+   ANIMACIONES ADICIONALES
+   ================================= */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.table tbody tr {
+    animation: fadeInUp 0.3s ease-out;
+}
+
+.card {
+    animation: fadeInUp 0.4s ease-out;
+}
+
+/* =================================
+   MEJORAS EN BADGES Y ESTADOS
+   ================================= */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge-fixed {
+    background: linear-gradient(45deg, #17a2b8, #138496);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 10px;
+    margin-left: 8px;
+    font-weight: 600;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}Requisiciones - Sistema Constructora{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+        <a href="{{ url_for('dashboard') }}">Dashboard</a> /
+        <span>Requisiciones</span>
+    </nav>
+
+    <div class="page-header">
+        <div>
+            <h1><i class="fas fa-clipboard-list"></i> Gestión de Requisiciones</h1>
+            <p class="subtitle">Administra las requisiciones de materiales</p>
+        </div>
+        <a href="{{ url_for('crear_requisicion') }}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Nueva Requisición
+        </a>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-clipboard-list"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ requisiciones|length }}</h3>
+                <p>Requisiciones Totales</p>
+            </div>
+        </div>
+
+<!-- Estadísticas del Módulo -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon bg-blue">
+            <i class="fas fa-list"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ requisiciones|length or 0 }}</div>
+            <div class="stat-label">Total Requisiciones</div>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon bg-green">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ requisiciones|length or 0 }}</div>
+            <div class="stat-label">Activos</div>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon bg-orange">
+            <i class="fas fa-clock"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">0</div>
+            <div class="stat-label">Pendientes</div>
+        </div>
+    </div>
+</div>
+
+    </div>
+
+    <!-- Tabla de Requisiciones -->
+    <div class="card">
+        <div class="card-header">
+            <h2><i class="fas fa-list"></i> Lista de Requisiciones</h2>
+        </div>
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Fecha</th>
+                        <th>Estado</th>
+                        <th>Área</th>
+                        <th>Items</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if requisiciones %}
+                        {% for req in requisiciones %}
+                        <tr>
+                            <td>{{ req.id_requisicion }}</td>
+                            <td>{{ req.fecha_requisicion }}</td>
+                            <td>
+                                {% if req.estado_requisicion == 'Pendiente' %}
+                                    <span class="badge badge-warning">{{ req.estado_requisicion }}</span>
+                                {% elif req.estado_requisicion == 'Aprobada' %}
+                                    <span class="badge badge-success">{{ req.estado_requisicion }}</span>
+                                {% elif req.estado_requisicion == 'Rechazada' %}
+                                    <span class="badge badge-danger">{{ req.estado_requisicion }}</span>
+                                {% else %}
+                                    <span class="badge badge-secondary">{{ req.estado_requisicion }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if req.nombre_area %}
+                                    <span class="badge badge-primary">{{ req.nombre_area }}</span>
+                                {% else %}
+                                    <span class="badge badge-secondary">Sin área</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ req.items_solicitados or 0 }} items</td>
+                            <td class="actions">
+                                <a href="{{ url_for('ver_requisicion', id=req.id_requisicion) }}" 
+                                   class="btn-action btn-view" title="Ver detalle">
+                                    <i class="fas fa-eye"></i> Ver
+                                </a>
+                                <a href="{{ url_for('editar_requisicion', id=req.id_requisicion) }}" 
+                                   class="btn-action btn-edit" title="Editar">
+                                    <i class="fas fa-edit"></i> Editar
+                                </a>
+                                <form action="{{ url_for('eliminar_requisicion', id=req.id_requisicion) }}" 
+                                      method="POST" class="inline-form" 
+                                      onsubmit="return confirm('¿Estás seguro de eliminar esta requisición?');">
+                                    <button type="submit" class="btn-action btn-danger" title="Eliminar">
+                                        <i class="fas fa-trash"></i> Eliminar
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center">No hay requisiciones registradas</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

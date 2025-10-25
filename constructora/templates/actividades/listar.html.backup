@@ -1,0 +1,154 @@
+<!-- templates/actividades/listar.html -->
+{% extends "base.html" %}
+
+{% block title %}Gestión de Actividades{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="header-content">
+        <div class="header-left">
+            <h1 class="page-title">
+                <i class="fas fa-list"></i>
+                Gestión de Actividades
+            </h1>
+            <p class="page-subtitle">Control y administración de actividades</p>
+        </div>
+        <div class="header-actions">
+            <a href="{{ url_for('crear_actividad') }}" class="btn btn-primary">
+                <i class="fas fa-plus"></i>
+                Nueva Actividad
+            </a>
+        </div>
+</div>
+
+<!-- Estadísticas del Módulo -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon bg-blue">
+            <i class="fas fa-list"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ datos|length or 0 }}</div>
+            <div class="stat-label">Total Registros</div>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon bg-green">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ datos|length or 0 }}</div>
+            <div class="stat-label">Activos</div>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon bg-orange">
+            <i class="fas fa-clock"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">0</div>
+            <div class="stat-label">Pendientes</div>
+        </div>
+    </div>
+</div>
+
+</div>
+
+
+<div class="dashboard-header">
+    <h1><i class="fas fa-tasks"></i> Gestión de Actividades</h1>
+    <a href="{{ url_for('crear_actividad') }}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Nueva Actividad
+    </a>
+</div>
+
+<div class="content-grid">
+    <div class="stats-cards">
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-tasks"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ actividades|length }}</h3>
+                <p>Total Actividades</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">
+                <i class="fas fa-calendar-check"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ actividades|selectattr('fecha_programada_actividad')|list|length }}</h3>
+                <p>Con Fecha Programada</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre Actividad</th>
+                    <th>Descripción</th>
+                    <th>Fecha Programada</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for actividad in actividades %}
+                <tr>
+                    <td>{{ actividad.id_actividad }}</td>
+                    <td><strong>{{ actividad.nombre_actividad }}</strong></td>
+                    <td>{{ actividad.descripcion_actividad or 'Sin descripción' }}</td>
+                    <td>
+                        {% if actividad.fecha_programada_actividad %}
+                            {{ actividad.fecha_programada_actividad.strftime('%d/%m/%Y') if actividad.fecha_programada_actividad.strftime else actividad.fecha_programada_actividad }}
+                        {% else %}
+                            <span class="text-muted">No programada</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="table-actions">
+                            <a class="btn-action btn-view" 
+                               href="{{ url_for('ver_actividad', id=(actividad.id or actividad.actividad_id or actividad.id_actividad)) }}" 
+                               title="Ver Detalles">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a class="btn-action btn-edit" 
+                               href="{{ url_for('editar_actividad', id=(actividad.id or actividad.actividad_id or actividad.id_actividad)) }}" 
+                               title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form action="{{ url_for('eliminar_actividad', id=(actividad.id or actividad.actividad_id or actividad.id_actividad)) }}" 
+                                  method="post" 
+                                  class="inline-form" 
+                                  onsubmit="return confirm('¿Estás seguro de eliminar esta actividad?');">
+                                <button class="btn-action btn-danger" title="Eliminar" type="submit">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="text-center">
+                        <div class="empty-state">
+                            <i class="fas fa-tasks fa-3x"></i>
+                            <h3>No hay actividades registradas</h3>
+                            <p>Comienza creando la primera actividad del proyecto</p>
+                            <a href="{{ url_for('crear_actividad') }}" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Crear Primera Actividad
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

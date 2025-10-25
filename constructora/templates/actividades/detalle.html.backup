@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Detalle Actividad{% endblock %}
+{% block content %}
+<div class="page-header">
+  <nav class="breadcrumb">
+    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+    <span class="breadcrumb-separator">/</span>
+    <a href="{{ url_for('listar_actividades') }}">Actividades</a>
+    <span class="breadcrumb-separator">/</span>
+    <span>Detalle</span>
+  </nav>
+  <h1 class="page-title">📋 {{ actividad.nombre or 'Actividad' }} <small class="text-muted">ID: {{ actividad.id or actividad.actividad_id }}</small></h1>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <dl class="detail-list">
+      <dt>Nombre</dt>
+      <dd>{{ actividad.nombre or 'N/D' }}</dd>
+      
+      <dt>Descripción</dt>
+      <dd>{{ actividad.descripcion or 'Sin descripción' }}</dd>
+      
+      <dt>Fecha Programada</dt>
+      <dd>
+        {% if actividad.fecha_programada %}
+          {{ actividad.fecha_programada.strftime('%d/%m/%Y') if actividad.fecha_programada.strftime else actividad.fecha_programada }}
+        {% else %}
+          <span class="text-muted">No programada</span>
+        {% endif %}
+      </dd>
+    </dl>
+  </div>
+  <div class="card-footer" style="display:flex; gap: 0.5rem;">
+    <a class="btn btn-secondary" href="{{ url_for('listar_actividades') }}">Volver</a>
+    <a class="btn btn-primary" href="{{ url_for('editar_actividad', id=(actividad.id or actividad.actividad_id)) }}">Editar</a>
+    <form action="{{ url_for('eliminar_actividad', id=(actividad.id or actividad.actividad_id)) }}" method="post" class="inline-form" onsubmit="return confirm('¿Eliminar esta actividad?');">
+      <button class="btn btn-danger" type="submit">Eliminar</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

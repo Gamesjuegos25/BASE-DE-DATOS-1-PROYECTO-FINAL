@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}Gestión de Vehículos - Sistema ERP{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="header-content">
+        <div class="header-left">
+            <h1 class="page-title">
+                <i class="fas fa-truck"></i>
+                Gestión de Vehículos
+            </h1>
+            <p class="page-subtitle">Control y administración del parque vehicular</p>
+        </div>
+        <div class="header-actions">
+            <a href="{{ url_for('crear_vehiculo') }}" class="btn btn-primary">
+                <i class="fas fa-plus"></i>
+                Nuevo Vehículo
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Estadísticas Rápidas -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon bg-blue">
+            <i class="fas fa-truck"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ vehiculos|length }}</div>
+            <div class="stat-label">Total Vehículos</div>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon bg-green">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ vehiculos|selectattr('disponible', 'equalto', true)|list|length }}</div>
+            <div class="stat-label">Disponibles</div>
+        </div>
+    </div>
+</div>
+
+<!-- Lista de Vehículos -->
+<div class="data-table-container">
+    <div class="table-header">
+        <div class="table-title">
+            <h3>Lista de Vehículos</h3>
+            <span class="record-count">{{ vehiculos|length }} registros</span>
+        </div>
+    </div>
+    
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Placa</th>
+                    <th>Tipo</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for vehiculo in vehiculos %}
+                <tr>
+                    <td>{{ vehiculo.id or vehiculo.vehiculo_id or 'N/A' }}</td>
+                    <td>
+                        <div class="vehicle-info">
+                            <strong>{{ vehiculo.placa or 'Sin placa' }}</strong>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge badge-secondary">
+                            {{ vehiculo.tipo or 'No especificado' }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="status-badge status-success">
+                            <i class="fas fa-circle"></i>
+                            {{ vehiculo.estado or 'Disponible' }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <a class="btn-action btn-view" title="Ver detalles" href="{{ url_for('ver_vehiculo', id=(vehiculo.id or vehiculo.id_vehiculo)) }}">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a class="btn-action btn-edit" title="Editar" href="{{ url_for('editar_vehiculo', id=(vehiculo.id or vehiculo.id_vehiculo)) }}">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <form action="{{ url_for('eliminar_vehiculo', id=(vehiculo.id or vehiculo.id_vehiculo)) }}" method="post" onsubmit="return confirm('¿Eliminar este vehículo?');">
+                                <button class="btn-action btn-danger" title="Eliminar" type="submit">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="empty-state">
+                        <div class="empty-content">
+                            <i class="fas fa-truck"></i>
+                            <h3>No hay vehículos registrados</h3>
+                            <p>Comienza agregando un nuevo vehículo al sistema</p>
+                            <a href="{{ url_for('crear_vehiculo') }}" class="btn btn-primary">
+                                <i class="fas fa-plus"></i>
+                                Agregar Primer Vehículo
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

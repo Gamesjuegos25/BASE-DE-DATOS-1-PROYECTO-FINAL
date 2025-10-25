@@ -1,0 +1,242 @@
+{% extends "base.html" %}
+
+{% block title %}Bodegas{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="header-content">
+        <div class="header-left">
+            <h1 class="page-title">
+                <i class="fas fa-list"></i>
+                Gestión de Bodegas
+            </h1>
+            <p class="page-subtitle">Control y administración de bodegas</p>
+        </div>
+        <div class="header-actions">
+            <a href="{{ url_for('crear_bodega') }}" class="btn btn-primary">
+                <i class="fas fa-plus"></i>
+                Nuevo Bodega
+            </a>
+        </div>
+</div>
+
+<!-- Estadísticas del Módulo -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon bg-blue">
+            <i class="fas fa-list"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ datos|length or 0 }}</div>
+            <div class="stat-label">Total Registros</div>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon bg-green">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ datos|length or 0 }}</div>
+            <div class="stat-label">Activos</div>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon bg-orange">
+            <i class="fas fa-clock"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">0</div>
+            <div class="stat-label">Pendientes</div>
+        </div>
+    </div>
+</div>
+
+</div>
+
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h2><i class="bi bi-building"></i> Bodegas</h2>
+            <p class="text-muted">Gestión de almacenes y centros de distribución</p>
+        </div>
+        <div class="col-md-6 text-end">
+            <a href="{{ url_for('crear_bodega') }}" class="btn btn-success">
+                <i class="bi bi-plus-circle"></i> Nueva Bodega
+            </a>
+        </div>
+    </div>
+
+    {% if bodegas %}
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Responsable</th>
+                            <th>Ubicación</th>
+                            <th>Capacidad</th>
+                            <th>Estado</th>
+                            <th>Relaciones</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for bodega in bodegas %}
+                        <tr>
+                            <td><strong>#{{ bodega.id_bodega }}</strong></td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-user text-primary me-2"></i>
+                                    <div>
+                                        <div class="fw-bold">{{ bodega.responsable_bodega or 'Sin asignar' }}</div>
+                                        {% if bodega.telefono_bodega %}
+                                            <small class="text-muted">
+                                                <i class="fas fa-phone"></i> {{ bodega.telefono_bodega }}
+                                            </small>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                {% if bodega.ubicacion_bodega %}
+                                    <div class="text-truncate" style="max-width: 200px;" title="{{ bodega.ubicacion_bodega }}">
+                                        <i class="fas fa-map-marker-alt text-success me-1"></i>
+                                        {{ bodega.ubicacion_bodega }}
+                                    </div>
+                                {% else %}
+                                    <span class="text-muted">Sin ubicación</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if bodega.capacidad_bodega %}
+                                    <span class="badge bg-info">
+                                        <i class="fas fa-boxes"></i> {{ bodega.capacidad_bodega }}
+                                    </span>
+                                {% else %}
+                                    <span class="text-muted">Sin especificar</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% set estado_class = 'success' if bodega.estado_bodega == 'Activa' else 'secondary' %}
+                                {% if bodega.estado_bodega == 'Mantenimiento' %}
+                                    {% set estado_class = 'warning' %}
+                                {% elif bodega.estado_bodega == 'Inactiva' %}
+                                    {% set estado_class = 'danger' %}
+                                {% endif %}
+                                <span class="badge bg-{{ estado_class }}">
+                                    {{ bodega.estado_bodega or 'Activa' }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="d-flex gap-1">
+                                    <span class="badge bg-primary" title="Obras asignadas">
+                                        <i class="fas fa-building"></i> {{ bodega.obras_asignadas }}
+                                    </span>
+                                    <span class="badge bg-info" title="Inventarios asignados">
+                                        <i class="fas fa-boxes"></i> {{ bodega.inventarios_asignados }}
+                                    </span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <a href="{{ url_for('ver_bodega', id=bodega.id_bodega) }}" 
+                                       class="btn btn-outline-info" title="Ver detalle">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="{{ url_for('editar_bodega', id=bodega.id_bodega) }}" 
+                                       class="btn btn-outline-warning" title="Editar">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a href="{{ url_for('asignar_bodega_obras', id=bodega.id_bodega) }}" 
+                                       class="btn btn-outline-success" title="Asignar a obras">
+                                        <i class="bi bi-link-45deg"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-outline-danger" 
+                                            data-bodega-id="{{ bodega.id_bodega }}"
+                                            data-bodega-responsable="{{ bodega.responsable_bodega }}"
+                                            onclick="confirmarEliminacion(this)" title="Eliminar">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="5" class="text-muted text-center">
+                                <small>Total de bodegas: {{ bodegas|length }}</small>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i> 
+        No hay bodegas registradas. 
+        <a href="{{ url_for('crear_bodega') }}" class="alert-link">Crear la primera</a>
+    </div>
+    {% endif %}
+
+    <div class="card mt-4 bg-light border-0">
+        <div class="card-body">
+            <h6 class="card-title"><i class="bi bi-info-circle"></i> Información sobre Bodegas</h6>
+            <ul class="mb-0 small text-muted">
+                <li><strong>Responsable:</strong> Persona encargada de la bodega o almacén</li>
+                <li><strong>Obras Asignadas:</strong> Proyectos que utilizan esta bodega</li>
+                <li><strong>Inventarios:</strong> Registros de materiales almacenados</li>
+                <li><strong>Cascade:</strong> Al eliminar una bodega, se eliminan sus asignaciones de obras e inventarios</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmación de eliminación -->
+<div class="modal fade" id="modalEliminar" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-exclamation-triangle"></i> Confirmar Eliminación
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro que desea eliminar la bodega <strong id="bodega-nombre"></strong>?</p>
+                <p class="text-danger"><strong>Advertencia:</strong> Se eliminarán todas las asignaciones a obras e inventarios.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="formEliminar" method="POST">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function confirmarEliminacion(button) {
+    const bodegaId = button.getAttribute('data-bodega-id');
+    const bodegaResponsable = button.getAttribute('data-bodega-responsable');
+    
+    document.getElementById('bodega-nombre').textContent = `Bodega #${bodegaId} (${bodegaResponsable})`;
+    
+    const form = document.getElementById('formEliminar');
+    form.action = `/bodegas/${bodegaId}/eliminar`;
+    
+    const modal = new bootstrap.Modal(document.getElementById('modalEliminar'));
+    modal.show();
+}
+</script>
+{% endblock %}

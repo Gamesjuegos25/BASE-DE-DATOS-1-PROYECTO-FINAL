@@ -1,0 +1,371 @@
+{% extends "base.html" %}
+{% block title %}Detalle Obra{% endblock %}
+{% block content %}
+<div class="page-header">
+  <nav class="breadcrumb">
+    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+    <span class="breadcrumb-separator">/</span>
+    <a href="{{ url_for('listar_obras') }}">Obras</a>
+    <span class="breadcrumb-separator">/</span>
+    <span>Detalle</span>
+  </nav>
+  <h1 class="page-title">🏗️ {{ obra.nombre or 'Obra' }} <small class="text-muted">ID: {{ obra.id_obra }}</small></h1>
+</div>
+
+<div class="row">
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-building"></i> Información de la Obra</h5>
+      </div>
+      <div class="card-body">
+        <dl class="row">
+          <dt class="col-sm-4"><i class="fas fa-tag"></i> Nombre del Proyecto</dt>
+          <dd class="col-sm-8">
+            <strong>{{ obra.nombre or 'N/D' }}</strong>
+          </dd>
+          
+          <dt class="col-sm-4"><i class="fas fa-hammer"></i> Tipo de Obra</dt>
+          <dd class="col-sm-8">
+            <span class="badge badge-primary">{{ obra.tipo_obra or 'N/D' }}</span>
+            {% if obra.es_precio_fijo %}
+              <span class="badge badge-info">Precio Fijo</span>
+            {% endif %}
+          </dd>
+          
+          <dt class="col-sm-4"><i class="fas fa-align-left"></i> Descripción</dt>
+          <dd class="col-sm-8">
+            {{ obra.descripcion or 'Sin descripción' }}
+          </dd>
+          
+          <dt class="col-sm-4"><i class="fas fa-map-marker-alt"></i> Ubicación</dt>
+          <dd class="col-sm-8">
+            {% if obra.ubicacion %}
+              <i class="fas fa-location-arrow text-primary"></i> {{ obra.ubicacion }}
+            {% else %}
+              <span class="text-muted">N/D</span>
+            {% endif %}
+          </dd>
+          
+          <dt class="col-sm-4"><i class="fas fa-info-circle"></i> Estado</dt>
+          <dd class="col-sm-8">
+            {% set estado_class = {
+              'Planeación': 'warning',
+              'En Progreso': 'info', 
+              'Completada': 'success',
+              'Suspendida': 'danger'
+            } %}
+            <span class="badge badge-{{ estado_class.get(obra.estado, 'secondary') }}">
+              {{ obra.estado or 'Planeación' }}
+            </span>
+          </dd>
+        </dl>
+      </div>
+    </div>
+    
+    {% if obra.area_m2 or obra.cantidad_estimada %}
+    <div class="card mt-3">
+      <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-ruler-combined"></i> Especificaciones Técnicas</h5>
+      </div>
+      <div class="card-body">
+        <dl class="row">
+          {% if obra.area_m2 %}
+            <dt class="col-sm-4"><i class="fas fa-expand-arrows-alt"></i> Área</dt>
+            <dd class="col-sm-8">{{ "{:,.2f}".format(obra.area_m2) }} m²</dd>
+          {% endif %}
+          
+          {% if obra.cantidad_estimada %}
+            <dt class="col-sm-4"><i class="fas fa-calculator"></i> Cantidad Estimada</dt>
+            <dd class="col-sm-8">{{ "{:,.0f}".format(obra.cantidad_estimada) }} {{ obra.unidad_estimacion or 'unidades' }}</dd>
+          {% endif %}
+        </dl>
+      </div>
+    </div>
+    {% endif %}
+    
+    <!-- Sección de Asignaciones -->
+    <div class="card mt-3">
+      <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-users-cog"></i> Recursos Asignados</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <!-- Empleados Asignados -->
+          <div class="col-md-12 mb-4">
+            <h6 class="text-primary"><i class="fas fa-users"></i> Equipo de Trabajo</h6>
+            {% if asignaciones.empleados %}
+              <div class="table-responsive">
+                <table class="table table-sm">
+                  <thead>
+                    <tr>
+                      <th>Empleado</th>
+                      <th>Rol en Obra</th>
+                      <th>Especialidad</th>
+                      <th>Contacto</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for emp in asignaciones.empleados %}
+                    <tr>
+                      <td>
+                        <strong>{{ emp.nombre_empleado }} {{ emp.apellido_empleado }}</strong>
+                      </td>
+                      <td>
+                        {% set role_colors = {
+                          'ARQUITECTO': 'success',
+                          'INGENIERO': 'info', 
+                          'OBRERO': 'warning',
+                          'OPERARIO': 'secondary'
+                        } %}
+                        <span class="badge badge-{{ role_colors.get(emp.tipo_asignacion, 'secondary') }}">
+                          {{ emp.tipo_asignacion }}
+                        </span>
+                      </td>
+                      <td>
+                        <small class="text-muted">{{ emp.tipo_empleado }}</small>
+                      </td>
+                      <td>
+                        {% if emp.telefono %}
+                          <small><i class="fas fa-phone"></i> {{ emp.telefono }}</small><br>
+                        {% endif %}
+                        {% if emp.email %}
+                          <small><i class="fas fa-envelope"></i> {{ emp.email }}</small>
+                        {% endif %}
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            {% else %}
+              <p class="text-muted mb-0"><i class="fas fa-exclamation-circle"></i> No hay empleados asignados</p>
+            {% endif %}
+          </div>
+          
+          <!-- Materiales Asignados -->
+          <div class="col-md-12 mb-4">
+            <h6 class="text-primary"><i class="fas fa-boxes"></i> Materiales Asignados</h6>
+            {% if asignaciones.materiales %}
+              <div class="table-responsive">
+                <table class="table table-sm">
+                  <thead>
+                    <tr>
+                      <th>Material</th>
+                      <th>Asignado</th>
+                      <th>Utilizado</th>
+                      <th>Restante</th>
+                      <th>Valor Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for mat in asignaciones.materiales %}
+                    <tr>
+                      <td><strong>{{ mat.nombre_material }}</strong></td>
+                      <td>{{ "{:,.1f}".format(mat.cantidad_asignada) }} {{ mat.unidad_material }}</td>
+                      <td>{{ "{:,.1f}".format(mat.cantidad_utilizada or 0) }} {{ mat.unidad_material }}</td>
+                      <td>
+                        <span class="badge badge-{{ 'success' if mat.cantidad_restante > 0 else 'warning' }}">
+                          {{ "{:,.1f}".format(mat.cantidad_restante) }} {{ mat.unidad_material }}
+                        </span>
+                      </td>
+                      <td class="text-right">
+                        <strong>Q{{ "{:,.2f}".format(mat.valor_total) }}</strong>
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                  <tfoot>
+                    <tr class="table-info">
+                      <th colspan="4">Total Valor Materiales</th>
+                      <th class="text-right">Q{{ "{:,.2f}".format(asignaciones.estadisticas.valor_total_materiales) }}</th>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            {% else %}
+              <p class="text-muted mb-0"><i class="fas fa-exclamation-circle"></i> No hay materiales asignados</p>
+            {% endif %}
+          </div>
+          
+          <!-- Vehículos Asignados -->
+          <div class="col-md-12 mb-0">
+            <h6 class="text-primary"><i class="fas fa-truck"></i> Vehículos y Equipos</h6>
+            {% if asignaciones.vehiculos %}
+              <div class="row">
+                {% for veh in asignaciones.vehiculos %}
+                <div class="col-md-6 mb-2">
+                  <div class="card card-body p-2">
+                    <h6 class="mb-1">🚚 {{ veh.placa_vehiculo }}</h6>
+                    <small class="text-muted">{{ veh.tipo_vehiculo }}</small>
+                    <span class="badge badge-{{ 'success' if veh.estado_vehiculo == 'DISPONIBLE' else 'warning' }} mt-1">
+                      {{ veh.estado_vehiculo }}
+                    </span>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+            {% else %}
+              <p class="text-muted mb-0"><i class="fas fa-exclamation-circle"></i> No hay vehículos asignados</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Información del Cliente -->
+    {% if obra.nombre_cliente %}
+    <div class="card mt-3">
+      <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-user-tie"></i> Información del Cliente</h5>
+      </div>
+      <div class="card-body">
+        <dl class="row">
+          <dt class="col-sm-4"><i class="fas fa-user"></i> Nombre</dt>
+          <dd class="col-sm-8"><strong>{{ obra.nombre_cliente }}</strong></dd>
+          
+          {% if obra.documento_cliente %}
+            <dt class="col-sm-4"><i class="fas fa-id-card"></i> Documento</dt>
+            <dd class="col-sm-8">{{ obra.documento_cliente }}</dd>
+          {% endif %}
+          
+          {% if obra.telefono_cliente %}
+            <dt class="col-sm-4"><i class="fas fa-phone"></i> Teléfono</dt>
+            <dd class="col-sm-8">{{ obra.telefono_cliente }}</dd>
+          {% endif %}
+          
+          {% if obra.email_cliente %}
+            <dt class="col-sm-4"><i class="fas fa-envelope"></i> Email</dt>
+            <dd class="col-sm-8">{{ obra.email_cliente }}</dd>
+          {% endif %}
+          
+          {% if obra.direccion_cliente %}
+            <dt class="col-sm-4"><i class="fas fa-map-marker-alt"></i> Dirección</dt>
+            <dd class="col-sm-8">{{ obra.direccion_cliente }}</dd>
+          {% endif %}
+        </dl>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+  
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-coins"></i> Información Financiera</h5>
+      </div>
+      <div class="card-body text-center">
+        <div class="financial-info">
+          <h3 class="text-success mb-2">
+            {% if obra.valor is not none %}
+              Q{{ "{:,.2f}".format(obra.valor) }}
+            {% else %}
+              <span class="text-muted">N/D</span>
+            {% endif %}
+          </h3>
+          <p class="text-muted mb-3">Valor Total del Proyecto</p>
+          
+          {% if obra.precio_unitario_estimado %}
+            <div class="price-breakdown">
+              <div class="mb-2">
+                <small class="text-muted">Precio Unitario:</small><br>
+                <strong class="text-primary">Q{{ "{:,.2f}".format(obra.precio_unitario_estimado) }}</strong>
+                <small class="text-muted">/ {{ obra.unidad_estimacion or 'unidad' }}</small>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    
+    <div class="card mt-3">
+      <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-calendar"></i> Cronograma</h5>
+      </div>
+      <div class="card-body">
+        <div class="timeline-info">
+          <div class="mb-3">
+            <small class="text-muted">Fecha de Inicio:</small><br>
+            {% if obra.fecha_inicio %}
+              <strong class="text-info">{{ obra.fecha_inicio.strftime('%d/%m/%Y') }}</strong>
+            {% else %}
+              <span class="text-muted">Sin definir</span>
+            {% endif %}
+          </div>
+          
+          <div class="mb-3">
+            <small class="text-muted">Fecha de Finalización:</small><br>
+            {% if obra.fecha_fin %}
+              <strong class="text-warning">{{ obra.fecha_fin.strftime('%d/%m/%Y') }}</strong>
+            {% else %}
+              <span class="text-muted">Sin definir</span>
+            {% endif %}
+          </div>
+          
+          {% if obra.fecha_inicio and obra.fecha_fin %}
+            <div class="mb-2">
+              <small class="text-muted">Duración Estimada:</small><br>
+              <strong class="text-primary">{{ (obra.fecha_fin - obra.fecha_inicio).days }} días</strong>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    
+    <div class="card mt-3">
+      <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-cogs"></i> Acciones</h5>
+      </div>
+      <div class="card-body">
+        <div class="d-flex flex-column gap-2">
+          <a class="btn btn-primary" href="{{ url_for('editar_obra', id=obra.id_obra) }}">
+            <i class="fas fa-edit"></i> Editar Obra
+          </a>
+          <a class="btn btn-info" href="{{ url_for('listar_avances') }}?obra={{ obra.id_obra }}">
+            <i class="fas fa-chart-line"></i> Ver Avances
+          </a>
+          <a class="btn btn-success" href="{{ url_for('listar_contratos') }}?obra={{ obra.id_obra }}">
+            <i class="fas fa-file-contract"></i> Contratos
+          </a>
+          <a class="btn btn-secondary" href="{{ url_for('listar_obras') }}">
+            <i class="fas fa-arrow-left"></i> Volver a Lista
+          </a>
+          <form action="{{ url_for('eliminar_obra', id=obra.id_obra) }}" method="post" onsubmit="return confirm('¿Eliminar esta obra?');" class="mt-2">
+            <button class="btn btn-danger w-100" type="submit">
+              <i class="fas fa-trash"></i> Eliminar
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.financial-info h3 {
+  font-size: 2.5rem;
+  font-weight: bold;
+}
+
+.price-breakdown {
+  border-top: 1px solid #dee2e6;
+  padding-top: 1rem;
+}
+
+.timeline-info {
+  font-size: 0.9rem;
+}
+
+.card-header h5 {
+  color: #495057;
+}
+
+.badge {
+  font-size: 0.9rem;
+}
+
+.gap-2 > * + * {
+  margin-top: 0.5rem;
+}
+</style>
+{% endblock %}

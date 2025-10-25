@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/create-forms.css') }}">
+
+
+<div class="dashboard-header">
+  <h1><i class="fas fa-edit"></i> Editar Movimiento #{{ movimiento.id_movimiento_material or movimiento.id }}</h1>
+  <a href="{{ url_for('ver_movimiento_material', id=movimiento.id_movimiento_material or movimiento.id) }}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Volver</a>
+</div>
+
+<div class="create-form-container">
+<form method="post" class="form-card">
+  <div class="form-row">
+    <div class="form-group col-md-3">
+      <label for="tipo_movimiento">Tipo de movimiento *</label>
+      <select id="tipo_movimiento" name="tipo_movimiento" class="form-control" required>
+        {% set tipo_actual = movimiento.tipo_movimiento %}
+        {% for tipo in ['Entrada', 'Salida', 'Ajuste', 'Transferencia'] %}
+        <option value="{{ tipo }}" {% if tipo_actual == tipo %}selected{% endif %}>{{ tipo }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-group col-md-3">
+      <label for="cantidad">Cantidad *</label>
+      <input type="number" id="cantidad" name="cantidad" class="form-control" required min="1" value="{{ movimiento.cantidad or 0 }}" />
+    </div>
+    <div class="form-group col-md-3">
+      <label for="id_material">Material (opcional)</label>
+      <select id="id_material" name="id_material" class="form-control">
+        <option value="">Sin material</option>
+        {% for mat in materiales %}
+        <option value="{{ mat.id_material or mat.id }}" {% if movimiento.id_material and movimiento.id_material == (mat.id_material or mat.id) %}selected{% endif %}>
+          {{ mat.nombre }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-group col-md-3">
+      <label for="fecha_movimiento">Fecha</label>
+      <input type="date" id="fecha_movimiento" name="fecha_movimiento" class="form-control" value="{{ movimiento.fecha_movimiento|default('', true) }}" />
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group col-md-6">
+      <label for="origen">Origen</label>
+      <input type="text" id="origen" name="origen" class="form-control" value="{{ movimiento.origen_movimiento or '' }}" placeholder="Ej: Bodega principal" />
+    </div>
+    <div class="form-group col-md-6">
+      <label for="destino">Destino</label>
+      <input type="text" id="destino" name="destino" class="form-control" value="{{ movimiento.destino_movimiento or '' }}" placeholder="Ej: Obra A" />
+    </div>
+  </div>
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Guardar</button>
+    <a href="{{ url_for('ver_movimiento_material', id=movimiento.id_movimiento_material or movimiento.id) }}" class="btn btn-secondary">Cancelar</a>
+  </div>
+</form>
+</div>
+
+{% endblock %}

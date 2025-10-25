@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <!-- CSS para formularios -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/form-pages.css') }}">{% endblock %}
+
+{% block title %}Editar Proyecto{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/create-forms.css') }}">
+
+
+<div class="page-header">
+  <nav class="breadcrumb">
+    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+    <span class="breadcrumb-separator">/</span>
+    <a href="{{ url_for('listar_proyectos') }}">Proyectos</a>
+    <span class="breadcrumb-separator">/</span>
+    <span>Editar</span>
+  </nav>
+  <div class="form-header"><div class="form-header-content"><h1 class="form-title"><i class="fas fa-edit"></i>✏️ Editar Proyecto</h1></div></div>
+</div>
+
+<div class="create-form-max-w-7xl mx-auto px-6">
+<form action="{{ url_for('editar_proyecto', id=(proyecto.id or proyecto.proyecto_id)) }}" method="post" class="form">
+  <div class="form-group">
+    <label>Nombre</label>
+    <input class="form-input" value="{{ proyecto.nombre or '' }}" required>
+  </div>
+  <div class="form-group">
+    <label>Descripción</label>
+    <textarea class="form-textarea">{{ proyecto.descripcion or '' }}</textarea>
+  </div>
+  <div class="form-group">
+    <label>Fecha Inicio</label>
+    <input class="form-input" value="{{ proyecto.fecha_inicio or '' }}">
+  </div>
+  <div class="form-group">
+    <label>Fecha Fin</label>
+    <input class="form-input" value="{{ proyecto.fecha_fin or '' }}">
+  </div>
+  <div class="form-group">
+    <label>Presupuesto</label>
+    <input class="form-input" value="{{ proyecto.presupuesto if proyecto.presupuesto else '' }}">
+  </div>
+  <div class="form-group">
+    <label>Estado</label>
+    <select class="form-select">
+      <option value="Planificación" {{ 'selected' if proyecto.estado == 'Planificación' else '' }}>Planificación</option>
+      <option value="En Progreso" {{ 'selected' if proyecto.estado == 'En Progreso' else '' }}>En Progreso</option>
+      <option value="Pausado" {{ 'selected' if proyecto.estado == 'Pausado' else '' }}>Pausado</option>
+      <option value="Completado" {{ 'selected' if proyecto.estado == 'Completado' else '' }}>Completado</option>
+    </select>
+  </div>
+  <div class="form-actions">
+    <a class="btn btn btn btn-warm-secondary" href="{{ url_for('listar_proyectos') }}">Cancelar</a>
+    <button class="btn btn btn btn-warm-primary" type="submit">Guardar</button>
+  </div>
+</form>
+</div>
+
+{% endblock %}

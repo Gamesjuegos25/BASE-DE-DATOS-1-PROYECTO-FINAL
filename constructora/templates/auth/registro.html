@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - Sistema ERP Constructora</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="auth-body">
+    <div class="auth-max-w-7xl mx-auto px-6">
+        <div class="auth-stat-card fade-in-up">
+            <!-- Header del registro -->
+            <div class="auth-header">
+                <div class="auth-logo">
+                    <i class="fas fa-building text-prussian-blue"></i>
+                </div>
+                <h1 class="auth-title">Registro de Usuario</h1>
+                <p class="auth-subtitle">Crear nueva cuenta en el sistema</p>
+            </div>
+
+            <!-- Mensajes flash -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ 'danger' if category == 'error' else category }}">
+                            <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'check-circle' if category == 'success' else 'info-circle' }}"></i>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <!-- Formulario de registro -->
+            <form method="POST" class="auth-form" id="registroForm">
+                <div class="form-grid">
+                    <!-- Información básica -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-user"></i>
+                            Información Personal
+                        </h3>
+                        
+                        <div class="form-group">
+                            <label for="nombre_completo">
+                                <i class="fas fa-id-stat-card"></i>
+                                Nombre Completo
+                            </label>
+                            <input 
+                                type="text" 
+                                id="nombre_completo" 
+                                name="nombre_completo" 
+                                required 
+                                class="form-control"
+                                placeholder="Ingrese su nombre completo"
+                                value="{{ request.form.get('nombre_completo', '') }}"
+                                minlength="3"
+                                maxlength="100"
+                            >
+                            <div class="form-help">Mínimo 3 caracteres, máximo 100</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">
+                                <i class="fas fa-envelope"></i>
+                                Correo Electrónico
+                            </label>
+                            <input 
+                                type="email" 
+                                id="email" 
+                                name="email" 
+                                required 
+                                class="form-control"
+                                placeholder="usuario@constructora.com"
+                                value="{{ request.form.get('email', '') }}"
+                                maxlength="100"
+                            >
+                            <div class="form-help">Será utilizado para notificaciones del sistema</div>
+                        </div>
+                    </div>
+
+                    <!-- Credenciales de acceso -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-lock"></i>
+                            Credenciales de Acceso
+                        </h3>
+                        
+                        <div class="form-group">
+                            <label for="nombre_usuario">
+                                <i class="fas fa-user-tag"></i>
+                                Nombre de Usuario
+                            </label>
+                            <input 
+                                type="text" 
+                                id="nombre_usuario" 
+                                name="nombre_usuario" 
+                                required 
+                                class="form-control"
+                                placeholder="Elija un nombre de usuario único"
+                                value="{{ request.form.get('nombre_usuario', '') }}"
+                                minlength="4"
+                                maxlength="50"
+                                pattern="[a-zA-Z0-9_]+"
+                                title="Solo letras, números y guiones bajos"
+                            >
+                            <div class="form-help">4-50 caracteres, solo letras, números y _</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="password">
+                                <i class="fas fa-key"></i>
+                                Contraseña
+                            </label>
+                            <div class="password-input-group">
+                                <input 
+                                    type="password" 
+                                    id="password" 
+                                    name="password" 
+                                    required 
+                                    class="form-control"
+                                    placeholder="Cree una contraseña segura"
+                                    minlength="8"
+                                    maxlength="100"
+                                >
+                                <button class="btn btn-warm-primary" 
+                                    type="button" 
+                                    class="password-toggle" 
+                                    onclick="togglePassword('password')"
+                                    tabindex="-1"
+                                >
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div class="password-strength" id="passwordStrength"></div>
+                            <div class="form-help">Mínimo 8 caracteres, incluya mayúsculas, minúsculas y números</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="confirmar_password">
+                                <i class="fas fa-shield-alt"></i>
+                                Confirmar Contraseña
+                            </label>
+                            <div class="password-input-group">
+                                <input 
+                                    type="password" 
+                                    id="confirmar_password" 
+                                    name="confirmar_password" 
+                                    required 
+                                    class="form-control"
+                                    placeholder="Repita la contraseña"
+                                    minlength="8"
+                                    maxlength="100"
+                                >
+                                <button class="btn btn-warm-primary" 
+                                    type="button" 
+                                    class="password-toggle" 
+                                    onclick="togglePassword('confirmar_password')"
+                                    tabindex="-1"
+                                >
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div class="password-match" id="passwordMatch"></div>
+                        </div>
+                    </div>
+
+                    <!-- Información adicional -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-briefcase"></i>
+                            Información Laboral
+                        </h3>
+                        
+                        <div class="form-group">
+                            <label for="cargo">
+                                <i class="fas fa-user-tie"></i>
+                                Cargo o Posición
+                            </label>
+                            <select id="cargo" name="cargo" class="form-control" required>
+                                <option value="">Seleccione su cargo</option>
+                                <option value="Ingeniero Civil" {{ 'selected' if request.form.get('cargo') == 'Ingeniero Civil' }}>Ingeniero Civil</option>
+                                <option value="Arquitecto" {{ 'selected' if request.form.get('cargo') == 'Arquitecto' }}>Arquitecto</option>
+                                <option value="Supervisor de Obra" {{ 'selected' if request.form.get('cargo') == 'Supervisor de Obra' }}>Supervisor de Obra</option>
+                                <option value="Jefe de Proyecto" {{ 'selected' if request.form.get('cargo') == 'Jefe de Proyecto' }}>Jefe de Proyecto</option>
+                                <option value="Contador" {{ 'selected' if request.form.get('cargo') == 'Contador' }}>Contador</option>
+                                <option value="Administrador" {{ 'selected' if request.form.get('cargo') == 'Administrador' }}>Administrador</option>
+                                <option value="Operador de Equipo" {{ 'selected' if request.form.get('cargo') == 'Operador de Equipo' }}>Operador de Equipo</option>
+                                <option value="Almacenista" {{ 'selected' if request.form.get('cargo') == 'Almacenista' }}>Almacenista</option>
+                                <option value="Asistente" {{ 'selected' if request.form.get('cargo') == 'Asistente' }}>Asistente</option>
+                                <option value="Otro" {{ 'selected' if request.form.get('cargo') == 'Otro' }}>Otro</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="departamento">
+                                <i class="fas fa-sitemap"></i>
+                                Departamento
+                            </label>
+                            <select id="departamento" name="departamento" class="form-control" required>
+                                <option value="">Seleccione departamento</option>
+                                <option value="Administración" {{ 'selected' if request.form.get('departamento') == 'Administración' }}>Administración</option>
+                                <option value="Ingeniería" {{ 'selected' if request.form.get('departamento') == 'Ingeniería' }}>Ingeniería</option>
+                                <option value="Construcción" {{ 'selected' if request.form.get('departamento') == 'Construcción' }}>Construcción</option>
+                                <option value="Logística" {{ 'selected' if request.form.get('departamento') == 'Logística' }}>Logística</option>
+                                <option value="Finanzas" {{ 'selected' if request.form.get('departamento') == 'Finanzas' }}>Finanzas</option>
+                                <option value="Recursos Humanos" {{ 'selected' if request.form.get('departamento') == 'Recursos Humanos' }}>Recursos Humanos</option>
+                                <option value="Mantenimiento" {{ 'selected' if request.form.get('departamento') == 'Mantenimiento' }}>Mantenimiento</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Términos y condiciones -->
+                <div class="form-group">
+                    <div class="form-check">
+                        <input class="form-control form-warm" 
+                            type="checkbox" 
+                            id="terminos" 
+                            name="terminos" 
+                            required 
+                            class="form-check-input"
+                        >
+                        <label for="terminos" class="form-check-label">
+                            Acepto los términos y condiciones de uso del sistema ERP Constructora
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Botones de acción -->
+                <div class="auth-actions">
+                    <button type="submit" class="btn btn btn btn-warm-primary btn-lg" id="btnRegistro">
+                        <i class="fas fa-user-plus"></i>
+                        <span class="btn-text">Crear Cuenta</span>
+                        <div class="btn-loading" style="display: none;">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            Creando cuenta...
+                        </div>
+                    </button>
+
+                    <div class="auth-divider">
+                        <span>¿Ya tienes cuenta?</span>
+                    </div>
+
+                    <a href="{{ url_for('login') }}" class="btn btn-outline btn-lg">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Iniciar Sesión
+                    </a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Footer -->
+        <div class="auth-footer">
+            <p>&copy; 2025 Sistema ERP Constructora. Todos los derechos reservados.</p>
+        </div>
+    </div>
+
+    <!-- JavaScript para validaciones -->
+    <script>
+        // Validación de fortaleza de contraseña
+        function checkPasswordStrength(password) {
+            const strengthMeter = document.getElementById('passwordStrength');
+            let strength = 0;
+            let feedback = [];
+
+            if (password.length >= 8) strength++;
+            else feedback.push('Al menos 8 caracteres');
+
+            if (/[a-z]/.test(password)) strength++;
+            else feedback.push('Al menos una minúscula');
+
+            if (/[A-Z]/.test(password)) strength++;
+            else feedback.push('Al menos una mayúscula');
+
+            if (/[0-9]/.test(password)) strength++;
+            else feedback.push('Al menos un número');
+
+            if (/[^A-Za-z0-9]/.test(password)) strength++;
+
+            const levels = ['muy-debil', 'debil', 'regular', 'fuerte', 'muy-fuerte'];
+            const labels = ['Muy débil', 'Débil', 'Regular', 'Fuerte', 'Muy fuerte'];
+
+            strengthMeter.className = 'password-strength ' + levels[strength];
+            strengthMeter.innerHTML = `
+                <div class="strength-bar">
+                    <div class="strength-fill" style="width: ${(strength / 5) * 100}%"></div>
+                </div>
+                <div class="strength-text">${labels[strength]} ${feedback.length ? '- ' + feedback.join(', ') : ''}</div>
+            `;
+        }
+
+        // Validación de coincidencia de contraseñas
+        function checkPasswordMatch() {
+            const password = document.getElementById('password').value;
+            const confirmar = document.getElementById('confirmar_password').value;
+            const matchDiv = document.getElementById('passwordMatch');
+
+            if (confirmar.length === 0) {
+                matchDiv.innerHTML = '';
+                return;
+            }
+
+            if (password === confirmar) {
+                matchDiv.innerHTML = '<div class="match-success"><i class="fas fa-check"></i> Las contraseñas coinciden</div>';
+            } else {
+                matchDiv.innerHTML = '<div class="match-error"><i class="fas fa-times"></i> Las contraseñas no coinciden</div>';
+            }
+        }
+
+        // Toggle visibilidad de contraseña
+        function togglePassword(fieldId) {
+            const field = document.getElementById(fieldId);
+            const button = field.nextElementSibling;
+            const icon = button.querySelector('i');
+
+            if (field.type === 'password') {
+                field.type = 'text';
+                icon.className = 'fas fa-eye-slash';
+            } else {
+                field.type = 'password';
+                icon.className = 'fas fa-eye';
+            }
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            const passwordField = document.getElementById('password');
+            const confirmarField = document.getElementById('confirmar_password');
+            const form = document.getElementById('registroForm');
+
+            passwordField.addEventListener('input', function() {
+                checkPasswordStrength(this.value);
+                if (confirmarField.value) checkPasswordMatch();
+            });
+
+            confirmarField.addEventListener('input', checkPasswordMatch);
+
+            form.addEventListener('submit', function(e) {
+                const btnRegistro = document.getElementById('btnRegistro');
+                const btnText = btnRegistro.querySelector('.btn-text');
+                const btnLoading = btnRegistro.querySelector('.btn-loading');
+                
+                btnText.style.display = 'none';
+                btnLoading.style.display = 'flex';
+                btnRegistro.disabled = true;
+            });
+        });
+    </script>
+</body>
+</html>

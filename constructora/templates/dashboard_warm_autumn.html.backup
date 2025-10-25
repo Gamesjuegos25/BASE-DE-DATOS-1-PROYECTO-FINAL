@@ -1,0 +1,542 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - ERP Constructora Warm Autumn{% endblock %}
+
+{% block content %}
+<!-- Welcome Section -->
+<div class="welcome-section fade-in-up">
+    <div class="page-title">
+        <i class="fas fa-sun"></i> Bienvenido al Dashboard
+    </div>
+    <div class="page-subtitle">
+        Sistema ERP Constructora con tema Warm Autumn Glow
+    </div>
+    <div class="last-login">
+        <i class="fas fa-clock"></i>
+        <span>Último acceso: Hoy a las 14:30</span>
+    </div>
+</div>
+
+<!-- Dashboard Metrics -->
+<div class="dashboard-grid">
+    <!-- Stat Card 1 -->
+    <div class="stat-card slide-in-left">
+        <div class="stat-header">
+            <div class="stat-title">Obras Activas</div>
+            <div class="stat-icon primary">
+                <i class="fas fa-building"></i>
+            </div>
+        </div>
+        <div class="stat-value">24</div>
+        <div class="stat-change positive">
+            <i class="fas fa-arrow-up"></i>
+            <span>+12% desde el mes pasado</span>
+        </div>
+    </div>
+
+    <!-- Stat Card 2 -->
+    <div class="stat-card slide-in-left">
+        <div class="stat-header">
+            <div class="stat-title">Empleados Activos</div>
+            <div class="stat-icon secondary">
+                <i class="fas fa-users"></i>
+            </div>
+        </div>
+        <div class="stat-value">186</div>
+        <div class="stat-change positive">
+            <i class="fas fa-arrow-up"></i>
+            <span>+5% este trimestre</span>
+        </div>
+    </div>
+
+    <!-- Stat Card 3 -->
+    <div class="stat-card slide-in-left">
+        <div class="stat-header">
+            <div class="stat-title">Facturación Mensual</div>
+            <div class="stat-icon accent">
+                <i class="fas fa-dollar-sign"></i>
+            </div>
+        </div>
+        <div class="stat-value">$2.4M</div>
+        <div class="stat-change positive">
+            <i class="fas fa-arrow-up"></i>
+            <span>+18% vs mes anterior</span>
+        </div>
+    </div>
+
+    <!-- Stat Card 4 -->
+    <div class="stat-card slide-in-left">
+        <div class="stat-header">
+            <div class="stat-title">Alertas Pendientes</div>
+            <div class="stat-icon danger">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+        </div>
+        <div class="stat-value">7</div>
+        <div class="stat-change negative">
+            <i class="fas fa-arrow-down"></i>
+            <span>Requieren atención</span>
+        </div>
+    </div>
+</div>
+
+<!-- Modules Grid -->
+<div class="modules-grid">
+    <!-- Módulo Obras -->
+    <div class="module-card">
+        <div class="module-header">
+            <div class="module-icon">
+                <i class="fas fa-building"></i>
+            </div>
+            <div class="module-title">Gestión de Obras</div>
+            <div class="module-description">
+                Control completo de proyectos de construcción y seguimiento de avances
+            </div>
+        </div>
+        <div class="module-content">
+            <div class="module-stats">
+                <div class="module-stat">
+                    <div class="module-stat-value">24</div>
+                    <div class="module-stat-label">Obras Activas</div>
+                </div>
+                <div class="module-stat">
+                    <div class="module-stat-value">12</div>
+                    <div class="module-stat-label">En Progreso</div>
+                </div>
+            </div>
+            <div class="module-actions">
+                <a href="/obras" class="btn btn-primary btn-sm">
+                    <i class="fas fa-eye"></i> Ver Obras
+                </a>
+                <a href="/obras/crear" class="btn btn-secondary btn-sm">
+                    <i class="fas fa-plus"></i> Nueva Obra
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Módulo Recursos Humanos -->
+    <div class="module-card">
+        <div class="module-header">
+            <div class="module-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="module-title">Recursos Humanos</div>
+            <div class="module-description">
+                Administración de personal, nóminas y contratos laborales
+            </div>
+        </div>
+        <div class="module-content">
+            <div class="module-stats">
+                <div class="module-stat">
+                    <div class="module-stat-value">186</div>
+                    <div class="module-stat-label">Empleados</div>
+                </div>
+                <div class="module-stat">
+                    <div class="module-stat-value">24</div>
+                    <div class="module-stat-label">Nuevos</div>
+                </div>
+            </div>
+            <div class="module-actions">
+                <a href="/empleados" class="btn btn-primary btn-sm">
+                    <i class="fas fa-eye"></i> Ver Empleados
+                </a>
+                <a href="/empleados/crear" class="btn btn-secondary btn-sm">
+                    <i class="fas fa-user-plus"></i> Agregar
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Módulo Inventarios -->
+    <div class="module-card">
+        <div class="module-header">
+            <div class="module-icon">
+                <i class="fas fa-boxes"></i>
+            </div>
+            <div class="module-title">Inventarios</div>
+            <div class="module-description">
+                Control de materiales, bodegas y movimientos de inventario
+            </div>
+        </div>
+        <div class="module-content">
+            <div class="module-stats">
+                <div class="module-stat">
+                    <div class="module-stat-value">1,247</div>
+                    <div class="module-stat-label">Materiales</div>
+                </div>
+                <div class="module-stat">
+                    <div class="module-stat-value">8</div>
+                    <div class="module-stat-label">Bodegas</div>
+                </div>
+            </div>
+            <div class="module-actions">
+                <a href="/materiales" class="btn btn-primary btn-sm">
+                    <i class="fas fa-eye"></i> Ver Materiales
+                </a>
+                <a href="/bodegas" class="btn btn-secondary btn-sm">
+                    <i class="fas fa-warehouse"></i> Bodegas
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Módulo Equipos -->
+    <div class="module-card">
+        <div class="module-header">
+            <div class="module-icon">
+                <i class="fas fa-tools"></i>
+            </div>
+            <div class="module-title">Equipos & Vehículos</div>
+            <div class="module-description">
+                Gestión de maquinaria, equipos y flota vehicular
+            </div>
+        </div>
+        <div class="module-content">
+            <div class="module-stats">
+                <div class="module-stat">
+                    <div class="module-stat-value">45</div>
+                    <div class="module-stat-label">Equipos</div>
+                </div>
+                <div class="module-stat">
+                    <div class="module-stat-value">18</div>
+                    <div class="module-stat-label">Vehículos</div>
+                </div>
+            </div>
+            <div class="module-actions">
+                <a href="/equipos" class="btn btn-primary btn-sm">
+                    <i class="fas fa-eye"></i> Ver Equipos
+                </a>
+                <a href="/vehiculos" class="btn btn-secondary btn-sm">
+                    <i class="fas fa-car"></i> Vehículos
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Módulo Finanzas -->
+    <div class="module-card">
+        <div class="module-header">
+            <div class="module-icon">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="module-title">Control Financiero</div>
+            <div class="module-description">
+                Presupuestos, facturación y análisis financiero de proyectos
+            </div>
+        </div>
+        <div class="module-content">
+            <div class="module-stats">
+                <div class="module-stat">
+                    <div class="module-stat-value">$2.4M</div>
+                    <div class="module-stat-label">Ingresos</div>
+                </div>
+                <div class="module-stat">
+                    <div class="module-stat-value">$1.8M</div>
+                    <div class="module-stat-label">Gastos</div>
+                </div>
+            </div>
+            <div class="module-actions">
+                <a href="/presupuestos" class="btn btn-primary btn-sm">
+                    <i class="fas fa-coins"></i> Presupuestos
+                </a>
+                <a href="/reportes" class="btn btn-secondary btn-sm">
+                    <i class="fas fa-chart-bar"></i> Reportes
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Módulo Reportes -->
+    <div class="module-card">
+        <div class="module-header">
+            <div class="module-icon">
+                <i class="fas fa-chart-bar"></i>
+            </div>
+            <div class="module-title">Reportes & Analytics</div>
+            <div class="module-description">
+                Informes detallados y análisis de rendimiento empresarial
+            </div>
+        </div>
+        <div class="module-content">
+            <div class="module-stats">
+                <div class="module-stat">
+                    <div class="module-stat-value">127</div>
+                    <div class="module-stat-label">Reportes</div>
+                </div>
+                <div class="module-stat">
+                    <div class="module-stat-value">24/7</div>
+                    <div class="module-stat-label">Monitoreo</div>
+                </div>
+            </div>
+            <div class="module-actions">
+                <a href="/reportes" class="btn btn-primary btn-sm">
+                    <i class="fas fa-file-alt"></i> Ver Reportes
+                </a>
+                <a href="/dashboard/analytics" class="btn btn-secondary btn-sm">
+                    <i class="fas fa-analytics"></i> Analytics
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions Panel -->
+<div class="bg-gradient-warm-autumn p-8 rounded-2xl shadow-xl mt-8">
+    <h3 class="text-2xl font-bold text-white mb-6 flex items-center gap-3">
+        <i class="fas fa-bolt text-xanthous"></i>
+        Acciones Rápidas
+    </h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <a href="/obras/crear" class="btn btn-accent btn-lg flex-col">
+            <i class="fas fa-plus-circle text-2xl mb-2"></i>
+            <span>Nueva Obra</span>
+        </a>
+        <a href="/empleados/crear" class="btn btn-accent btn-lg flex-col">
+            <i class="fas fa-user-plus text-2xl mb-2"></i>
+            <span>Nuevo Empleado</span>
+        </a>
+        <a href="/materiales/crear" class="btn btn-accent btn-lg flex-col">
+            <i class="fas fa-box text-2xl mb-2"></i>
+            <span>Nuevo Material</span>
+        </a>
+        <a href="/reportes" class="btn btn-accent btn-lg flex-col">
+            <i class="fas fa-chart-line text-2xl mb-2"></i>
+            <span>Ver Reportes</span>
+        </a>
+    </div>
+</div>
+
+<!-- Color Palette Demo -->
+<div class="mt-8 p-8 bg-vanilla-900 rounded-2xl shadow-xl">
+    <h3 class="text-2xl font-bold text-prussian-blue mb-6 gradient-text-warm">
+        <i class="fas fa-palette"></i>
+        Paleta de Colores Warm Autumn Glow
+    </h3>
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <!-- Prussian Blue -->
+        <div class="text-center">
+            <div class="w-full h-20 bg-prussian-blue rounded-lg shadow-md mb-3"></div>
+            <h4 class="font-semibold text-sm text-prussian-blue">Prussian Blue</h4>
+            <p class="text-xs text-prussian-blue-600">#003049</p>
+        </div>
+        
+        <!-- Fire Engine Red -->
+        <div class="text-center">
+            <div class="w-full h-20 bg-fire-engine-red rounded-lg shadow-md mb-3"></div>
+            <h4 class="font-semibold text-sm text-fire-engine-red">Fire Engine Red</h4>
+            <p class="text-xs text-fire-engine-red-600">#d62828</p>
+        </div>
+        
+        <!-- Orange Wheel -->
+        <div class="text-center">
+            <div class="w-full h-20 bg-orange-wheel rounded-lg shadow-md mb-3"></div>
+            <h4 class="font-semibold text-sm text-orange-wheel">Orange Wheel</h4>
+            <p class="text-xs text-orange-wheel-600">#f77f00</p>
+        </div>
+        
+        <!-- Xanthous -->
+        <div class="text-center">
+            <div class="w-full h-20 bg-xanthous rounded-lg shadow-md mb-3"></div>
+            <h4 class="font-semibold text-sm text-xanthous-100">Xanthous</h4>
+            <p class="text-xs text-xanthous-300">#fcbf49</p>
+        </div>
+        
+        <!-- Vanilla -->
+        <div class="text-center">
+            <div class="w-full h-20 bg-vanilla rounded-lg shadow-md mb-3"></div>
+            <h4 class="font-semibold text-sm text-vanilla-100">Vanilla</h4>
+            <p class="text-xs text-vanilla-300">#eae2b7</p>
+        </div>
+    </div>
+</div>
+
+<!-- Sample Table -->
+<div class="table-container mt-8">
+    <div class="table-header">
+        <h3 class="table-title">
+            <i class="fas fa-table text-prussian-blue mr-3"></i>
+            Tabla de Demostración
+        </h3>
+        <div class="table-tools">
+            <div class="table-search">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" class="form-control" placeholder="Buscar...">
+            </div>
+            <div class="flex gap-2">
+                <button class="btn btn-secondary btn-sm">
+                    <i class="fas fa-filter"></i>
+                    Filtrar
+                </button>
+                <button class="btn btn-primary btn-sm">
+                    <i class="fas fa-plus"></i>
+                    Agregar
+                </button>
+            </div>
+        </div>
+    </div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Estado</th>
+                <th>Fecha</th>
+                <th>Valor</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="font-mono text-sm">#001</span></td>
+                <td><strong>Proyecto Alpha</strong></td>
+                <td><span class="badge badge-success">Activo</span></td>
+                <td>2024-10-24</td>
+                <td><span class="text-xanthous font-semibold">$125,000</span></td>
+                <td class="actions-cell">
+                    <div class="table-actions">
+                        <a href="#" class="btn-action btn-view" title="Ver">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="#" class="btn-action btn-edit" title="Editar">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <a href="#" class="btn-action btn-delete" title="Eliminar">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td><span class="font-mono text-sm">#002</span></td>
+                <td><strong>Proyecto Beta</strong></td>
+                <td><span class="badge badge-warning">Pendiente</span></td>
+                <td>2024-10-23</td>
+                <td><span class="text-xanthous font-semibold">$89,500</span></td>
+                <td class="actions-cell">
+                    <div class="table-actions">
+                        <a href="#" class="btn-action btn-view" title="Ver">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="#" class="btn-action btn-edit" title="Editar">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <a href="#" class="btn-action btn-delete" title="Eliminar">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td><span class="font-mono text-sm">#003</span></td>
+                <td><strong>Proyecto Gamma</strong></td>
+                <td><span class="badge badge-danger">Suspendido</span></td>
+                <td>2024-10-22</td>
+                <td><span class="text-xanthous font-semibold">$234,750</span></td>
+                <td class="actions-cell">
+                    <div class="table-actions">
+                        <a href="#" class="btn-action btn-view" title="Ver">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="#" class="btn-action btn-edit" title="Editar">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <a href="#" class="btn-action btn-delete" title="Eliminar">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<style>
+/* Mejoras específicas para este dashboard */
+.btn-lg.flex-col {
+    padding: 1.5rem;
+    flex-direction: column;
+    min-height: 100px;
+    text-align: center;
+}
+
+.gradient-text-warm {
+    background: linear-gradient(135deg, var(--prussian-blue), var(--orange-wheel), var(--xanthous));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+@media (max-width: 768px) {
+    .dashboard-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+    
+    .modules-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .stat-card {
+        padding: 1.5rem;
+    }
+    
+    .stat-value {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .stat-card {
+        padding: 1rem;
+    }
+    
+    .welcome-section {
+        padding: 2rem;
+        text-align: center;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Animación de entrada para las tarjetas
+    const cards = document.querySelectorAll('.stat-card, .module-card');
+    cards.forEach((card, index) => {
+        card.style.animationDelay = `${index * 0.1}s`;
+    });
+    
+    // Efectos de hover mejorados
+    cards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-8px) scale(1.02)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+        });
+    });
+    
+    // Simular actualizaciones en tiempo real
+    function updateMetrics() {
+        const statValues = document.querySelectorAll('.stat-value');
+        statValues.forEach(stat => {
+            const currentValue = parseInt(stat.textContent.replace(/[^\d]/g, ''));
+            if (currentValue > 0) {
+                stat.style.animation = 'pulse-warm 0.5s ease';
+                setTimeout(() => {
+                    stat.style.animation = '';
+                }, 500);
+            }
+        });
+    }
+    
+    // Actualizar métricas cada 30 segundos (simulado)
+    setInterval(updateMetrics, 30000);
+});
+</script>
+{% endblock %}

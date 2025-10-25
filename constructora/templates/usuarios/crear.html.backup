@@ -1,0 +1,268 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sistema-unificado.css') }}">
+{% endblock %}
+
+
+
+{%extends "base.html"%}
+
+{%block title%}Crear Usuario - Sistema Constructora{%endblock%}
+
+{%block content%}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/create-forms.css') }}">
+
+<div class="create-form-max-w-7xl mx-auto px-6">
+    <!-- Header de página estilo detalle -->
+    <div class="create-page-header">
+        <nav class="breadcrumb">
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <span class="breadcrumb-separator">/</span>
+            <a href="{{ url_for('listar_usuarios_sistema') }}">Usuarios</a>
+            <span class="breadcrumb-separator">/</span>
+            <span>Crear Usuario</span>
+        </nav>
+        <h1 class="create-page-title">
+            <i class="fas fa-user-plus"></i>
+            Crear Nuevo Usuario
+        </h1>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-6-fluid">
+        <!-- Mensajes flash -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'error' else category }} mb-6">
+                        <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'check-circle' if category == 'success' else 'info-circle' }}"></i>
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('crear_usuario_sistema_route') }}" id="create-usuario-form" class="needs-validation" novalidate>
+            <div class="create-form-flex flex-wrap -mx-2">
+                <!-- Información Personal -->
+                <div class="create-form-stat-card fade-in-up">
+                    <div class="stat-stat-header">
+                        <h5><i class="fas fa-user"></i> Información Personal</h5>
+                    </div>
+                    <div class="stat-module-content">
+                        <div class="create-form-group">
+                            <label for="nombre_completo" class="create-form-label">
+                                <i class="fas fa-id-stat-card"></i>Nombre Completo<span class="required">*</span>
+                            </label>
+                            <input type="text" class="create-form-control" id="nombre_completo" name="nombre_completo" 
+                                   placeholder="Nombre completo del usuario" 
+                                   value="{{ request.form.nombre_completo if request.form else '' }}" required>
+                            <div class="invalid-feedback">
+                                Por favor, ingrese el nombre completo.
+                            </div>
+                        </div>
+
+                        <div class="create-form-group">
+                            <label for="email" class="create-form-label">
+                                <i class="fas fa-envelope"></i>Correo Electrónico<span class="required">*</span>
+                            </label>
+                            <input type="email" class="create-form-control" id="email" name="email" 
+                                   placeholder="usuario@constructora.com" 
+                                   value="{{ request.form.email if request.form else '' }}" required>
+                            <div class="invalid-feedback">
+                                Por favor, ingrese un correo electrónico válido.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Credenciales de Acceso -->
+                <div class="create-form-stat-card fade-in-up">
+                    <div class="stat-stat-header">
+                        <h5><i class="fas fa-lock"></i> Credenciales de Acceso</h5>
+                    </div>
+                    <div class="stat-module-content">
+                        <div class="create-form-group">
+                            <label for="nombre_usuario" class="create-form-label">
+                                <i class="fas fa-user-tag"></i>Nombre de Usuario<span class="required">*</span>
+                            </label>
+                            <input type="text" class="create-form-control" id="nombre_usuario" name="nombre_usuario" 
+                                   placeholder="username" 
+                                   value="{{ request.form.nombre_usuario if request.form else '' }}" required>
+                            <div class="invalid-feedback">
+                                Por favor, ingrese un nombre de usuario.
+                            </div>
+                            <small class="form-text text-vanilla-600">4-50 caracteres, solo letras, números y guiones bajos.</small>
+                        </div>
+
+                        <div class="create-form-group">
+                            <label for="password" class="create-form-label">
+                                <i class="fas fa-key"></i>Contraseña<span class="required">*</span>
+                            </label>
+                            <div class="password-input-max-w-7xl mx-auto px-6">
+                                <input type="password" class="create-form-control" id="password" name="password" 
+                                       placeholder="Contraseña segura" required minlength="8">
+                                <button class="btn btn-warm-primary" type="button" class="password-toggle" onclick="togglePassword('password')">
+                                    <i class="fas fa-eye" id="password-icon"></i>
+                                </button>
+                            </div>
+                            <div class="invalid-feedback">
+                                Por favor, ingrese una contraseña de al menos 8 caracteres.
+                            </div>
+                            <small class="form-text text-vanilla-600">Mínimo 8 caracteres, incluya mayúsculas, minúsculas y números.</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Asignaciones del Sistema -->
+                <div class="create-form-stat-card fade-in-up">
+                    <div class="stat-stat-header">
+                        <h5><i class="fas fa-briefcase"></i> Asignaciones del Sistema</h5>
+                    </div>
+                    <div class="stat-module-content">
+                        <div class="create-form-group">
+                            <label for="id_empleado" class="create-form-label">
+                                <i class="fas fa-user-tie"></i>Empleado Asociado
+                            </label>
+                            <select class="create-form-control" id="id_empleado" name="id_empleado">
+                                <option value="">Sin asociar</option>
+                                {% for empleado in empleados %}
+                                <option value="{{ empleado.id_empleado }}" {{ 'selected' if request.form.id_empleado == empleado.id_empleado|string else '' }}>
+                                    {{ empleado.nombre_empleado }} {{ empleado.apellido_empleado }} - {{ empleado.tipo_empleado }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <small class="form-text text-vanilla-600">Opcional: Asocie este usuario a un empleado existente.</small>
+                        </div>
+
+                        <div class="create-form-group">
+                            <label for="id_rol" class="create-form-label">
+                                <i class="fas fa-shield-alt"></i>Rol del Sistema<span class="required">*</span>
+                            </label>
+                            <select class="create-form-control" id="id_rol" name="id_rol" required>
+                                <option value="">Seleccione un rol</option>
+                                {% for rol in roles %}
+                                <option value="{{ rol.nombre_rol }}" {{ 'selected' if request.form.id_rol == rol.nombre_rol else '' }}>
+                                    {{ rol.nombre_rol }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            <div class="invalid-feedback">
+                                Por favor, seleccione un rol para el usuario.
+                            </div>
+                            <small class="form-text text-vanilla-600">Define los permisos y accesos del usuario en el sistema.</small>
+                        </div>
+
+                        <div class="create-form-group">
+                            <div class="form-check">
+                                <input class="form-control form-warm" type="checkbox" class="form-check-input" id="activo" name="activo" checked>
+                                <label class="form-check-label" for="activo">
+                                    <i class="fas fa-user-check"></i>
+                                    Usuario activo al crear
+                                </label>
+                            </div>
+                            <small class="form-text text-vanilla-600">Los usuarios inactivos no pueden acceder al sistema.</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Botones de acción -->
+            <div class="form-actions mt-6">
+                <div class="flex justify-between">
+                    <a href="{{ url_for('listar_usuarios_sistema') }}" class="btn btn btn btn-warm-secondary">
+                        <i class="fas fa-times"></i> Cancelar
+                    </a>
+                    <button type="submit" class="btn btn btn btn-warm-primary" id="btnCrearUsuario">
+                        <i class="fas fa-save"></i> Crear Usuario
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// Validación de formularios Bootstrap
+(function() {
+    'use strict';
+    window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        var validation = Array.prototype.filter.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+})();
+
+// Toggle visibilidad de contraseña
+function togglePassword(fieldId) {
+    const field = document.getElementById(fieldId);
+    const icon = document.getElementById(fieldId + '-icon');
+    
+    if (field.type === 'password') {
+        field.type = 'text';
+        icon.classList.replace('fa-eye', 'fa-eye-slash');
+    } else {
+        field.type = 'password';
+        icon.classList.replace('fa-eye-slash', 'fa-eye');
+    }
+}
+
+// Prevenir doble submit
+document.getElementById('create-usuario-form').addEventListener('submit', function() {
+    const btn = document.getElementById('btnCrearUsuario');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creando...';
+});
+</script>
+
+<style>
+.password-input-container {
+    position: relative;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    padding: 5px;
+    z-index: 10;
+}
+
+.password-toggle:hover {
+    color: var(--color-primary);
+}
+
+.form-check {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    padding: var(--spacing-3);
+    background: rgba(var(--color-primary-rgb), 0.1);
+    border-radius: var(--border-radius);
+}
+
+.form-check-input {
+    margin: 0;
+}
+
+.form-check-label {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    cursor: pointer;
+}
+</style>
+{%endblock%}

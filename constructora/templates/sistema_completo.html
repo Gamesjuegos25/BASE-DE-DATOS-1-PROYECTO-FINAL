@@ -1,259 +1,378 @@
 {% extends "base.html" %}
 
-{% block title %}Sistema Completo - ERP Constructora{% endblock %}
+{% block title %}Dashboard - ERP Constructora{% endblock %}
+
+{% block head %}
+    <!-- CSS para dashboard -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-12">
-            <h1 class="display-4 text-center mb-4">
-                <i class="fas fa-building"></i> Sistema ERP Constructora Completo
-            </h1>
-            <p class="text-center text-muted">86 Tablas - 8 Módulos Integrados</p>
-        </div>
-    </div>
-
-    <!-- Métricas Generales -->
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card bg-primary text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h4>{{ dashboard.finanzas.total_facturas or 0 }}</h4>
-                            <p>Facturas Emitidas</p>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-file-invoice fa-2x"></i>
-                        </div>
-                    </div>
-                </div>
+<div class="dashboard-container">
+    <!-- Header del Dashboard -->
+    <div class="dashboard-header">
+        <div class="dashboard-header-content">
+            <div>
+                <h1 class="dashboard-title">
+                    <i class="fas fa-tachometer-alt"></i>
+                    Dashboard ERP Constructora
+                </h1>
+                <p class="dashboard-subtitle">Sistema Completo de Gestión - 86 Tablas Integradas</p>
             </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-success text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h4>{{ dashboard.obras.obras_activas or 0 }}</h4>
-                            <p>Obras Activas</p>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-hammer fa-2x"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-warning text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h4>{{ dashboard.mantenimiento.programados or 0 }}</h4>
-                            <p>Mantenimientos Programados</p>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-wrench fa-2x"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-info text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <h4>{{ dashboard.alertas_pendientes or 0 }}</h4>
-                            <p>Alertas Pendientes</p>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-exclamation-triangle fa-2x"></i>
-                        </div>
-                    </div>
-                </div>
+            <div class="dashboard-date">
+                <div>{{ moment().format('dddd, DD [de] MMMM [de] YYYY') if moment else 'Dashboard Principal' }}</div>
+                <div style="font-size: 0.9em; opacity: 0.8;">Última actualización: Ahora</div>
             </div>
         </div>
     </div>
 
-    <!-- Módulos del Sistema -->
-    <div class="row">
-        <!-- Módulo Comercial -->
-        <div class="col-md-6 col-lg-4 mb-4">
-            <div class="card h-100">
-                <div class="card-header bg-primary text-white">
-                    <h5><i class="fas fa-handshake"></i> Módulo Comercial</h5>
+    <!-- Métricas Principales -->
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <div class="metric-header">
+                <div class="metric-icon primary">
+                    <i class="fas fa-file-invoice"></i>
                 </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-6">
-                            <p><strong>Clientes:</strong> {{ dashboard.modulos.comercial.clientes if dashboard.modulos else 0 }}</p>
-                            <p><strong>Obras:</strong> {{ dashboard.modulos.comercial.obras if dashboard.modulos else 0 }}</p>
-                        </div>
-                        <div class="col-6">
-                            <a href="/clientes" class="btn btn-outline-primary btn-sm mb-1">Ver Clientes</a><br>
-                            <a href="/obras" class="btn btn-outline-primary btn-sm">Ver Obras</a>
-                        </div>
+                <div class="metric-trend positive">
+                    <i class="fas fa-arrow-up"></i>
+                    +12%
+                </div>
+            </div>
+            <div class="metric-value">{{ dashboard.finanzas.total_facturas or 0 }}</div>
+            <div class="metric-label">Facturas Emitidas</div>
+            <div class="metric-description">Total acumulado este mes</div>
+        </div>
+        
+        <div class="metric-card">
+            <div class="metric-header">
+                <div class="metric-icon success">
+                    <i class="fas fa-hammer"></i>
+                </div>
+                <div class="metric-trend positive">
+                    <i class="fas fa-arrow-up"></i>
+                    +8%
+                </div>
+            </div>
+            <div class="metric-value">{{ dashboard.obras.obras_activas or 0 }}</div>
+            <div class="metric-label">Obras Activas</div>
+            <div class="metric-description">Proyectos en desarrollo</div>
+        </div>
+        
+        <div class="metric-card">
+            <div class="metric-header">
+                <div class="metric-icon warning">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="metric-trend neutral">
+                    <i class="fas fa-minus"></i>
+                    0%
+                </div>
+            </div>
+            <div class="metric-value">{{ dashboard.empleados.total_empleados or 0 }}</div>
+            <div class="metric-label">Empleados Activos</div>
+            <div class="metric-description">Personal en nómina</div>
+        </div>
+        
+        <div class="metric-card">
+            <div class="metric-header">
+                <div class="metric-icon danger">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <div class="metric-trend positive">
+                    <i class="fas fa-arrow-up"></i>
+                    +15%
+                </div>
+            </div>
+            <div class="metric-value">Q{{ "{:,.0f}".format(dashboard.finanzas.ingresos_mes or 0) }}</div>
+            <div class="metric-label">Ingresos del Mes</div>
+            <div class="metric-description">Facturación mensual</div>
+        </div>
+    </div>
+    
+    <!-- Widgets Principales del Dashboard -->
+    <div class="dashboard-widgets">
+        <!-- Widget Principal - Gráfico de Rendimiento -->
+        <div class="widget">
+            <div class="widget-header">
+                <h3 class="widget-title">
+                    <i class="fas fa-chart-line"></i>
+                    Rendimiento del Sistema
+                </h3>
+            </div>
+            <div class="widget-content">
+                <div class="chart-container">
+                    <div class="chart-placeholder">
+                        <i class="fas fa-chart-area"></i>
+                        Gráfico de Rendimiento (Datos en tiempo real)
                     </div>
                 </div>
-                <div class="card-footer">
-                    <small class="text-muted">Gestión de clientes y proyectos</small>
+                <div class="progress-bars">
+                    <div class="progress-item">
+                        <div class="progress-label">
+                            <span>Obras Completadas</span>
+                            <span>75%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill success" style="width: 75%"></div>
+                        </div>
+                    </div>
+                    <div class="progress-item">
+                        <div class="progress-label">
+                            <span>Satisfacción Cliente</span>
+                            <span>89%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill primary" style="width: 89%"></div>
+                        </div>
+                    </div>
+                    <div class="progress-item">
+                        <div class="progress-label">
+                            <span>Eficiencia Operativa</span>
+                            <span>67%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill warning" style="width: 67%"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-
-        <!-- Módulo Facturación -->
-        <div class="col-md-6 col-lg-4 mb-4">
-            <div class="card h-100">
-                <div class="card-header bg-success text-white">
-                    <h5><i class="fas fa-file-invoice-dollar"></i> Módulo Facturación</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-6">
-                            <p><strong>Facturación Total:</strong> {{ format_currency(dashboard.finanzas.facturacion_total) if dashboard.finanzas else '$0.00' }}</p>
-                            <p><strong>Por Cobrar:</strong> {{ format_currency(dashboard.finanzas.pendiente_cobro) if dashboard.finanzas else '$0.00' }}</p>
+        
+        <!-- Widget Lateral - Actividades Recientes -->
+        <div class="widget">
+            <div class="widget-header">
+                <h3 class="widget-title">
+                    <i class="fas fa-clock"></i>
+                    Actividades Recientes
+                </h3>
+            </div>
+            <div class="widget-content">
+                <div class="activity-list">
+                    <div class="activity-item">
+                        <div class="activity-icon create">
+                            <i class="fas fa-plus"></i>
                         </div>
-                        <div class="col-6">
-                            <a href="/facturas" class="btn btn-outline-success btn-sm mb-1">Ver Facturas</a><br>
-                            <a href="/pagos" class="btn btn-outline-success btn-sm mb-1">Ver Pagos</a><br>
-                            <a href="/cuentas-por-cobrar" class="btn btn-outline-success btn-sm">Cuentas por Cobrar</a>
+                        <div class="activity-content">
+                            <div class="activity-title">Nueva obra creada</div>
+                            <div class="activity-description">Construcción residencial - Villa Aurora</div>
+                            <div class="activity-time">Hace 15 minutos</div>
                         </div>
                     </div>
-                </div>
-                <div class="card-footer">
-                    <small class="text-muted">Facturación y cobranzas</small>
+                    <div class="activity-item">
+                        <div class="activity-icon update">
+                            <i class="fas fa-edit"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">Factura actualizada</div>
+                            <div class="activity-description">Factura #001234 - Cliente ABC Corp</div>
+                            <div class="activity-time">Hace 1 hora</div>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon create">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">Nuevo empleado</div>
+                            <div class="activity-description">Juan Pérez - Ingeniero Civil</div>
+                            <div class="activity-time">Hace 2 horas</div>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <div class="activity-icon update">
+                            <i class="fas fa-truck"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">Vehículo asignado</div>
+                            <div class="activity-description">Camión CAM-001 a Obra Villa Aurora</div>
+                            <div class="activity-time">Hace 3 horas</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-
-        <!-- Módulo Contabilidad -->
-        <div class="col-md-6 col-lg-4 mb-4">
-            <div class="card h-100">
-                <div class="card-header bg-warning text-dark">
-                    <h5><i class="fas fa-calculator"></i> Módulo Contabilidad</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-12">
-                            <a href="/contabilidad" class="btn btn-outline-warning btn-sm mb-1">Dashboard Contable</a><br>
-                            <a href="/contabilidad/cuentas" class="btn btn-outline-warning btn-sm mb-1">Cuentas Contables</a><br>
-                            <a href="/contabilidad/flujo-caja" class="btn btn-outline-warning btn-sm mb-1">Flujo de Caja</a><br>
-                            <a href="/contabilidad/gastos-obra" class="btn btn-outline-warning btn-sm">Gastos por Obra</a>
-                        </div>
+    </div>
+    
+    <!-- Acciones Rápidas -->
+    <!-- Sección de Acciones Rápidas -->
+    <div class="widget" style="margin-bottom: var(--spacing-xl);">
+        <div class="widget-header">
+            <h3 class="widget-title">
+                <i class="fas fa-bolt"></i>
+                Acciones Rápidas
+            </h3>
+        </div>
+        <div class="widget-content">
+            <div class="quick-actions">
+                <a href="/obras/nueva" class="quick-action">
+                    <div class="quick-action-icon">
+                        <i class="fas fa-hammer"></i>
                     </div>
+                    <div class="quick-action-label">Nueva Obra</div>
+                </a>
+                
+                <a href="/facturas/nueva" class="quick-action">
+                    <div class="quick-action-icon">
+                        <i class="fas fa-file-invoice"></i>
+                    </div>
+                    <div class="quick-action-label">Nueva Factura</div>
+                </a>
+                
+                <a href="/empleados/nuevo" class="quick-action">
+                    <div class="quick-action-icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <div class="quick-action-label">Nuevo Empleado</div>
+                </a>
+                
+                <a href="/proveedores/nuevo" class="quick-action">
+                    <div class="quick-action-icon">
+                        <i class="fas fa-truck"></i>
+                    </div>
+                    <div class="quick-action-label">Nuevo Proveedor</div>
+                </a>
+                
+                <a href="/materiales/nuevo" class="quick-action">
+                    <div class="quick-action-icon">
+                        <i class="fas fa-boxes"></i>
+                    </div>
+                    <div class="quick-action-label">Nuevo Material</div>
+                </a>
+                
+                <a href="/vehiculos/nuevo" class="quick-action">
+                    <div class="quick-action-icon">
+                        <i class="fas fa-car"></i>
+                    </div>
+                    <div class="quick-action-label">Nuevo Vehículo</div>
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Widget de Estado del Sistema -->
+    <div class="widget">
+        <div class="widget-header">
+            <h3 class="widget-title">
+                <i class="fas fa-server"></i>
+                Estado del Sistema ERP
+            </h3>
+        </div>
+        <div class="widget-content">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--spacing-lg); text-align: center;">
+                <div>
+                    <div style="font-size: var(--font-size-2xl); font-weight: 700; color: var(--prussian-blue-600);">86</div>
+                    <div style="font-size: var(--font-size-sm); color: var(--prussian-blue-400);">Tablas Activas</div>
+                    <span class="status-badge active">Conectado</span>
                 </div>
-                <div class="card-footer">
-                    <small class="text-muted">Control contable y financiero</small>
+                <div>
+                    <div style="font-size: var(--font-size-2xl); font-weight: 700; color: var(--xanthous-600);">23</div>
+                    <div style="font-size: var(--font-size-sm); color: var(--xanthous-400);">Módulos</div>
+                    <span class="status-badge active">Operativo</span>
+                </div>
+                <div>
+                    <div style="font-size: var(--font-size-2xl); font-weight: 700; color: var(--orange-wheel-600);">100%</div>
+                    <div style="font-size: var(--font-size-sm); color: var(--orange-wheel-400);">Disponibilidad</div>
+                    <span class="status-badge completed">Estable</span>
+                </div>
+                <div>
+                    <div style="font-size: var(--font-size-2xl); font-weight: 700; color: var(--fire-engine-red-600);">24/7</div>
+                    <div style="font-size: var(--font-size-sm); color: var(--fire-engine-red-400);">Monitoreo</div>
+                    <span class="status-badge active">Activo</span>
                 </div>
             </div>
         </div>
-
-        <!-- Módulo RRHH -->
-        <div class="col-md-6 col-lg-4 mb-4">
-            <div class="card h-100">
-                <div class="card-header bg-info text-white">
-                    <h5><i class="fas fa-users"></i> Módulo RRHH</h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-6">
-                            <p><strong>Empleados:</strong> {{ dashboard.modulos.rrhh.empleados if dashboard.modulos else 0 }}</p>
-                        </div>
-                        <div class="col-6">
-                            <a href="/empleados" class="btn btn-outline-info btn-sm mb-1">Ver Empleados</a><br>
-                            <a href="/nomina" class="btn btn-outline-info btn-sm mb-1">Nómina</a><br>
-                            <a href="/nomina/asistencia" class="btn btn-outline-info btn-sm mb-1">Asistencia</a><br>
-                            <a href="/nomina/capacitaciones" class="btn btn-outline-info btn-sm">Capacitaciones</a>
+    </div>
+    
+</div>
+{% endblock %}
                         </div>
                     </div>
                 </div>
-                <div class="card-footer">
-                    <small class="text-muted">Gestión de recursos humanos</small>
+                <div class="stat-module-actions">
+                    <small class="text-vanilla-600">Gestión de recursos humanos</small>
                 </div>
             </div>
         </div>
 
         <!-- Módulo Activos -->
-        <div class="col-md-6 col-lg-4 mb-4">
-            <div class="card h-100">
-                <div class="card-header bg-secondary text-white">
-                    <h5><i class="fas fa-tools"></i> Módulo Activos</h5>
+        <div class="w-full md:w-1/2 px-2 flex-1 px-2-lg-4 mb-6">
+            <div class="stat-card h-100 fade-in-up">
+                <div class="stat-stat-header bg-gradient-warm-secondary text-white text-white">
+                    <h5><i class="fas fa-tools text-xanthous-100"></i> Módulo Activos</h5>
                 </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-6">
+                <div class="stat-module-content">
+                    <div class="flex flex-wrap -mx-2">
+                        <div class="flex-1 px-2-6">
                             <p><strong>Equipos:</strong> {{ dashboard.modulos.activos.equipos if dashboard.modulos else 0 }}</p>
                             <p><strong>Vehículos:</strong> {{ dashboard.modulos.activos.vehiculos if dashboard.modulos else 0 }}</p>
                         </div>
-                        <div class="col-6">
+                        <div class="flex-1 px-2-6">
                             <a href="/equipos" class="btn btn-outline-secondary btn-sm mb-1">Ver Equipos</a><br>
                             <a href="/vehiculos" class="btn btn-outline-secondary btn-sm">Ver Vehículos</a>
                         </div>
                     </div>
                 </div>
-                <div class="card-footer">
-                    <small class="text-muted">Control de activos fijos</small>
+                <div class="stat-module-actions">
+                    <small class="text-vanilla-600">Control de activos fijos</small>
                 </div>
             </div>
         </div>
 
         <!-- Módulo Mantenimiento -->
-        <div class="col-md-6 col-lg-4 mb-4">
-            <div class="card h-100">
-                <div class="card-header bg-danger text-white">
+        <div class="w-full md:w-1/2 px-2 flex-1 px-2-lg-4 mb-6">
+            <div class="stat-card h-100 fade-in-up">
+                <div class="stat-stat-header bg-gradient-warm-danger text-white text-white">
                     <h5><i class="fas fa-wrench"></i> Módulo Mantenimiento</h5>
                 </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-12">
+                <div class="stat-module-content">
+                    <div class="flex flex-wrap -mx-2">
+                        <div class="flex-1 px-2-12">
                             <a href="/mantenimiento" class="btn btn-outline-danger btn-sm mb-1">Dashboard</a><br>
                             <a href="/mantenimiento/mantenimientos" class="btn btn-outline-danger btn-sm mb-1">Mantenimientos</a><br>
                             <a href="/mantenimiento/repuestos" class="btn btn-outline-danger btn-sm">Repuestos</a>
                         </div>
                     </div>
                 </div>
-                <div class="card-footer">
-                    <small class="text-muted">Mantenimiento preventivo y correctivo</small>
+                <div class="stat-module-actions">
+                    <small class="text-vanilla-600">Mantenimiento preventivo y correctivo</small>
                 </div>
             </div>
         </div>
 
         <!-- Módulo Inventarios -->
-        <div class="col-md-6 col-lg-4 mb-4">
-            <div class="card h-100">
-                <div class="card-header bg-dark text-white">
-                    <h5><i class="fas fa-boxes"></i> Módulo Inventarios</h5>
+        <div class="w-full md:w-1/2 px-2 flex-1 px-2-lg-4 mb-6">
+            <div class="stat-card h-100 fade-in-up">
+                <div class="stat-stat-header bg-prussian-blue text-white text-white">
+                    <h5><i class="fas fa-boxes text-vanilla-100"></i> Módulo Inventarios</h5>
                 </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-6">
+                <div class="stat-module-content">
+                    <div class="flex flex-wrap -mx-2">
+                        <div class="flex-1 px-2-6">
                             <p><strong>Materiales:</strong> {{ dashboard.modulos.inventarios.materiales if dashboard.modulos else 0 }}</p>
                             <p><strong>Bodegas:</strong> {{ dashboard.modulos.inventarios.bodegas if dashboard.modulos else 0 }}</p>
                         </div>
-                        <div class="col-6">
+                        <div class="flex-1 px-2-6">
                             <a href="/materiales" class="btn btn-outline-dark btn-sm mb-1">Ver Materiales</a><br>
                             <a href="/bodegas" class="btn btn-outline-dark btn-sm mb-1">Ver Bodegas</a><br>
                             <a href="/compras/ordenes" class="btn btn-outline-dark btn-sm">Órdenes de Compra</a>
                         </div>
                     </div>
                 </div>
-                <div class="card-footer">
-                    <small class="text-muted">Control de inventarios y compras</small>
+                <div class="stat-module-actions">
+                    <small class="text-vanilla-600">Control de inventarios y compras</small>
                 </div>
             </div>
         </div>
 
         <!-- Módulo Reportes -->
-        <div class="col-md-6 col-lg-4 mb-4">
-            <div class="card h-100">
-                <div class="card-header bg-light text-dark">
-                    <h5><i class="fas fa-chart-bar"></i> Módulo Reportes</h5>
+        <div class="w-full md:w-1/2 px-2 flex-1 px-2-lg-4 mb-6">
+            <div class="stat-card h-100 fade-in-up">
+                <div class="stat-stat-header bg-vanilla-800 text-dark">
+                    <h5><i class="fas fa-chart-bar text-xanthous"></i> Módulo Reportes</h5>
                 </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-12">
+                <div class="stat-module-content">
+                    <div class="flex flex-wrap -mx-2">
+                        <div class="flex-1 px-2-12">
                             <a href="/reportes" class="btn btn-outline-dark btn-sm mb-1">Reportes Generales</a><br>
                             <a href="/reportes/kpi" class="btn btn-outline-dark btn-sm mb-1">Métricas KPI</a><br>
                             <a href="/reportes/completos" class="btn btn-outline-dark btn-sm mb-1">Reportes Completos</a><br>
@@ -261,25 +380,25 @@
                         </div>
                     </div>
                 </div>
-                <div class="card-footer">
-                    <small class="text-muted">Reportes y análisis avanzados</small>
+                <div class="stat-module-actions">
+                    <small class="text-vanilla-600">Reportes y análisis avanzados</small>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Búsqueda Global -->
-    <div class="row mt-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
+    <div class="flex flex-wrap -mx-2 mt-6">
+        <div class="flex-1 px-2-12">
+            <div class="stat-card fade-in-up">
+                <div class="stat-stat-header">
                     <h5><i class="fas fa-search"></i> Búsqueda Global</h5>
                 </div>
-                <div class="card-body">
+                <div class="stat-module-content">
                     <div class="input-group">
                         <input type="text" class="form-control" id="busqueda-global" placeholder="Buscar en todo el sistema...">
                         <div class="input-group-append">
-                            <button class="btn btn-primary" type="button" onclick="buscarGlobal()">
+                            <button class="btn btn btn btn-warm-primary" type="button" onclick="buscarGlobal()">
                                 <i class="fas fa-search"></i> Buscar
                             </button>
                         </div>
@@ -291,25 +410,25 @@
     </div>
 
     <!-- Estado del Sistema -->
-    <div class="row mt-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
+    <div class="flex flex-wrap -mx-2 mt-6">
+        <div class="flex-1 px-2-12">
+            <div class="stat-card fade-in-up">
+                <div class="stat-stat-header">
                     <h5><i class="fas fa-server"></i> Estado del Sistema</h5>
                 </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-4">
+                <div class="stat-module-content">
+                    <div class="flex flex-wrap -mx-2">
+                        <div class="flex-1 px-2-md-4">
                             <h6>Base de Datos</h6>
-                            <span class="badge badge-success">86 Tablas Activas</span>
+                            <span class="badge badge badge-success">86 Tablas Activas</span>
                         </div>
-                        <div class="col-md-4">
+                        <div class="flex-1 px-2-md-4">
                             <h6>Módulos</h6>
-                            <span class="badge badge-success">8 Módulos Operativos</span>
+                            <span class="badge badge badge-success">8 Módulos Operativos</span>
                         </div>
-                        <div class="col-md-4">
+                        <div class="flex-1 px-2-md-4">
                             <h6>Conexión</h6>
-                            <span class="badge badge-success">PostgreSQL Conectado</span>
+                            <span class="badge badge badge-success">PostgreSQL Conectado</span>
                         </div>
                     </div>
                 </div>
@@ -324,7 +443,7 @@ function buscarGlobal() {
     const resultadosDiv = document.getElementById('resultados-busqueda');
     
     if (!termino.trim()) {
-        resultadosDiv.innerHTML = '<div class="alert alert-warning">Por favor ingrese un término de búsqueda</div>';
+        resultadosDiv.innerHTML = '<div class="alert alert alert-warning">Por favor ingrese un término de búsqueda</div>';
         return;
     }
     
@@ -336,17 +455,17 @@ function buscarGlobal() {
                 data.resultados.forEach(resultado => {
                     html += `<li class="list-group-item">
                         <strong>${resultado.tipo}:</strong> ${resultado.nombre} 
-                        ${resultado.detalle ? `<small class="text-muted">(${resultado.detalle})</small>` : ''}
+                        ${resultado.detalle ? `<small class="text-vanilla-600">(${resultado.detalle})</small>` : ''}
                     </li>`;
                 });
                 html += '</ul>';
                 resultadosDiv.innerHTML = html;
             } else {
-                resultadosDiv.innerHTML = '<div class="alert alert-info">No se encontraron resultados</div>';
+                resultadosDiv.innerHTML = '<div class="alert alert alert-info">No se encontraron resultados</div>';
             }
         })
         .catch(error => {
-            resultadosDiv.innerHTML = '<div class="alert alert-danger">Error en la búsqueda</div>';
+            resultadosDiv.innerHTML = '<div class="alert alert alert-danger">Error en la búsqueda</div>';
         });
 }
 

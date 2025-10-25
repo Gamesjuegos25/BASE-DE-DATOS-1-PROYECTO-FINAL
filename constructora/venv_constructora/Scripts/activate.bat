@@ -8,7 +8,7 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-set "VIRTUAL_ENV=C:\Users\games\Desktop\BASE-DE-DATOS-1-PROYECTO-FINAL-master\BASE-DE-DATOS-1-PROYECTO-FINAL-master\constructora\venv_constructora"
+set "VIRTUAL_ENV=C:\Users\VICTUS\Videos\BASE-DE-DATOS-1-PROYECTO-FINAL-master (2)\BASE-DE-DATOS-1-PROYECTO-FINAL-master\constructora\venv_constructora"
 
 if not defined PROMPT set PROMPT=$P$G
 

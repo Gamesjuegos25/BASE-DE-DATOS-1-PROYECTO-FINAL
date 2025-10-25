@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <!-- CSS para formularios -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/form-pages.css') }}">{% endblock %}
+
+{% block title %}Editar Proveedor{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/create-forms.css') }}">
+
+
+<div class="page-header">
+  <nav class="breadcrumb">
+    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+    <span class="breadcrumb-separator">/</span>
+    <a href="{{ url_for('listar_proveedores') }}">Proveedores</a>
+    <span class="breadcrumb-separator">/</span>
+    <span>Editar</span>
+  </nav>
+  <div class="form-header"><div class="form-header-content"><h1 class="form-title"><i class="fas fa-edit"></i>✏️ Editar Proveedor</h1></div></div>
+</div>
+
+<div class="create-form-max-w-7xl mx-auto px-6">
+<form action="{{ url_for('editar_proveedor', id=proveedor.id_proveedor) }}" method="post" class="form">
+  <div class="form-group">
+    <label>Nombre</label>
+    <input class="form-input" value="{{ proveedor.nombre or '' }}" required>
+  </div>
+  <div class="form-group">
+    <label>Teléfono</label>
+    <input class="form-input" value="{{ proveedor.telefono or '' }}">
+  </div>
+  <div class="form-group">
+    <label>Email</label>
+    <input class="form-input" value="{{ proveedor.email or '' }}">
+  </div>
+  <div class="form-group">
+    <label>Dirección</label>
+    <textarea class="form-textarea">{{ proveedor.direccion or '' }}</textarea>
+  </div>
+  <div class="form-group">
+    <label>Tipo</label>
+    <input class="form-input" value="{{ proveedor.tipo or '' }}">
+  </div>
+  <div class="form-actions">
+    <a class="btn btn btn btn-warm-secondary" href="{{ url_for('listar_proveedores') }}">Cancelar</a>
+    <button class="btn btn btn btn-warm-primary" type="submit">Guardar</button>
+  </div>
+</form>
+</div>
+
+{% endblock %}

@@ -1,0 +1,320 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <!-- CSS específico para páginas de detalle -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/detail-page.css') }}">
+    
+    <!-- CSS para páginas de detalle -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/detail-page.css') }}">{% endblock %}
+
+{% block title %}Detalle Factura{% endblock %}
+{% block content %}
+<div class="page-header">
+  <nav class="breadcrumb">
+    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+    <span class="breadcrumb-separator">/</span>
+    <a href="{{ url_for('listar_facturas') }}">Facturas</a>
+    <span class="breadcrumb-separator">/</span>
+    <span>Detalle</span>
+  </nav>
+  <h1 class="page-title">📄 {{ factura.numero_factura or 'Factura' }} <small class="text-vanilla-600">{{ factura.serie_factura or '' }}</small></h1>
+</div>
+
+<div class="flex flex-wrap -mx-2">
+  <div class="flex-1 px-2-md-8">
+    <div class="detail-card">
+      <div class="stat-stat-header">
+        <h4 style="color: var(--prussian-blue-600); margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: var(--spacing-sm);"><i class="fas fa-file-invoice-dollar text-xanthous"></i>Información de la Factura</h4>
+      </div>
+      <div class="stat-module-content">
+        <dl class="flex flex-wrap -mx-2">
+          <dt class="flex-1 px-2-sm-4"><i class="fas fa-hashtag"></i> Número</dt>
+          <dd class="flex-1 px-2-sm-8">
+            <strong class="text-prussian-blue">{{ factura.numero_factura or 'N/D' }}</strong>
+            {% if factura.serie_factura %}
+              <small class="text-vanilla-600"> - Serie: {{ factura.serie_factura }}</small>
+            {% endif %}
+          </dd>
+          
+          <dt class="flex-1 px-2-sm-4"><i class="fas fa-calendar-alt"></i> Emisión</dt>
+          <dd class="flex-1 px-2-sm-8">
+            {% if factura.fecha_emision %}
+              {{ factura.fecha_emision.strftime('%d/%m/%Y') if factura.fecha_emision is not string else factura.fecha_emision }}
+            {% else %}
+              <span class="text-vanilla-600">Sin fecha</span>
+            {% endif %}
+          </dd>
+          
+          <dt class="flex-1 px-2-sm-4"><i class="fas fa-calendar-times"></i> Vencimiento</dt>
+          <dd class="flex-1 px-2-sm-8">
+            {% if factura.fecha_vencimiento %}
+              {% set vence_pronto = (factura.fecha_vencimiento - now()).days < 7 if factura.fecha_vencimiento is not string else false %}
+              <span class="{% if vence_pronto %}text-fire-engine-red{% else %}text-prussian-blue-700{% endif %}">
+                {{ factura.fecha_vencimiento.strftime('%d/%m/%Y') if factura.fecha_vencimiento is not string else factura.fecha_vencimiento }}
+              </span>
+            {% else %}
+              <span class="text-vanilla-600">Sin fecha</span>
+            {% endif %}
+          </dd>
+          
+          <dt class="flex-1 px-2-sm-4"><i class="fas fa-info-circle text-prussian-blue-700"></i> Estado</dt>
+          <dd class="flex-1 px-2-sm-8">
+            {% set estado_class = {
+              'PAGADA': 'success',
+              'PENDIENTE': 'warning', 
+              'VENCIDA': 'danger',
+              'CANCELADA': 'secondary'
+            } %}
+            <span class="status-badge-detail {{ estado_class.get(factura.estado, 'secondary') }}">
+              {{ factura.estado or 'SIN ESTADO' }}
+            </span>
+          </dd>
+          
+          <dt class="flex-1 px-2-sm-4"><i class="fas fa-credit-stat-card"></i> Método Pago</dt>
+          <dd class="flex-1 px-2-sm-8">
+            <span class="status-badge-detail">{{ factura.metodo_pago or 'No especificado' }}</span>
+          </dd>
+          
+          {% if factura.fecha_pago %}
+          <dt class="flex-1 px-2-sm-4"><i class="fas fa-check-circle text-xanthous-600"></i> Fecha Pago</dt>
+          <dd class="flex-1 px-2-sm-8">
+            <strong class="text-xanthous-600">{{ factura.fecha_pago.strftime('%d/%m/%Y') if factura.fecha_pago is not string else factura.fecha_pago }}</strong>
+            {% if factura.referencia_pago %}
+              <br><small class="text-vanilla-600">Ref: {{ factura.referencia_pago }}</small>
+            {% endif %}
+          </dd>
+          {% endif %}
+        </dl>
+      </div>
+    </div>
+    
+    {% if factura.observaciones %}
+    <div class="detail-card">
+      <div class="stat-stat-header">
+        <h4 style="color: var(--prussian-blue-600); margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: var(--spacing-sm);"><i class="fas fa-comment-alt text-xanthous"></i>Observaciones</h4>
+      </div>
+      <div class="stat-module-content">
+        <p class="mb-0">{{ factura.observaciones }}</p>
+      </div>
+    </div>
+    {% endif %}
+    
+    {% if detalles %}
+    <div class="detail-card">
+      <div class="stat-stat-header">
+        <h4 style="color: var(--prussian-blue-600); margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: var(--spacing-sm);"><i class="fas fa-list text-xanthous"></i>Detalles de la Factura</h4>
+      </div>
+      <div class="stat-module-content">
+        <div class="table-max-w-7xl mx-auto px-6">
+          <table class="assignment-table">
+            <thead>
+              <tr>
+                <th>Descripción</th>
+                <th>Cantidad</th>
+                <th>Precio Unit.</th>
+                <th>Subtotal</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for detalle in detalles %}
+              <tr>
+                <td>{{ detalle.descripcion }}</td>
+                <td>{{ detalle.cantidad }}</td>
+                <td>Q{{ "{:,.2f}".format(detalle.precio_unitario or 0) }}</td>
+                <td>Q{{ "{:,.2f}".format(detalle.subtotal or 0) }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+    
+    {% if pagos %}
+    <div class="detail-card">
+      <div class="stat-stat-header">
+        <h4 style="color: var(--prussian-blue-600); margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: var(--spacing-sm);"><i class="fas fa-money-check-alt text-xanthous"></i>Pagos Registrados</h4>
+      </div>
+      <div class="stat-module-content">
+        <div class="table-max-w-7xl mx-auto px-6">
+          <table class="assignment-table">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Monto</th>
+                <th>Método</th>
+                <th>Referencia</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for pago in pagos %}
+              <tr>
+                <td>{{ pago.fecha_pago.strftime('%d/%m/%Y') if pago.fecha_pago else 'N/A' }}</td>
+                <td>Q{{ "{:,.2f}".format(pago.monto or 0) }}</td>
+                <td>{{ pago.metodo_pago or 'N/D' }}</td>
+                <td>{{ pago.referencia or '-' }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+  
+  <div class="flex-1 px-2-md-4">
+    <div class="detail-card">
+      <div class="stat-stat-header">
+        <h4 style="color: var(--prussian-blue-600); margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: var(--spacing-sm);"><i class="fas fa-calculator text-xanthous"></i>Resumen Financiero</h4>
+      </div>
+      <div class="stat-module-content text-center">
+        <div class="financial-summary">
+          <div class="mb-3">
+            <small class="text-vanilla-600">Subtotal:</small><br>
+            <strong class="h5">Q{{ "{:,.2f}".format(factura.subtotal or 0) }}</strong>
+          </div>
+          
+          {% if factura.descuento and factura.descuento > 0 %}
+          <div class="mb-3">
+            <small class="text-vanilla-600">Descuento:</small><br>
+            <strong class="text-orange-wheel">-Q{{ "{:,.2f}".format(factura.descuento) }}</strong>
+          </div>
+          {% endif %}
+          
+          <div class="mb-3">
+            <small class="text-vanilla-600">IVA (12%):</small><br>
+            <strong class="text-prussian-blue-700">Q{{ "{:,.2f}".format(factura.iva or 0) }}</strong>
+          </div>
+          
+          <hr>
+          
+          <div class="mb-3">
+            <small class="text-vanilla-600">TOTAL:</small><br>
+            <strong class="h3 text-xanthous-600">Q{{ "{:,.2f}".format(factura.total or 0) }}</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    {% if factura.nombre_cliente %}
+    <div class="detail-card">
+      <div class="stat-stat-header">
+        <h4 style="color: var(--prussian-blue-600); margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: var(--spacing-sm);"><i class="fas fa-user text-xanthous"></i>Cliente</h4>
+      </div>
+      <div class="stat-module-content">
+        <div class="text-center">
+          <h6 class="text-dark">{{ factura.nombre_cliente }} {{ factura.apellido_cliente or '' }}</h6>
+          {% if factura.documento_cliente %}
+            <small class="text-vanilla-600">{{ factura.documento_cliente }}</small>
+          {% endif %}
+          {% if factura.telefono_cliente %}
+            <div class="mt-2">
+              <a href="tel:{{ factura.telefono_cliente }}" class="btn btn-sm btn-outline-success">
+                <i class="fas fa-phone"></i> {{ factura.telefono_cliente }}
+              </a>
+            </div>
+          {% endif %}
+          {% if factura.email_cliente %}
+            <div class="mt-2">
+              <a href="mailto:{{ factura.email_cliente }}" class="btn btn-sm btn-outline-info">
+                <i class="fas fa-envelope"></i> Email
+              </a>
+            </div>
+          {% endif %}
+          {% if factura.direccion_cliente %}
+            <div class="mt-2">
+              <small class="text-vanilla-600"><i class="fas fa-map-marker-alt"></i> {{ factura.direccion_cliente }}</small>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endif %}
+    
+    {% if factura.nombre_obra %}
+    <div class="detail-card">
+      <div class="stat-stat-header">
+        <h4 style="color: var(--prussian-blue-600); margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: var(--spacing-sm);"><i class="fas fa-building text-prussian-blue text-xanthous"></i>Proyecto</h4>
+      </div>
+      <div class="stat-module-content text-center">
+        <h6 class="text-prussian-blue">{{ factura.nombre_obra }}</h6>
+        {% if factura.ubicacion_obra %}
+          <small class="text-vanilla-600"><i class="fas fa-map-marker-alt"></i> {{ factura.ubicacion_obra }}</small>
+        {% endif %}
+        {% if factura.monto_total_contrato %}
+          <div class="mt-2">
+            <small class="text-vanilla-600">Valor Contrato:</small><br>
+            <strong class="text-xanthous-600">Q{{ "{:,.2f}".format(factura.monto_total_contrato) }}</strong>
+          </div>
+        {% endif %}
+        <div class="mt-3">
+          <a href="{{ url_for('ver_obra', id=factura.id_obra) }}" class="btn btn-sm btn-outline-primary">
+            <i class="fas fa-eye"></i> Ver Proyecto
+          </a>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+    
+    <div class="detail-card">
+      <div class="stat-stat-header">
+        <h4 style="color: var(--prussian-blue-600); margin-bottom: var(--spacing-md); display: flex; align-items: center; gap: var(--spacing-sm);"><i class="fas fa-cogs text-xanthous"></i>Acciones</h4>
+      </div>
+      <div class="stat-module-content">
+        <div class="flex flex-col gap-2">
+          <a class="btn btn btn btn-warm-primary" href="{{ url_for('editar_factura', id=factura.id_factura) }}">
+            <i class="fas fa-edit"></i> Editar Factura
+          </a>
+          <a class="btn btn btn-accent" href="#">
+            <i class="fas fa-file-pdf"></i> Generar PDF
+          </a>
+          <a class="btn btn btn btn-warm-primary" href="#">
+            <i class="fas fa-print"></i> Imprimir
+          </a>
+          {% if factura.estado == 'PENDIENTE' %}
+          <a class="btn btn btn btn-warm-secondary" href="#">
+            <i class="fas fa-money-bill-wave"></i> Registrar Pago
+          </a>
+          {% endif %}
+          <a class="btn btn btn btn-warm-secondary" href="{{ url_for('listar_facturas') }}">
+            <i class="fas fa-arrow-left"></i> Volver a Lista
+          </a>
+          <form action="{{ url_for('eliminar_factura', id=factura.id_factura) }}" method="post" onsubmit="return confirm('¿Eliminar esta factura?');" class="mt-2">
+            <button class="btn btn btn btn-warm-danger w-100" type="submit">
+              <i class="fas fa-trash"></i> Eliminar
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.financial-summary .h3 {
+  font-size: 1.8rem;
+}
+
+.financial-summary .h5 {
+  font-size: 1.25rem;
+}
+
+.card-header h5 {
+  color: #495057;
+}
+
+.badge {
+  font-size: 0.9rem;
+}
+
+.gap-2 > * + * {
+  margin-top: 0.5rem;
+}
+
+.table-responsive {
+  border-radius: 0.375rem;
+}
+</style>
+{% endblock %}

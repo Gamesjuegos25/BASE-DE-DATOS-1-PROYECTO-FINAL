@@ -14,8 +14,8 @@ DB_CONFIG = {
     'host': os.getenv('DB_HOST', 'localhost'),
     'port': int(os.getenv('DB_PORT', 5432)),
     'user': os.getenv('DB_USER', 'postgres'),
-    'password': os.getenv('DB_PASSWORD', '123'),
-    'database': os.getenv('DB_NAME', 'PROYECTO_FINAL_BD1'),
+    'password': os.getenv('DB_PASSWORD', '123654'),
+    'database': os.getenv('DB_NAME', 'cosntructora'),
     'client_encoding': 'LATIN1'
 }
 

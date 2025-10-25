@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <!-- CSS para formularios -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/form-pages.css') }}">{% endblock %}
+
+
+{% block title %}Crear Bodega{% endblock %}
+
+{% block content %}
+    <div class="create-form-max-w-7xl mx-auto px-6">
+        <!-- Header -->
+        <div class="create-page-header">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="{{ url_for('dashboard') }}">
+                            <i class="fas fa-home"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="{{ url_for('listar_bodegas') }}">
+                            <i class="fas fa-list"></i> Bodegas
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        <i class="fas fa-plus"></i> Crear Bodega
+                    </li>
+                </ol>
+            </nav>
+            
+            <div class="create-title-section">
+                <h1 class="create-title">
+                    <i class="fas fa-plus-circle"></i>
+                    Crear Bodega
+                </h1>
+                <p class="create-subtitle">Complete el formulario para registrar una nueva bodega</p>
+            </div>
+        </div>
+
+        <!-- Formulario -->
+        <div class="form-card">
+            <form method="POST" action="{{ url_for('crear_bodega') }}" class="needs-validation" novalidate>
+                <div class="create-form-flex flex-wrap -mx-2">
+                    <div class="create-form-group">
+                        <label class="form-label">
+                            <i class="fas fa-user"></i> Responsable de la Bodega <span class="required">*</span>
+                        </label>
+                        <input class="form-input" id="responsable_bodega" name="responsable_bodega" required placeholder="Ingrese nombre del responsable">
+                        <div class="invalid-feedback">
+                            Por favor ingrese el responsable de la bodega.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="create-form-flex flex-wrap -mx-2">
+                    <div class="create-form-group">
+                        <label class="form-label">
+                            <i class="fas fa-map-marker-alt"></i> Ubicación de la Bodega
+                        </label>
+                        <input class="form-input" id="ubicacion_bodega" name="ubicacion_bodega" placeholder="Ej: Sector Norte - Zona Industrial Km 15">
+                        <small class="form-text text-vanilla-600">
+                            Dirección o ubicación específica de la bodega
+                        </small>
+                    </div>
+                </div>
+
+                <div class="create-form-flex flex-wrap -mx-2">
+                    <div class="create-form-group flex-1 px-2-md-6">
+                        <label class="form-label">
+                            <i class="fas fa-boxes text-vanilla-100"></i> Capacidad de Almacenamiento
+                        </label>
+                        <input class="form-input" id="capacidad_bodega" name="capacidad_bodega" placeholder="Ej: 1500 m³ - Materiales pesados">
+                        <small class="form-text text-vanilla-600">
+                            Descripción de la capacidad de la bodega
+                        </small>
+                    </div>
+
+                    <div class="create-form-group flex-1 px-2-md-6">
+                        <label class="form-label">
+                            <i class="fas fa-phone"></i> Teléfono de Contacto
+                        </label>
+                        <input class="form-input" id="telefono_bodega" name="telefono_bodega" placeholder="+502 2234-5678">
+                        <small class="form-text text-vanilla-600">
+                            Número telefónico de la bodega
+                        </small>
+                    </div>
+                </div>
+
+                <div class="create-form-flex flex-wrap -mx-2">
+                    <div class="create-form-group flex-1 px-2-md-6">
+                        <label class="form-label">
+                            <i class="fas fa-toggle-on"></i> Estado de la Bodega
+                        </label>
+                        <select class="form-select" id="estado_bodega" name="estado_bodega">
+                            <option value="Activa" selected>Activa</option>
+                            <option value="Inactiva">Inactiva</option>
+                            <option value="Mantenimiento">En Mantenimiento</option>
+                            <option value="Construccion">En Construcción</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="create-form-flex flex-wrap -mx-2">
+                    <div class="create-form-group">
+                        <label class="form-label">
+                            <i class="fas fa-sticky-note"></i> Observaciones
+                        </label>
+                        <textarea class="form-textarea" id="observaciones_bodega" name="observaciones_bodega" rows="3" placeholder="Descripciones adicionales, especialidades, restricciones, etc."></textarea>
+                        <small class="form-text text-vanilla-600">
+                            Información adicional sobre la bodega (especialidades, restricciones, etc.)
+                        </small>
+                    </div>
+                </div>
+
+                <!-- Botones de acción -->
+                <div class="create-form-actions">
+                    <div class="action-buttons">
+                        <a href="{{ url_for('listar_bodegas') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn btn btn-warm-primary">
+                            <i class="fas fa-save"></i> Guardar Bodega
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+<script>
+// Validación de formularios Bootstrap
+(function() {
+    'use strict';
+    window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        var validation = Array.prototype.filter.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+})();
+</script>
+
+<style>
+.create-form-row .col-md-6 {
+    width: 48%;
+    display: inline-block;
+    vertical-align: top;
+    margin-right: 2%;
+}
+
+.create-form-row .col-md-6:last-child {
+    margin-right: 0;
+}
+
+.form-label i {
+    margin-right: 5px;
+    color: #4e73df;
+}
+
+.required {
+    color: #e74a3b;
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.form-text {
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+</style>
+
+{% endblock %}

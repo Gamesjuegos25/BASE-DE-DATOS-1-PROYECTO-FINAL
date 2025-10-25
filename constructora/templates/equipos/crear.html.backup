@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}Nuevo Equipo - Sistema Constructora{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/create-forms.css') }}">
+
+<div class="create-form-container">
+    <div class="create-page-header">
+        <nav class="breadcrumb">
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <span class="breadcrumb-separator">/</span>
+            <a href="{{ url_for('listar_equipos') }}">Equipos</a>
+            <span class="breadcrumb-separator">/</span>
+            <span>Nuevo</span>
+        </nav>
+        <h1 class="create-page-title">
+            <i class="fas fa-tools"></i>
+            Crear Nuevo Equipo
+        </h1>
+    </div>
+
+    <div class="container-fluid">
+        <form method="POST" action="{{ url_for('crear_equipo') }}" id="create-equipo-form" class="needs-validation" novalidate>
+            <div class="create-form-row">
+                <div class="create-form-card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-cog"></i> Información del Equipo</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="create-form-group">
+                            <label for="nombre_equipo" class="create-form-label">
+                                <i class="fas fa-tag"></i>Nombre del Equipo<span class="required">*</span>
+                            </label>
+                            <input type="text" class="create-form-control" id="nombre_equipo" name="nombre_equipo" 
+                                   placeholder="Ej: Taladro Industrial Bosch" required>
+                        </div>
+
+                        <div class="create-form-group">
+                            <label for="tipo_equipo" class="create-form-label">
+                                <i class="fas fa-list"></i>Tipo de Equipo<span class="required">*</span>
+                            </label>
+                            <select class="create-form-control" id="tipo_equipo" name="tipo_equipo" required>
+                                <option value="">Seleccionar tipo...</option>
+                                <option value="HERRAMIENTA_MANUAL">🔨 Herramienta Manual</option>
+                                <option value="HERRAMIENTA_ELECTRICA">⚡ Herramienta Eléctrica</option>
+                                <option value="MAQUINARIA_PESADA">🏗️ Maquinaria Pesada</option>
+                                <option value="EQUIPO_SEGURIDAD">🦺 Equipo de Seguridad</option>
+                                <option value="EQUIPO_MEDICION">📏 Equipo de Medición</option>
+                                <option value="OTRO">❓ Otro</option>
+                            </select>
+                        </div>
+
+                        <div class="create-form-group">
+                            <label for="estado_equipo" class="create-form-label">
+                                <i class="fas fa-check-circle"></i>Estado<span class="required">*</span>
+                            </label>
+                            <select class="create-form-control" id="estado_equipo" name="estado_equipo" required>
+                                <option value="">Seleccionar estado...</option>
+                                <option value="DISPONIBLE">✅ Disponible</option>
+                                <option value="EN_USO">🔄 En Uso</option>
+                                <option value="MANTENIMIENTO">🔧 Mantenimiento</option>
+                                <option value="FUERA_SERVICIO">❌ Fuera de Servicio</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="create-form-card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-info-circle"></i> Detalles Adicionales</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="create-form-group">
+                            <label for="marca_equipo" class="create-form-label">
+                                <i class="fas fa-copyright"></i>Marca
+                            </label>
+                            <input type="text" class="create-form-control" id="marca_equipo" name="marca_equipo" 
+                                   placeholder="Ej: Bosch, DeWalt, Caterpillar">
+                        </div>
+
+                        <div class="create-form-group">
+                            <label for="modelo_equipo" class="create-form-label">
+                                <i class="fas fa-code"></i>Modelo
+                            </label>
+                            <input type="text" class="create-form-control" id="modelo_equipo" name="modelo_equipo" 
+                                   placeholder="Ej: HD-2020">
+                        </div>
+
+                        <div class="create-form-group">
+                            <label for="numero_serie" class="create-form-label">
+                                <i class="fas fa-barcode"></i>Número de Serie
+                            </label>
+                            <input type="text" class="create-form-control" id="numero_serie" name="numero_serie" 
+                                   placeholder="Número de serie único">
+                        </div>
+
+                        <div class="create-form-group">
+                            <label for="fecha_compra" class="create-form-label">
+                                <i class="fas fa-calendar-plus"></i>Fecha de Compra
+                            </label>
+                            <input type="date" class="create-form-control" id="fecha_compra" name="fecha_compra">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="container-fluid">
+        <div class="create-form-card">
+            <div class="create-form-actions">
+                <a href="{{ url_for('listar_equipos') }}" class="create-btn create-btn-secondary">
+                    <i class="fas fa-times"></i>Cancelar
+                </a>
+                <button type="submit" form="create-equipo-form" class="create-btn create-btn-primary">
+                    <i class="fas fa-tools"></i>Crear Equipo
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+(function() {
+    'use strict';
+    window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        var validation = Array.prototype.filter.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+})();
+</script>
+{% endblock %}

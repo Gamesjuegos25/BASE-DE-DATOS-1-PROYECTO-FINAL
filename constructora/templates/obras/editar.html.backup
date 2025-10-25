@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+{% block title %}Editar Obra{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/create-forms.css') }}">
+
+
+<div class="page-header">
+  <nav class="breadcrumb">
+    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+    <span class="breadcrumb-separator">/</span>
+    <a href="{{ url_for('listar_obras') }}">Obras</a>
+    <span class="breadcrumb-separator">/</span>
+    <span>Editar</span>
+  </nav>
+  <h1 class="page-title">✏️ Editar Obra</h1>
+</div>
+
+<div class="create-form-container">
+<form action="{{ url_for('editar_obra', id=(obra.id or obra.obra_id)) }}" method="post" class="form">
+  <div class="form-group">
+    <label>Nombre</label>
+    <input type="text" name="nombre" class="form-control" value="{{ obra.nombre or '' }}" required>
+  </div>
+  <div class="form-group">
+    <label>Descripción</label>
+    <textarea name="descripcion" id="descripcion" class="form-control">{{ obra.descripcion or '' }}</textarea>
+  </div>
+  <div class="form-group">
+    <label>Cliente</label>
+    <input type="text" name="cliente" class="form-control" value="{{ obra.cliente or '' }}">
+  </div>
+  <div class="form-group">
+    <label>Estado</label>
+    <select name="estado" class="form-control">
+      <option value="Planeación" {{ 'selected' if obra.estado == 'Planeación' else '' }}>Planeación</option>
+      <option value="En Progreso" {{ 'selected' if obra.estado == 'En Progreso' else '' }}>En Progreso</option>
+      <option value="Pausado" {{ 'selected' if obra.estado == 'Pausado' else '' }}>Pausado</option>
+      <option value="Completado" {{ 'selected' if obra.estado == 'Completado' else '' }}>Completado</option>
+      <option value="Cancelado" {{ 'selected' if obra.estado == 'Cancelado' else '' }}>Cancelado</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label>Fecha Inicio</label>
+    <input type="date" name="fecha_inicio" class="form-control" value="{{ obra.fecha_inicio.strftime('%Y-%m-%d') if obra.fecha_inicio else '' }}">
+  </div>
+  <div class="form-group">
+    <label>Fecha Fin</label>
+    <input type="date" name="fecha_fin" class="form-control" value="{{ obra.fecha_fin.strftime('%Y-%m-%d') if obra.fecha_fin else '' }}">
+  </div>
+  <div class="form-group">
+    <label>Valor</label>
+    <input type="number" step="0.01" id="valor" name="valor" class="form-control" value="{{ obra.valor if obra.valor else '' }}">
+  </div>
+
+  <!-- Tipo de Obra (Catálogo) -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h3 class="card-title">Tipo de Obra (Catálogo)</h3>
+      <p style="margin:0;color:#6c757d;font-size:14px;">Si activas precio fijo, se usarán valores del catálogo.</p>
+    </div>
+    <div class="card-body">
+      <div class="form-group">
+        <label class="form-label">
+          <input type="checkbox" id="es_precio_fijo" name="es_precio_fijo" {% if obra.es_precio_fijo %}checked{% endif %}>
+          Usar precio y descripción fijos del catálogo
+        </label>
+      </div>
+      <div class="form-group">
+        <label for="id_tipo_obra" class="form-label">Tipo de Obra</label>
+        <select id="id_tipo_obra" name="id_tipo_obra" class="form-control" {% if not obra.es_precio_fijo %}disabled{% endif %}>
+          <option value="">Seleccionar tipo...</option>
+          {% for t in tipos_obra %}
+          <option value="{{ t.id }}" data-unidad="{{ t.unidad_medida }}" data-rango="{{ t.rango_precio }}" data-precio="{{ t.precio_base }}" {% if obra.id_tipo_obra and obra.id_tipo_obra == t.id %}selected{% endif %}>
+            {{ t.nombre_tipo }}{% if t.unidad_medida %} - ({{ t.unidad_medida }}){% endif %}{% if t.rango_precio %} • {{ t.rango_precio }}{% endif %}
+          </option>
+          {% endfor %}
+        </select>
+        <small id="tipo-info" class="form-text text-muted" style="display:block; margin-top:6px;"></small>
+      </div>
+      <div class="alert alert-info" id="alerta-tipo-obra" style="display:none;">
+        Con precio fijo, la descripción y el valor se fijarán automáticamente según el tipo.
+      </div>
+      <!-- Estimación para cotización -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="unidad_estimacion" class="form-label">Unidad de estimación</label>
+          <select id="unidad_estimacion" name="unidad_estimacion" class="form-control" {% if not obra.es_precio_fijo %}disabled{% endif %}>
+            <option value="">Auto (según tipo)</option>
+            <option value="m2" {% if obra.unidad_estimacion == 'm2' %}selected{% endif %}>m2</option>
+            <option value="unidad" {% if obra.unidad_estimacion == 'unidad' %}selected{% endif %}>Unidad</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="area_m2" class="form-label">Área estimada (m²)</label>
+          <input type="number" step="0.01" id="area_m2" name="area_m2" class="form-control" placeholder="0" value="{{ obra.area_m2 or '' }}" {% if not obra.es_precio_fijo %}disabled{% endif %}>
+        </div>
+        <div class="form-group">
+          <label for="cantidad_estimada" class="form-label">Cantidad estimada (unidades)</label>
+          <input type="number" step="0.01" id="cantidad_estimada" name="cantidad_estimada" class="form-control" placeholder="1" value="{{ obra.cantidad_estimada or '' }}" {% if not obra.es_precio_fijo %}disabled{% endif %}>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Valor estimado</label>
+          <input type="text" id="valor_estimado_preview" class="form-control" placeholder="$0" disabled>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="form-actions">
+    <a class="btn btn-secondary" href="{{ url_for('listar_obras') }}">Cancelar</a>
+    <button class="btn btn-primary" type="submit">Guardar</button>
+  </div>
+</form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const chkFijo = document.getElementById('es_precio_fijo');
+  const selTipo = document.getElementById('id_tipo_obra');
+  const txtDesc = document.getElementById('descripcion');
+  const numValor = document.getElementById('valor');
+  const info = document.getElementById('tipo-info');
+  const alerta = document.getElementById('alerta-tipo-obra');
+  const unidadSel = document.getElementById('unidad_estimacion');
+  const areaInput = document.getElementById('area_m2');
+  const cantInput = document.getElementById('cantidad_estimada');
+  const valorPreview = document.getElementById('valor_estimado_preview');
+
+  function toggleTipoObra() {
+    const activo = chkFijo && chkFijo.checked;
+    if (selTipo) selTipo.disabled = !activo;
+    if (alerta) alerta.style.display = activo ? 'block' : 'none';
+    if (txtDesc && numValor) {
+      if (activo) {
+        txtDesc.setAttribute('disabled', 'disabled');
+        numValor.setAttribute('disabled', 'disabled');
+        if (unidadSel) unidadSel.removeAttribute('disabled');
+        if (areaInput) areaInput.removeAttribute('disabled');
+        if (cantInput) cantInput.removeAttribute('disabled');
+      } else {
+        txtDesc.removeAttribute('disabled');
+        numValor.removeAttribute('disabled');
+        if (unidadSel) unidadSel.setAttribute('disabled', 'disabled');
+        if (areaInput) areaInput.setAttribute('disabled', 'disabled');
+        if (cantInput) cantInput.setAttribute('disabled', 'disabled');
+        if (valorPreview) valorPreview.value = '';
+      }
+    }
+  }
+
+  function updateTipoInfo() {
+    if (!selTipo) return;
+    const opt = selTipo.options[selTipo.selectedIndex];
+    if (!opt || !opt.value) { info.textContent=''; return; }
+    const unidad = opt.getAttribute('data-unidad') || '';
+    const rango = opt.getAttribute('data-rango') || '';
+    info.textContent = `${unidad ? 'Unidad: ' + unidad + ' • ' : ''}${rango ? 'Rango: ' + rango : ''}`;
+    // Auto-set unidad si vacío
+    if (unidadSel && (!unidadSel.value || unidadSel.value === '')) {
+      if (unidad.toLowerCase().includes('m2')) unidadSel.value = 'm2';
+      else unidadSel.value = 'unidad';
+    }
+    calcularEstimacion();
+  }
+
+  function calcularEstimacion() {
+    if (!selTipo || !valorPreview) return;
+    const opt = selTipo.options[selTipo.selectedIndex];
+    if (!opt || !opt.value) { valorPreview.value=''; return; }
+    const precio = parseFloat(opt.getAttribute('data-precio') || '0') || 0;
+    const unidad = (unidadSel && unidadSel.value ? unidadSel.value : (opt.getAttribute('data-unidad')||'')).toLowerCase();
+    const area = areaInput ? (parseFloat(areaInput.value || '0') || 0) : 0;
+    const cant = cantInput ? (parseFloat(cantInput.value || '0') || 0) : 0;
+    let mult = 1;
+    if (unidad.includes('m2')) mult = area > 0 ? area : 1;
+    else mult = cant > 0 ? cant : 1;
+    const total = Math.round(precio * mult * 100) / 100;
+    valorPreview.value = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP' }).format(total);
+  }
+
+  if (chkFijo) chkFijo.addEventListener('change', toggleTipoObra);
+  if (selTipo) selTipo.addEventListener('change', updateTipoInfo);
+  [unidadSel, areaInput, cantInput].forEach(el => {
+    if (el) el.addEventListener('input', calcularEstimacion);
+    if (el) el.addEventListener('change', calcularEstimacion);
+  });
+  toggleTipoObra();
+  updateTipoInfo();
+  calcularEstimacion();
+});
+</script>
+{% endblock %}

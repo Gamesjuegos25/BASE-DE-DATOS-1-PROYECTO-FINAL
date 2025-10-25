@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-header">
+    <div class="header-content">
+        <div class="header-left">
+            <h1 class="page-title">
+                <i class="fas fa-list"></i>
+                Gestión de Auditorias
+            </h1>
+            <p class="page-subtitle">Control y administración de auditorias</p>
+        </div>
+        <div class="header-actions">
+            <span class="text-muted">
+                <i class="fas fa-info-circle"></i>
+                Módulo de solo lectura
+            </span>
+        </div>
+</div>
+
+<!-- Estadísticas del Módulo -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon bg-blue">
+            <i class="fas fa-list"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ datos|length or 0 }}</div>
+            <div class="stat-label">Total Registros</div>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon bg-green">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ datos|length or 0 }}</div>
+            <div class="stat-label">Activos</div>
+        </div>
+    </div>
+    
+    <div class="stat-card">
+        <div class="stat-icon bg-orange">
+            <i class="fas fa-clock"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">0</div>
+            <div class="stat-label">Pendientes</div>
+        </div>
+    </div>
+</div>
+
+</div>
+
+
+<div class="dashboard-header">
+  <h1><i class="fas fa-clipboard-list"></i> Auditorías del Sistema</h1>
+  <div class="btn-group">
+    <a href="{{ url_for('dashboard') }}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Volver</a>
+  </div>
+</div>
+
+<div class="info-card">
+  <p><i class="fas fa-info-circle"></i> Las auditorías se registran automáticamente por el sistema para mantener trazabilidad de todas las acciones realizadas.</p>
+</div>
+
+<div class="table-container">
+  {% if auditorias %}
+  <table class="table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Fecha</th>
+        <th>Acción</th>
+        <th>Usuario</th>
+        <th>Detalle</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for a in auditorias %}
+      <tr>
+        <td>{{ a.id_auditoria or a.id }}</td>
+        <td>{{ a.fecha_auditoria }}</td>
+        <td>
+          {% set accion = a.accion_auditoria %}
+          <span class="badge 
+            {% if 'LOGIN' in accion or 'CREAR' in accion or 'INSERTAR' in accion %}badge-success
+            {% elif 'ELIMINAR' in accion or 'DELETE' in accion %}badge-danger
+            {% elif 'ACTUALIZAR' in accion or 'UPDATE' in accion %}badge-warning
+            {% else %}badge-info{% endif %}">
+            {{ accion }}
+          </span>
+        </td>
+        <td>{{ a.nombre_usuario or 'Sistema' }}</td>
+        <td>
+          {% if a.detalle_auditoria %}
+            {{ a.detalle_auditoria[:60] }}{% if a.detalle_auditoria|length > 60 %}...{% endif %}
+          {% else %}
+            <span class="text-muted">Sin detalles</span>
+          {% endif %}
+        </td>
+        <td class="table-actions">
+          <a class="btn btn-sm btn-view" href="{{ url_for('ver_auditoria', id=a.id_auditoria or a.id) }}">
+            <i class="fas fa-eye"></i> Ver
+          </a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  
+  <div class="table-footer">
+    <p class="text-muted">Mostrando {{ auditorias|length }} registros de auditoría más recientes</p>
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <i class="fas fa-inbox"></i>
+    <p>No hay auditorías registradas</p>
+  </div>
+  {% endif %}
+</div>
+
+<style>
+.info-card {
+  background: #e3f2fd;
+  border-left: 4px solid #2196F3;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+}
+.info-card i {
+  color: #2196F3;
+  margin-right: 8px;
+}
+.table-footer {
+  padding: 15px;
+  background: #f5f5f5;
+  border-top: 1px solid #dee2e6;
+  text-align: center;
+}
+</style>
+{% endblock %}

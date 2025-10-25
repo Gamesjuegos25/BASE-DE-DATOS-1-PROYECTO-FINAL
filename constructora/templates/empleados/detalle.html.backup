@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% block title %}Detalle Empleado{% endblock %}
+{% block content %}
+<div class="page-header">
+  <nav class="breadcrumb">
+    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+    <span class="breadcrumb-separator">/</span>
+    <a href="{{ url_for('listar_empleados') }}">Empleados</a>
+    <span class="breadcrumb-separator">/</span>
+    <span>Detalle</span>
+  </nav>
+  <h1 class="page-title">👤 {{ empleado.nombre_empleado or 'Empleado' }} <small class="text-muted">ID: {{ empleado.id_empleado }}</small></h1>
+</div>
+
+<div class="row">
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-user"></i> Información Personal</h5>
+      </div>
+      <div class="card-body">
+        <dl class="row">
+          <dt class="col-sm-4"><i class="fas fa-user-tag"></i> Nombre</dt>
+          <dd class="col-sm-8">
+            <strong>{{ empleado.nombre_empleado or 'N/D' }}</strong>
+          </dd>
+          
+          <dt class="col-sm-4"><i class="fas fa-id-badge"></i> Apellidos</dt>
+          <dd class="col-sm-8">
+            <strong>{{ empleado.apellido_empleado or 'N/D' }}</strong>
+          </dd>
+          
+          <dt class="col-sm-4"><i class="fas fa-briefcase"></i> Cargo/Tipo</dt>
+          <dd class="col-sm-8">
+            <span class="badge badge-primary">{{ empleado.tipo_empleado or 'N/D' }}</span>
+          </dd>
+          
+          <dt class="col-sm-4"><i class="fas fa-phone"></i> Teléfono</dt>
+          <dd class="col-sm-8">
+            {% if empleado.telefono %}
+              <a href="tel:{{ empleado.telefono }}" class="text-primary">{{ empleado.telefono }}</a>
+            {% else %}
+              <span class="text-muted">N/D</span>
+            {% endif %}
+          </dd>
+          
+          <dt class="col-sm-4"><i class="fas fa-envelope"></i> Email</dt>
+          <dd class="col-sm-8">
+            {% if empleado.email %}
+              <a href="mailto:{{ empleado.email }}" class="text-primary">{{ empleado.email }}</a>
+            {% else %}
+              <span class="text-muted">N/D</span>
+            {% endif %}
+          </dd>
+          
+          <dt class="col-sm-4"><i class="fas fa-calendar-alt"></i> Fecha de Ingreso</dt>
+          <dd class="col-sm-8">
+            {% if empleado.fecha_ingreso %}
+              <span class="badge badge-info">
+                {{ empleado.fecha_ingreso.strftime('%d/%m/%Y') if empleado.fecha_ingreso is not string else empleado.fecha_ingreso }}
+              </span>
+            {% else %}
+              <span class="text-muted">N/D</span>
+            {% endif %}
+          </dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-coins"></i> Información Salarial</h5>
+      </div>
+      <div class="card-body text-center">
+        <div class="salary-info">
+          <h3 class="text-success mb-2">
+            {% if empleado.salario_fijo_empleado is not none %}
+              Q{{ "{:,.2f}".format(empleado.salario_fijo_empleado) }}
+            {% else %}
+              <span class="text-muted">N/D</span>
+            {% endif %}
+          </h3>
+          <p class="text-muted mb-3">Salario Mensual</p>
+          
+          {% if empleado.salario_fijo_empleado is not none %}
+            <div class="salary-breakdown">
+              <div class="mb-2">
+                <small class="text-muted">Salario Anual:</small><br>
+                <strong class="text-primary">Q{{ "{:,.2f}".format(empleado.salario_fijo_empleado * 12) }}</strong>
+              </div>
+              <div class="mb-2">
+                <small class="text-muted">Con Bono Constitucional:</small><br>
+                <strong class="text-info">Q{{ "{:,.2f}".format(empleado.salario_fijo_empleado * 13) }}</strong>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    
+    <div class="card mt-3">
+      <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-cogs"></i> Acciones</h5>
+      </div>
+      <div class="card-body">
+        <div class="d-flex flex-column gap-2">
+          <a class="btn btn-primary" href="{{ url_for('editar_empleado', id=empleado.id_empleado) }}">
+            <i class="fas fa-edit"></i> Editar Empleado
+          </a>
+          <a class="btn btn-secondary" href="{{ url_for('listar_empleados') }}">
+            <i class="fas fa-arrow-left"></i> Volver a Lista
+          </a>
+          <form action="{{ url_for('eliminar_empleado', id=empleado.id_empleado) }}" method="post" onsubmit="return confirm('¿Eliminar este empleado?');" class="mt-2">
+            <button class="btn btn-danger w-100" type="submit">
+              <i class="fas fa-trash"></i> Eliminar
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.salary-info h3 {
+  font-size: 2.5rem;
+  font-weight: bold;
+}
+
+.salary-breakdown {
+  border-top: 1px solid #dee2e6;
+  padding-top: 1rem;
+}
+
+.card-header h5 {
+  color: #495057;
+}
+
+.badge {
+  font-size: 0.9rem;
+}
+
+.gap-2 > * + * {
+  margin-top: 0.5rem;
+}
+</style>
+{% endblock %}

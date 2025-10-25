@@ -1,0 +1,296 @@
+{% extends "base.html" %}
+
+{% block title %}Inventario #{{ inventario.id_inventario }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{{ url_for('dashboard') }}">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="{{ url_for('inventarios') }}">
+                    <i class="fas fa-boxes"></i> Inventarios
+                </a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                <i class="fas fa-eye"></i> Inventario #{{ inventario.id_inventario }}
+            </li>
+        </ol>
+    </nav>
+    
+    <div class="title-section">
+        <h1 class="page-title">
+            <i class="fas fa-boxes"></i>
+            Inventario #{{ inventario.id_inventario }}
+        </h1>
+        <p class="page-subtitle">Detalles completos del control de stock</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-xl-4 col-lg-5">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="card-title mb-0">
+                    <i class="fas fa-info-circle"></i>
+                    Información General
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="info-list">
+                    <div class="info-item">
+                        <span class="info-label">ID Inventario:</span>
+                        <span class="info-value">#{{ inventario.id_inventario }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Cantidad Total:</span>
+                        <span class="info-value">
+                            <span class="badge badge-primary">{{ inventario.cantidad_inventario or 0 }}</span>
+                        </span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Bodegas Asignadas:</span>
+                        <span class="info-value">
+                            <span class="badge badge-success">{{ bodegas_asignadas|length }}</span>
+                        </span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Materiales Incluidos:</span>
+                        <span class="info-value">
+                            <span class="badge badge-info">{{ materiales_asignados|length }}</span>
+                        </span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Valor Estimado:</span>
+                        <span class="info-value">
+                            <strong class="text-success">Q{{ "%.2f"|format(valor_total or 0) }}</strong>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="action-buttons mt-4">
+                    <a href="{{ url_for('editar_inventario', id=inventario.id_inventario) }}" 
+                       class="btn btn-primary btn-sm btn-block">
+                        <i class="fas fa-edit"></i> Editar Inventario
+                    </a>
+                    <a href="{{ url_for('asignar_materiales_inventario', id=inventario.id_inventario) }}" 
+                       class="btn btn-info btn-sm btn-block">
+                        <i class="fas fa-cubes"></i> Gestionar Materiales
+                    </a>
+                    <a href="{{ url_for('asignar_bodegas_inventario', id=inventario.id_inventario) }}" 
+                       class="btn btn-success btn-sm btn-block">
+                        <i class="fas fa-warehouse"></i> Gestionar Bodegas
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-8 col-lg-7">
+        <div class="row">
+            <!-- Bodegas Asignadas -->
+            <div class="col-12 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0">
+                            <i class="fas fa-warehouse"></i>
+                            Bodegas Asignadas ({{ bodegas_asignadas|length }})
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        {% if bodegas_asignadas %}
+                            <div class="row">
+                                {% for bodega in bodegas_asignadas %}
+                                    <div class="col-md-6 mb-3">
+                                        <div class="info-card">
+                                            <div class="info-card-header">
+                                                <i class="fas fa-warehouse text-success"></i>
+                                                <strong>Bodega #{{ bodega.id_bodega }}</strong>
+                                            </div>
+                                            <div class="info-card-body">
+                                                <p class="mb-1">
+                                                    <strong>Responsable:</strong> {{ bodega.responsable_bodega or 'Sin asignar' }}
+                                                </p>
+                                                {% if bodega.ubicacion_bodega %}
+                                                    <p class="mb-1">
+                                                        <i class="fas fa-map-marker-alt text-muted"></i> 
+                                                        {{ bodega.ubicacion_bodega }}
+                                                    </p>
+                                                {% endif %}
+                                                {% if bodega.capacidad_bodega %}
+                                                    <p class="mb-0">
+                                                        <strong>Capacidad:</strong> {{ bodega.capacidad_bodega }}
+                                                    </p>
+                                                {% endif %}
+                                            </div>
+                                            <div class="info-card-footer">
+                                                <a href="{{ url_for('ver_bodega', id=bodega.id_bodega) }}" 
+                                                   class="btn btn-sm btn-outline-primary">
+                                                    Ver Bodega
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="empty-state-sm">
+                                <i class="fas fa-warehouse fa-2x mb-3 text-muted"></i>
+                                <p class="text-muted mb-3">No hay bodegas asignadas a este inventario</p>
+                                <a href="{{ url_for('asignar_bodegas_inventario', id=inventario.id_inventario) }}" 
+                                   class="btn btn-primary">
+                                    <i class="fas fa-plus"></i> Asignar Bodegas
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Materiales Asignados -->
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0">
+                            <i class="fas fa-cubes"></i>
+                            Materiales en Inventario ({{ materiales_asignados|length }})
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        {% if materiales_asignados %}
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Material</th>
+                                            <th>Descripción</th>
+                                            <th>Precio Unitario</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for material in materiales_asignados %}
+                                            <tr>
+                                                <td>
+                                                    <strong>{{ material.nombre_material }}</strong>
+                                                    <br>
+                                                    <small class="text-muted">#{{ material.id_material }}</small>
+                                                </td>
+                                                <td>{{ material.descripcion_material or '-' }}</td>
+                                                <td>
+                                                    {% if material.precio_unitario %}
+                                                        <span class="text-success">
+                                                            <strong>Q{{ "%.2f"|format(material.precio_unitario) }}</strong>
+                                                        </span>
+                                                    {% else %}
+                                                        <span class="text-muted">-</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    <a href="{{ url_for('ver_material', id=material.id_material) }}" 
+                                                       class="btn btn-sm btn-outline-info" 
+                                                       title="Ver material">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <div class="mt-3">
+                                <div class="alert alert-info">
+                                    <i class="fas fa-calculator"></i>
+                                    <strong>Valor Total Estimado:</strong> 
+                                    Q{{ "%.2f"|format(valor_total or 0) }}
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="empty-state-sm">
+                                <i class="fas fa-cubes fa-2x mb-3 text-muted"></i>
+                                <p class="text-muted mb-3">No hay materiales asignados a este inventario</p>
+                                <a href="{{ url_for('asignar_materiales_inventario', id=inventario.id_inventario) }}" 
+                                   class="btn btn-primary">
+                                    <i class="fas fa-plus"></i> Asignar Materiales
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.info-list {
+    list-style: none;
+    padding: 0;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #e3e6f0;
+}
+
+.info-item:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    font-weight: 600;
+    color: #5a5c69;
+}
+
+.info-value {
+    color: #3a3b45;
+}
+
+.info-card {
+    border: 1px solid #e3e6f0;
+    border-radius: 8px;
+    background: #fff;
+}
+
+.info-card-header {
+    padding: 12px 15px;
+    border-bottom: 1px solid #e3e6f0;
+    background: #f8f9fc;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.info-card-body {
+    padding: 15px;
+}
+
+.info-card-body p {
+    margin-bottom: 8px;
+    font-size: 0.875rem;
+}
+
+.info-card-footer {
+    padding: 12px 15px;
+    border-top: 1px solid #e3e6f0;
+    background: #f8f9fc;
+}
+
+.empty-state-sm {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.action-buttons .btn {
+    margin-bottom: 8px;
+}
+</style>
+{% endblock %}

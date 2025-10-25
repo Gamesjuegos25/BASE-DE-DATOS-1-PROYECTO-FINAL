@@ -1,0 +1,635 @@
+/* ============================================
+   ESTILOS PARA PÁGINA DE DETALLES MEJORADA
+   Vista de Detalle Estética y Moderna
+   ============================================ */
+
+/* Variables específicas para detalles */
+:root {
+    --detail-card-bg: linear-gradient(135deg, var(--vanilla), var(--vanilla-200));
+    --detail-header-bg: linear-gradient(135deg, var(--prussian-blue), var(--prussian-blue-600));
+    --detail-accent: var(--orange-wheel);
+    --detail-text: var(--prussian-blue-700);
+    --detail-shadow: 0 8px 25px rgba(0, 48, 73, 0.1);
+    --detail-border-radius: 16px;
+}
+
+/* ============================================
+   CONTENEDOR PRINCIPAL DE DETALLES
+   ============================================ */
+.detail-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: var(--spacing-lg);
+    background: linear-gradient(135deg, var(--vanilla-100) 0%, var(--vanilla-200) 100%);
+    min-height: 100vh;
+}
+
+/* ============================================
+   HEADER PRINCIPAL MEJORADO
+   ============================================ */
+.detail-header {
+    background: var(--detail-header-bg);
+    color: var(--vanilla);
+    padding: var(--spacing-xl);
+    border-radius: var(--detail-border-radius);
+    margin-bottom: var(--spacing-xl);
+    box-shadow: var(--detail-shadow);
+    position: relative;
+    overflow: hidden;
+}
+
+.detail-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 200px;
+    height: 200px;
+    background: rgba(247, 127, 0, 0.1);
+    border-radius: 50%;
+    transform: translate(50%, -50%);
+}
+
+.detail-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+    font-size: 0.9rem;
+}
+
+.detail-breadcrumb a {
+    color: var(--vanilla-300);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.detail-breadcrumb a:hover {
+    color: var(--vanilla);
+}
+
+.detail-breadcrumb-separator {
+    color: var(--vanilla-400);
+}
+
+.detail-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.detail-subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin-top: var(--spacing-sm);
+}
+
+.detail-id-badge {
+    background: rgba(255, 255, 255, 0.2);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: 20px;
+    font-size: 0.9rem;
+    backdrop-filter: blur(10px);
+}
+
+/* ============================================
+   GRID DE INFORMACIÓN
+   ============================================ */
+.detail-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: var(--spacing-xl);
+    margin-bottom: var(--spacing-xl);
+}
+
+/* ============================================
+   TARJETAS DE INFORMACIÓN MEJORADAS
+   ============================================ */
+.info-card {
+    background: var(--detail-card-bg);
+    border: 2px solid var(--prussian-blue-200);
+    border-radius: var(--detail-border-radius);
+    box-shadow: var(--detail-shadow);
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-bottom: var(--spacing-lg);
+}
+
+.info-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 35px rgba(0, 48, 73, 0.15);
+    border-color: var(--detail-accent);
+}
+
+.info-card-header {
+    background: linear-gradient(90deg, var(--prussian-blue-300), var(--prussian-blue-400));
+    color: var(--vanilla);
+    padding: var(--spacing-lg);
+    border-bottom: 3px solid var(--detail-accent);
+    position: relative;
+}
+
+.info-card-header::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background: var(--xanthous);
+    transition: width 0.3s ease;
+}
+
+.info-card:hover .info-card-header::after {
+    width: 120px;
+}
+
+.info-card-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.info-card-content {
+    padding: var(--spacing-xl);
+}
+
+/* ============================================
+   LISTA DE DETALLES ESTÉTICA
+   ============================================ */
+.detail-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-lg);
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+    padding: var(--spacing-md);
+    border: 1px solid var(--prussian-blue-100);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.5);
+    transition: all 0.3s ease;
+}
+
+.detail-item:hover {
+    background: rgba(247, 127, 0, 0.1);
+    border-color: var(--detail-accent);
+    transform: translateY(-2px);
+}
+
+.detail-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--prussian-blue-500);
+    margin-bottom: var(--spacing-xs);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.detail-value {
+    font-size: 1rem;
+    color: var(--detail-text);
+    font-weight: 500;
+}
+
+/* ============================================
+   BADGES Y ESTADOS MEJORADOS
+   ============================================ */
+.status-badge-detail {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-sm) var(--spacing-md);
+    border-radius: 25px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.status-badge-detail.warning {
+    background: linear-gradient(135deg, var(--xanthous-200), var(--xanthous-300));
+    color: var(--xanthous-800);
+    border-color: var(--xanthous-400);
+}
+
+.status-badge-detail.info {
+    background: linear-gradient(135deg, var(--prussian-blue-200), var(--prussian-blue-300));
+    color: var(--prussian-blue-800);
+    border-color: var(--prussian-blue-400);
+}
+
+.status-badge-detail.success {
+    background: linear-gradient(135deg, var(--xanthous-600), var(--xanthous-700));
+    color: var(--vanilla);
+    border-color: var(--xanthous-800);
+}
+
+.status-badge-detail.danger {
+    background: linear-gradient(135deg, var(--fire-engine-red-200), var(--fire-engine-red-300));
+    color: var(--fire-engine-red-800);
+    border-color: var(--fire-engine-red-400);
+}
+
+.status-badge-detail:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* ============================================
+   INFORMACIÓN FINANCIERA DESTACADA
+   ============================================ */
+.financial-showcase {
+    text-align: center;
+    padding: var(--spacing-xl);
+    background: linear-gradient(135deg, var(--xanthous-100), var(--xanthous-200));
+    border-radius: var(--detail-border-radius);
+    border: 3px solid var(--xanthous-300);
+    position: relative;
+    overflow: hidden;
+}
+
+.financial-showcase::before {
+    content: '💰';
+    position: absolute;
+    top: -20px;
+    right: -20px;
+    font-size: 4rem;
+    opacity: 0.1;
+    transform: rotate(15deg);
+}
+
+.financial-amount {
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--xanthous-800);
+    margin-bottom: var(--spacing-sm);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.financial-label {
+    font-size: 1rem;
+    color: var(--xanthous-700);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.price-breakdown {
+    margin-top: var(--spacing-lg);
+    padding-top: var(--spacing-lg);
+    border-top: 2px solid var(--xanthous-300);
+}
+
+.price-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-sm) 0;
+    border-bottom: 1px solid var(--xanthous-200);
+}
+
+.price-item:last-child {
+    border-bottom: none;
+}
+
+/* ============================================
+   CRONOGRAMA VISUAL
+   ============================================ */
+.timeline-visual {
+    position: relative;
+    padding: var(--spacing-lg) 0;
+}
+
+.timeline-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md) 0;
+    position: relative;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: 20px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--prussian-blue-300);
+}
+
+.timeline-item:last-child::before {
+    display: none;
+}
+
+.timeline-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--vanilla);
+    font-size: 1rem;
+    z-index: 2;
+    position: relative;
+}
+
+.timeline-icon.start {
+    background: linear-gradient(135deg, var(--prussian-blue), var(--prussian-blue-600));
+}
+
+.timeline-icon.end {
+    background: linear-gradient(135deg, var(--orange-wheel), var(--orange-wheel-600));
+}
+
+.timeline-content {
+    flex: 1;
+}
+
+.timeline-date {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--detail-text);
+}
+
+.timeline-label {
+    font-size: 0.9rem;
+    color: var(--prussian-blue-500);
+    margin-bottom: var(--spacing-xs);
+}
+
+/* ============================================
+   TABLAS DE ASIGNACIONES MEJORADAS
+   ============================================ */
+.assignment-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: var(--spacing-md);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+}
+
+.assignment-table thead th {
+    background: var(--detail-header-bg);
+    color: var(--vanilla);
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: var(--spacing-md);
+    text-align: left;
+    border: none;
+}
+
+.assignment-table tbody td {
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--prussian-blue-100);
+    background: var(--vanilla);
+    transition: background-color 0.3s ease;
+}
+
+.assignment-table tbody tr:hover td {
+    background: var(--vanilla-200);
+}
+
+.assignment-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* ============================================
+   TARJETAS DE RECURSOS
+   ============================================ */
+.resource-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-md);
+}
+
+.resource-card {
+    background: var(--vanilla);
+    border: 2px solid var(--prussian-blue-200);
+    border-radius: 12px;
+    padding: var(--spacing-md);
+    text-align: center;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.resource-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: linear-gradient(90deg, var(--orange-wheel), var(--xanthous));
+}
+
+.resource-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--detail-accent);
+    box-shadow: 0 8px 25px rgba(247, 127, 0, 0.2);
+}
+
+.resource-icon {
+    font-size: 2rem;
+    margin-bottom: var(--spacing-sm);
+    color: var(--detail-accent);
+}
+
+.resource-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--detail-text);
+    margin-bottom: var(--spacing-xs);
+}
+
+.resource-subtitle {
+    font-size: 0.85rem;
+    color: var(--prussian-blue-500);
+    margin-bottom: var(--spacing-sm);
+}
+
+/* ============================================
+   PANEL DE ACCIONES MEJORADO
+   ============================================ */
+.actions-panel {
+    background: var(--detail-card-bg);
+    border: 2px solid var(--prussian-blue-200);
+    border-radius: var(--detail-border-radius);
+    padding: var(--spacing-xl);
+    box-shadow: var(--detail-shadow);
+}
+
+.action-button {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+    border: none;
+    border-radius: 12px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-bottom: var(--spacing-sm);
+    width: 100%;
+    justify-content: flex-start;
+    position: relative;
+    overflow: hidden;
+}
+
+.action-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s;
+}
+
+.action-button:hover::before {
+    left: 100%;
+}
+
+.action-button.primary {
+    background: linear-gradient(135deg, var(--prussian-blue), var(--prussian-blue-600));
+    color: var(--vanilla);
+}
+
+.action-button.secondary {
+    background: linear-gradient(135deg, var(--orange-wheel), var(--orange-wheel-600));
+    color: var(--vanilla);
+}
+
+.action-button.accent {
+    background: linear-gradient(135deg, var(--xanthous-600), var(--xanthous));
+    color: var(--vanilla);
+}
+
+.action-button.danger {
+    background: linear-gradient(135deg, var(--fire-engine-red), var(--fire-engine-red-600));
+    color: var(--vanilla);
+}
+
+.action-button:hover {
+    transform: translateY(-2px) translateX(4px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+@media (max-width: 1200px) {
+    .detail-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .detail-list {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .detail-container {
+        padding: var(--spacing-md);
+    }
+    
+    .detail-title {
+        font-size: 2rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-sm);
+    }
+    
+    .financial-amount {
+        font-size: 2rem;
+    }
+    
+    .resource-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .assignment-table {
+        font-size: 0.85rem;
+    }
+    
+    .assignment-table thead th,
+    .assignment-table tbody td {
+        padding: var(--spacing-sm);
+    }
+}
+
+@media (max-width: 576px) {
+    .detail-header {
+        padding: var(--spacing-lg);
+    }
+    
+    .detail-title {
+        font-size: 1.5rem;
+    }
+    
+    .info-card-header,
+    .info-card-content {
+        padding: var(--spacing-md);
+    }
+    
+    .financial-amount {
+        font-size: 1.8rem;
+    }
+}
+
+/* ============================================
+   ANIMACIONES
+   ============================================ */
+@keyframes slideInFromRight {
+    from {
+        opacity: 0;
+        transform: translateX(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInFromLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.slide-in-right {
+    animation: slideInFromRight 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.slide-in-left {
+    animation: slideInFromLeft 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Stagger animations */
+.info-card:nth-child(1) { animation-delay: 0.1s; }
+.info-card:nth-child(2) { animation-delay: 0.2s; }
+.info-card:nth-child(3) { animation-delay: 0.3s; }
+.info-card:nth-child(4) { animation-delay: 0.4s; }

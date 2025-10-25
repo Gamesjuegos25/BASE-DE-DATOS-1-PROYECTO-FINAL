@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <!-- CSS para formularios -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/form-pages.css') }}">{% endblock %}
+
+
+{% block title %}Editar Trabajo - Sistema Constructora{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/create-forms.css') }}">
+
+
+<div class="max-w-7xl mx-auto px-6">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+        <a href="{{ url_for('dashboard') }}">Dashboard</a> /
+        <a href="{{ url_for('listar_trabajos') }}">Trabajos</a> /
+        <span>Editar</span>
+    </nav>
+
+    <div class="page-header">
+        <h1><i class="fas fa-edit"></i> Editar Trabajo</h1>
+        <p class="subtitle">Modifica los datos del trabajo #{{ trabajo.id_trabajo }}</p>
+    </div>
+
+    <div class="form-card">
+        <div class="create-form-max-w-7xl mx-auto px-6">
+<form method="POST" action="{{ url_for('editar_trabajo', id=trabajo.id_trabajo) }}">
+            <div class="form-grid">
+                <div class="form-group full-width">
+                    <label for="descripcion">
+                        <i class="fas fa-info-circle text-prussian-blue-700"></i> Descripción del Trabajo *
+                    </label>
+                    <input class="form-input" type="text" id="descripcion" name="descripcion" 
+                           value="{{ trabajo.descripcion_trabajo }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="precio_unitario">
+                        <i class="fas fa-coins"></i> Precio Unitario
+                    </label>
+                    <input class="form-input" type="number" step="0.01" id="precio_unitario" name="precio_unitario" 
+                           value="{{ trabajo.precio_unitario_trabajo or '' }}">
+                </div>
+
+                <div class="form-group">
+                    <label for="unidad">
+                        <i class="fas fa-ruler"></i> Unidad de Medida
+                    </label>
+                    <input class="form-input" type="text" id="unidad" name="unidad" 
+                           value="{{ trabajo.unidad_trabajo or '' }}"
+                           placeholder="Ej: m², m³, kg, unidad">
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn btn btn-warm-primary">
+                    <i class="fas fa-save"></i> Actualizar Trabajo
+                </button>
+                <a href="{{ url_for('ver_trabajo', id=trabajo.id_trabajo) }}" class="btn btn btn btn-warm-secondary">
+                    <i class="fas fa-times"></i> Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

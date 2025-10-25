@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+{% block title %}Detalle Material{% endblock %}
+{% block content %}
+<div class="page-header">
+  <nav class="breadcrumb">
+    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+    <span class="breadcrumb-separator">/</span>
+    <a href="{{ url_for('listar_materiales') }}">Materiales</a>
+    <span class="breadcrumb-separator">/</span>
+    <span>Detalle</span>
+  </nav>
+  <h1 class="page-title">📦 {{ material.nombre or 'Material' }} <small class="text-muted">ID: {{ material.id_material }}</small></h1>
+</div>
+
+<div class="row">
+  <div class="col-md-8">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-box"></i> Información del Material</h5>
+      </div>
+      <div class="card-body">
+        <dl class="row">
+          <dt class="col-sm-4"><i class="fas fa-tag"></i> Nombre</dt>
+          <dd class="col-sm-8">
+            <strong>{{ material.nombre or 'N/D' }}</strong>
+          </dd>
+          
+          <dt class="col-sm-4"><i class="fas fa-align-left"></i> Descripción</dt>
+          <dd class="col-sm-8">
+            {{ material.descripcion or 'Sin descripción' }}
+          </dd>
+          
+          <dt class="col-sm-4"><i class="fas fa-layer-group"></i> Categoría</dt>
+          <dd class="col-sm-8">
+            <span class="badge badge-secondary">{{ material.categoria or 'Sin categoría' }}</span>
+          </dd>
+          
+          <dt class="col-sm-4"><i class="fas fa-balance-scale"></i> Unidad de Medida</dt>
+          <dd class="col-sm-8">
+            <span class="badge badge-info">{{ material.unidad or 'N/D' }}</span>
+          </dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-coins"></i> Información Económica</h5>
+      </div>
+      <div class="card-body text-center">
+        <div class="price-info">
+          <h3 class="text-success mb-2">
+            {% if material.precio is not none %}
+              Q{{ "{:,.2f}".format(material.precio) }}
+            {% else %}
+              <span class="text-muted">N/D</span>
+            {% endif %}
+          </h3>
+          <p class="text-muted mb-3">Precio Unitario</p>
+          
+          {% if material.precio is not none %}
+            <div class="price-breakdown">
+              <div class="mb-2">
+                <small class="text-muted">Por {{ material.unidad or 'unidad' }}:</small><br>
+                <strong class="text-primary">Q{{ "{:,.2f}".format(material.precio) }}</strong>
+              </div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    
+    <div class="card mt-3">
+      <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-warehouse"></i> Inventario</h5>
+      </div>
+      <div class="card-body text-center">
+        <div class="stock-info">
+          <h4 class="text-info mb-2">{{ material.stock_actual or 0 }}</h4>
+          <p class="text-muted mb-2">Unidades en Stock</p>
+          <small class="text-muted">Mínimo: {{ material.stock_minimo or 0 }}</small>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card mt-3">
+      <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-cogs"></i> Acciones</h5>
+      </div>
+      <div class="card-body">
+        <div class="d-flex flex-column gap-2">
+          <a class="btn btn-primary" href="{{ url_for('editar_material', id=material.id_material) }}">
+            <i class="fas fa-edit"></i> Editar Material
+          </a>
+          <a class="btn btn-info" href="{{ url_for('listar_movimientos') }}?material={{ material.id_material }}">
+            <i class="fas fa-exchange-alt"></i> Ver Movimientos
+          </a>
+          <a class="btn btn-secondary" href="{{ url_for('listar_materiales') }}">
+            <i class="fas fa-arrow-left"></i> Volver a Lista
+          </a>
+          <form action="{{ url_for('eliminar_material', id=material.id_material) }}" method="post" onsubmit="return confirm('¿Eliminar este material?');" class="mt-2">
+            <button class="btn btn-danger w-100" type="submit">
+              <i class="fas fa-trash"></i> Eliminar
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.price-info h3 {
+  font-size: 2.5rem;
+  font-weight: bold;
+}
+
+.price-breakdown {
+  border-top: 1px solid #dee2e6;
+  padding-top: 1rem;
+}
+
+.stock-info h4 {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.card-header h5 {
+  color: #495057;
+}
+
+.badge {
+  font-size: 0.9rem;
+}
+
+.gap-2 > * + * {
+  margin-top: 0.5rem;
+}
+</style>
+{% endblock %}

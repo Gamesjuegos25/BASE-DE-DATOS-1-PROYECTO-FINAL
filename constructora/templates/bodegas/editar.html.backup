@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Bodega{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/create-forms.css') }}">
+
+
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h2><i class="bi bi-building-gear"></i> Editar Bodega</h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Inicio</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('listar_bodegas') }}">Bodegas</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('ver_bodega', id=bodega.id_bodega) }}">Bodega #{{ bodega.id_bodega }}</a></li>
+                    <li class="breadcrumb-item active">Editar</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="bi bi-pencil-square"></i> Modificar Información de la Bodega</h5>
+                </div>
+                <div class="card-body">
+                    <div class="create-form-container">
+<form method="POST">
+                        <div class="mb-3">
+                            <label for="responsable_bodega" class="form-label">
+                                <i class="bi bi-person-badge"></i> Responsable de la Bodega *
+                            </label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="responsable_bodega" 
+                                   name="responsable_bodega" 
+                                   value="{{ bodega.responsable_bodega }}"
+                                   placeholder="Nombre del responsable o encargado" 
+                                   required>
+                            <div class="form-text">
+                                Persona encargada de administrar y supervisar la bodega
+                            </div>
+                        </div>
+
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i>
+                            <strong>Nota:</strong> Los cambios no afectarán las asignaciones existentes a obras ni los inventarios registrados.
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a href="{{ url_for('ver_bodega', id=bodega.id_bodega) }}" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-warning">
+                                <i class="bi bi-check-circle"></i> Guardar Cambios
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card bg-light border-0">
+                <div class="card-body">
+                    <h6 class="card-title"><i class="bi bi-building"></i> Bodega Actual</h6>
+                    <ul class="small mb-0">
+                        <li><strong>ID:</strong> {{ bodega.id_bodega }}</li>
+                        <li><strong>Responsable:</strong> {{ bodega.responsable_bodega }}</li>
+                        <li><strong>Obras asignadas:</strong> {{ bodega.obras_asignadas }}</li>
+                        <li><strong>Inventarios:</strong> {{ bodega.inventarios_asignados }}</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card bg-info bg-opacity-10 border-info mt-3">
+                <div class="card-body">
+                    <h6 class="card-title text-info"><i class="bi bi-info-circle"></i> Información</h6>
+                    <p class="small mb-0">
+                        Al cambiar el responsable, todas las operaciones y registros asociados 
+                        a esta bodega se mantendrán intactos. Solo se actualiza quién está a cargo.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

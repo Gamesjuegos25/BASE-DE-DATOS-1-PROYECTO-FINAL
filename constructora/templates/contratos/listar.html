@@ -1,0 +1,277 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <!-- CSS para páginas de listado -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/list-pages.css') }}">{% endblock %}
+
+
+{% block title %}Contratos - Sistema Constructora
+<script>
+// Mejoras JavaScript automáticas para tablas
+document.addEventListener('DOMContentLoaded', function() {
+    // Aplicar efectos de hover a filas de tabla
+    const tableRows = document.querySelectorAll('.data-table-enhanced tbody tr, table tbody tr');
+    tableRows.forEach((row, index) => {
+        row.style.animationDelay = `${index * 0.1}s`;
+        row.classList.add('fade-in-up');
+        
+        row.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+            this.style.boxShadow = '0 4px 15px rgba(247, 127, 0, 0.2)';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = 'none';
+        });
+    });
+    
+    // Mejorar botones de acción con tooltips
+    const actionButtons = document.querySelectorAll('.btn-action-enhanced, .action-buttons a, .action-buttons button');
+    actionButtons.forEach(button => {
+        if (!button.querySelector('.custom-tooltip')) {
+            button.addEventListener('mouseenter', function() {
+                const title = this.getAttribute('title');
+                if (title) {
+                    const tooltip = document.createElement('div');
+                    tooltip.className = 'custom-tooltip';
+                    tooltip.textContent = title;
+                    tooltip.style.cssText = `
+                        position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+                        background: var(--prussian-blue-700); color: var(--vanilla);
+                        padding: 4px 8px; border-radius: 4px; font-size: 0.7rem;
+                        white-space: nowrap; z-index: 1000; margin-bottom: 5px;
+                    `;
+                    this.style.position = 'relative';
+                    this.appendChild(tooltip);
+                }
+            });
+            
+            button.addEventListener('mouseleave', function() {
+                const tooltip = this.querySelector('.custom-tooltip');
+                if (tooltip) tooltip.remove();
+            });
+        }
+    });
+    
+    // Contador animado para números
+    const statNumbers = document.querySelectorAll('.stat-number-enhanced, .stat-number');
+    statNumbers.forEach(stat => {
+        const finalNumber = parseInt(stat.textContent) || 0;
+        if (finalNumber > 0) {
+            let currentNumber = 0;
+            const increment = Math.max(1, Math.ceil(finalNumber / 20));
+            const timer = setInterval(() => {
+                currentNumber += increment;
+                if (currentNumber >= finalNumber) {
+                    currentNumber = finalNumber;
+                    clearInterval(timer);
+                }
+                stat.textContent = currentNumber;
+            }, 100);
+        }
+    });
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/enhanced-tables.css') }}">
+
+<div class="max-w-7xl mx-auto px-6">
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb">
+        <a href="{{ url_for('dashboard') }}">Dashboard</a> /
+        <span>Contratos</span>
+    </nav>
+
+    <div class="page-container"><div class="page-header fade-in-up">
+        <div>
+            <h1><i class="fas fa-file-contract"></i> Gestión de Contratos</h1>
+            <p class="subtitle">Administra los contratos de obra</p>
+        </div>
+        <a href="{{ url_for('crear_contrato') }}" class="btn btn btn btn-warm-primary">
+            <i class="fas fa-plus"></i> Nuevo Contrato
+        </a>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-flex flex-wrap -mx-2">
+        <div class="stat-stat-card fade-in-up">
+            <div class="stat-icon">
+                <i class="fas fa-file-contract"></i>
+            </div>
+            <div class="stat-info">
+                <h3>{{ contratos|length }}</h3>
+                <p>Contratos Totales</p>
+            </div>
+        </div>
+
+<!-- Estadísticas del Módulo -->
+<div class="stats-grid">
+    <div class="stat-stat-card fade-in-up">
+        <div class="stat-icon bg-blue">
+            <i class="fas fa-list"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ contratos|length or 0 }}</div>
+            <div class="stat-label">Total Contratos</div>
+        </div>
+    </div>
+    
+    <div class="stat-stat-card fade-in-up">
+        <div class="stat-icon bg-green">
+            <i class="fas fa-check-circle text-xanthous-600"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ contratos|length or 0 }}</div>
+            <div class="stat-label">Activos</div>
+        </div>
+    </div>
+    
+    <div class="stat-stat-card fade-in-up">
+        <div class="stat-icon bg-orange">
+            <i class="fas fa-clock"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">0</div>
+            <div class="stat-label">Pendientes</div>
+        </div>
+    </div>
+</div>
+
+    </div>
+
+    <!-- Tabla de Contratos -->
+    <div class="stat-card fade-in-up">
+        <div class="stat-stat-header">
+            <h2><i class="fas fa-list"></i> Lista de Contratos</h2>
+        </div>
+        <div class="list-table-container">
+            <table class="data-table">
+                <thead><tr>
+                        <th class="d-none d-lg-table-cell">ID</th>
+                        <th class="hidden-md"><i class="fas fa-calendar-alt"></i> Fecha Inicio</th>
+                        <th class="hidden-md"><i class="fas fa-calendar-alt"></i> Fecha Fin</th>
+                        <th>Tipo de Pago</th>
+                        <th>Obra</th>
+                        <th class="text-center"><i class="fas fa-cogs"></i> Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if contratos %}
+                        {% for contrato in contratos %}
+                        <tr>
+                            <td>{{ contrato.id_contrato }}</td>
+                            <td>{{ contrato.fecha_inicio_contrato }}</td>
+                            <td>{{ contrato.fecha_fin_contrato or 'N/A' }}</td>
+                            <td>{{ contrato.tipo_pago_contrato or 'No especificado' }}</td>
+                            <td>
+                                {% if contrato.nombre_obra %}
+                                    <span class="status-badge">{{ contrato.nombre_obra }}</span>
+                                {% else %}
+                                    <span class="status-badge">Sin obra asignada</span>
+                                {% endif %}
+                            </td>
+                            <td class="actions">
+                                <a href="{{ url_for('ver_contrato', id=contrato.id_contrato) }}" class="btn-action btn-view transition-all hover:scale-110 hover:-translate-y-1" title="Ver detalle">
+                                    <i class="fas fa-eye"></i> Ver
+                                </a>
+                                <a href="{{ url_for('editar_contrato', id=contrato.id_contrato) }}" class="btn-action btn-edit transition-all hover:scale-110 hover:-translate-y-1" title="Editar">
+                                    <i class="fas fa-edit"></i> Editar
+                                </a>
+                                <form action="{{ url_for('facturizar_contrato_route', id=contrato.id_contrato) }}" 
+                                      method="POST" class="inline-form"
+                                      onsubmit="return confirm('¿Generar factura para este contrato?');">
+                                    <button type="submit" class="btn-action btn btn-accent" title="Generar factura">
+                                        <i class="fas fa-file-invoice-dollar"></i> Facturar
+                                    </button>
+                                </form>
+                                <form action="{{ url_for('eliminar_contrato', id=contrato.id_contrato) }}" 
+                                      method="POST" class="inline-form" 
+                                      onsubmit="return confirm('¿Estás seguro de eliminar este contrato?');">
+                                    <button type="submit" class="btn-action btn btn btn-warm-danger" title="Eliminar">
+                                        <i class="fas fa-trash"></i> Eliminar
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center">No hay contratos registrados</td>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table></div></div></div></div>
+    </div>
+</div>
+
+<script>
+// Mejoras JavaScript automáticas para tablas
+document.addEventListener('DOMContentLoaded', function() {
+    // Aplicar efectos de hover a filas de tabla
+    const tableRows = document.querySelectorAll('.data-table-enhanced tbody tr, table tbody tr');
+    tableRows.forEach((row, index) => {
+        row.style.animationDelay = `${index * 0.1}s`;
+        row.classList.add('fade-in-up');
+        
+        row.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+            this.style.boxShadow = '0 4px 15px rgba(247, 127, 0, 0.2)';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = 'none';
+        });
+    });
+    
+    // Mejorar botones de acción con tooltips
+    const actionButtons = document.querySelectorAll('.btn-action-enhanced, .action-buttons a, .action-buttons button');
+    actionButtons.forEach(button => {
+        if (!button.querySelector('.custom-tooltip')) {
+            button.addEventListener('mouseenter', function() {
+                const title = this.getAttribute('title');
+                if (title) {
+                    const tooltip = document.createElement('div');
+                    tooltip.className = 'custom-tooltip';
+                    tooltip.textContent = title;
+                    tooltip.style.cssText = `
+                        position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+                        background: var(--prussian-blue-700); color: var(--vanilla);
+                        padding: 4px 8px; border-radius: 4px; font-size: 0.7rem;
+                        white-space: nowrap; z-index: 1000; margin-bottom: 5px;
+                    `;
+                    this.style.position = 'relative';
+                    this.appendChild(tooltip);
+                }
+            });
+            
+            button.addEventListener('mouseleave', function() {
+                const tooltip = this.querySelector('.custom-tooltip');
+                if (tooltip) tooltip.remove();
+            });
+        }
+    });
+    
+    // Contador animado para números
+    const statNumbers = document.querySelectorAll('.stat-number-enhanced, .stat-number');
+    statNumbers.forEach(stat => {
+        const finalNumber = parseInt(stat.textContent) || 0;
+        if (finalNumber > 0) {
+            let currentNumber = 0;
+            const increment = Math.max(1, Math.ceil(finalNumber / 20));
+            const timer = setInterval(() => {
+                currentNumber += increment;
+                if (currentNumber >= finalNumber) {
+                    currentNumber = finalNumber;
+                    clearInterval(timer);
+                }
+                stat.textContent = currentNumber;
+            }, 100);
+        }
+    });
+});
+</script>
+{% endblock %}

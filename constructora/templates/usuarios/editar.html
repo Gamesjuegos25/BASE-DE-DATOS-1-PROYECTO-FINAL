@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Usuario - ERP Constructora{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/create-forms.css') }}">
+
+
+<div class="page-header">
+    <nav class="breadcrumb">
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+        <span class="breadcrumb-separator">/</span>
+        <a href="{{ url_for('listar_usuarios_sistema') }}">Usuarios</a>
+        <span class="breadcrumb-separator">/</span>
+        <span>Editar</span>
+    </nav>
+    <h1 class="page-title">Editar Usuario</h1>
+    <p class="page-subtitle">Actualiza los datos básicos del usuario</p>
+</div>
+
+<div class="stat-card fade-in-up">
+    <div class="stat-module-content">
+        <div class="create-form-max-w-7xl mx-auto px-6">
+<form method="POST" action="{{ url_for('editar_usuario_sistema_route', id=usuario.id_usuario) }}">
+            <div class="grid grid-2">
+                <div class="form-group">
+                    <label>Nombre de Usuario</label>
+                    <input type="text" name="nombre_usuario" class="form-control" value="{{ usuario.nombre_usuario }}" required>
+                </div>
+                <div class="form-group">
+                    <label>Nombre Completo</label>
+                    <input type="text" name="nombre_completo" class="form-control" value="{{ usuario.nombre_completo or '' }}">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" name="email" class="form-control" value="{{ usuario.email or '' }}" required>
+                </div>
+                <div class="form-group">
+                    <label>Empleado Asociado</label>
+                    <select name="id_empleado" class="form-control form-select">
+                        <option value="">Sin asociación</option>
+                        {% for e in empleados %}
+                        <option value="{{ e.id_empleado }}" {% if usuario.id_empleado and usuario.id_empleado == e.id_empleado %}selected{% endif %}>
+                            {{ e.nombre }} {% if e.cargo %} - {{ e.cargo }}{% endif %}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Rol</label>
+                    <select name="id_rol" class="form-control form-select">
+                        <option value="">Sin rol específico</option>
+                        {% for r in roles %}
+                        <option value="{{ r.id_rol }}" {% if usuario.id_rol and usuario.id_rol == r.id_rol %}selected{% endif %}>
+                            {{ r.nombre_rol }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="form-actions">
+                <a href="{{ url_for('listar_usuarios_sistema') }}" class="btn btn btn btn-warm-secondary">Cancelar</a>
+                <button type="submit" class="btn btn btn btn-warm-primary">
+                    <i class="fas fa-save"></i> Guardar Cambios
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+.grid { display: grid; gap: var(--spacing-3); }
+.grid-2 { grid-template-columns: repeat(2, 1fr); }
+@media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
+</style>
+{% endblock %}

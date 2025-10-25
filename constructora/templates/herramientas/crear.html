@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sistema-unificado.css') }}">
+{% endblock %}
+
+{% block title %}Crear Herramienta - Sistema Constructora{% endblock %}
+
+{% block content %}
+<div class="page-container animate-fade-in">
+    <!-- Header de página -->
+    <div class="page-header">
+        <div class="breadcrumb-nav">
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <span class="breadcrumb-separator">/</span>
+            <a href="{{ url_for('listar_herramientas') }}">Herramientas</a>
+            <span class="breadcrumb-separator">/</span>
+            <span>Crear</span>
+        </div>
+        <h1 class="page-title">
+            <i class="fas fa-plus text-xanthous"></i>
+            Crear Herramienta
+        </h1>
+        <p class="page-subtitle">Completa el formulario para agregar un nuevo registro</p>
+    </div>
+
+    <!-- Formulario principal -->
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">
+                <i class="fas fa-form"></i>
+                Información del Herramienta
+            </h2>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ url_for('crear_herramientas') }}" class="animate-slide-in">
+                <div class="grid-container cols-2">
+                    <div class="form-group">
+                        <label class="form-label" for="nombre">
+                            <i class="fas fa-tag"></i>
+                            Nombre *
+                        </label>
+                        <input type="text" 
+                               class="form-input" 
+                               id="nombre" 
+                               name="nombre" 
+                               required
+                               placeholder="Ingrese el nombre"
+                               value="{{ request.form.nombre if request.form else '' }}">
+                        <div class="form-help">Campo obligatorio</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="estado">
+                            <i class="fas fa-toggle-on"></i>
+                            Estado
+                        </label>
+                        <select class="form-select" id="estado" name="estado">
+                            <option value="activo" {{ 'selected' if request.form.estado == 'activo' else '' }}>Activo</option>
+                            <option value="inactivo" {{ 'selected' if request.form.estado == 'inactivo' else '' }}>Inactivo</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="descripcion">
+                        <i class="fas fa-align-left"></i>
+                        Descripción
+                    </label>
+                    <textarea class="form-textarea" 
+                              id="descripcion" 
+                              name="descripcion" 
+                              placeholder="Descripción opcional">{{ request.form.descripcion if request.form else '' }}</textarea>
+                </div>
+                
+                <!-- Botones de acción -->
+                <div class="flex justify-between gap-4">
+                    <a href="{{ url_for('listar_herramientas') }}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i>
+                        Volver a Lista
+                    </a>
+                    <button type="submit" class="btn btn-accent">
+                        <i class="fas fa-save"></i>
+                        Guardar Herramienta
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

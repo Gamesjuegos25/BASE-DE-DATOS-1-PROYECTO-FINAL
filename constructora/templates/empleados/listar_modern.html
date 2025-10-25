@@ -1,0 +1,444 @@
+{% extends "base.html" %}
+
+{% block title %}Empleados - ERP Constructora{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/enhanced-tables.css') }}">
+
+<div class="page-container"><div class="page-header fade-in-up">
+    <nav class="breadcrumb">
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+        <span class="breadcrumb-separator">/</span>
+        <span>Empleados</span>
+    </nav>
+    <h1 class="page-title">👥 Gestión de Empleados</h1>
+    <p class="page-subtitle">Administra el personal de la constructora</p>
+</div>
+
+<!-- Estadísticas de Empleados -->
+<div class="dashboard-grid mb-8">
+    <div class="stat-stat-card fade-in-up">
+        <div class="stat-header">
+            <div class="stat-title">Total Empleados</div>
+            <div class="stat-icon primary">
+                <i class="fas fa-users text-orange-wheel"></i>
+            </div>
+        </div>
+        <div class="stat-value">{{ empleados|length or 0 }}</div>
+        <div class="stat-change positive">
+            <i class="fas fa-arrow-up"></i>
+            <span>Personal activo</span>
+        </div>
+    </div>
+    
+    <div class="stat-stat-card fade-in-up">
+        <div class="stat-header">
+            <div class="stat-title">Empleados Activos</div>
+            <div class="stat-icon success">
+                <i class="fas fa-user-check"></i>
+            </div>
+        </div>
+        <div class="stat-value">{{ empleados|selectattr('estado', 'equalto', 'Activo')|list|length or 0 }}</div>
+        <div class="stat-change positive">
+            <i class="fas fa-check"></i>
+            <span>Trabajando</span>
+        </div>
+    </div>
+    
+    <div class="stat-stat-card fade-in-up">
+        <div class="stat-header">
+            <div class="stat-title">Nómina Mensual</div>
+            <div class="stat-icon info">
+                <i class="fas fa-coins"></i>
+            </div>
+        </div>
+    <div class="stat-value">Q{{ "{:,.0f}".format((empleados | map(attribute='salario') | reject('equalto', None) | sum) or 0) }}</div>
+        <div class="stat-change positive">
+            <i class="fas fa-calculator"></i>
+            <span>Total salarios</span>
+        </div>
+    </div>
+    
+    <div class="stat-stat-card fade-in-up">
+        <div class="stat-header">
+            <div class="stat-title">Promedio Salarial</div>
+            <div class="stat-icon warning">
+                <i class="fas fa-chart-line text-xanthous"></i>
+            </div>
+        </div>
+    <div class="stat-value">Q{{ "{:,.0f}".format(((empleados | map(attribute='salario') | reject('equalto', None) | sum) / (((empleados | map(attribute='salario') | reject('equalto', None) | list | length)) or 1))) }}</div>
+        <div class="stat-change">
+            <i class="fas fa-equals"></i>
+            <span>Por empleado</span>
+        </div>
+    </div>
+</div>
+
+<!-- Tabla de Empleados -->
+<div class="table-max-w-7xl mx-auto px-6">
+    <div class="table-header">
+        <h2 class="table-title">📋 Lista de Empleados</h2>
+        <div class="table-tools">
+            <div class="table-search">
+                <i class="search-icon fas fa-search"></i>
+                <input type="text" class="form-control-enhanced" placeholder="Buscar empleados..." id="searchEmpleados">
+            </div>
+            <div class="flex gap-3">
+                <select class="form-control form-select filter-cargo" id="filterCargo" aria-label="Filtrar por cargo">
+                    <option value="">Todos los cargos</option>
+                    <option value="Ingeniero Civil">Ingeniero Civil</option>
+                    <option value="Arquitecto">Arquitecto</option>
+                    <option value="Maestro de Obra">Maestro de Obra</option>
+                    <option value="Electricista">Electricista</option>
+                    <option value="Plomero">Plomero</option>
+                    <option value="Soldador">Soldador</option>
+                    <option value="Albañil">Albañil</option>
+                    <option value="Supervisor">Supervisor</option>
+                </select>
+                <a href="{{ url_for('crear_empleado') }}" class="btn btn btn btn-warm-primary">
+                    <i class="fas fa-plus"></i> Nuevo Empleado
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="table-wrapper fade-in-up"><div class="table-container-responsive"><table class="data-table-enhanced" id="tablaEmpleados">
+        <thead><tr>
+                <th>Empleado</th>
+                <th>Cargo</th>
+                <th>Contacto</th>
+                <th>Salario</th>
+                <th class="hidden-md"><i class="fas fa-calendar-alt"></i> Fecha Contratación</th>
+                <th><i class="fas fa-tasks"></i> Estado</th>
+                <th class="text-center"><i class="fas fa-cogs"></i> Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for empleado in empleados %}
+            <tr data-cargo="{{ empleado.cargo or '' }}">
+                <td>
+                    <div class="flex items-center gap-3">
+                        <div class="user-avatar bg-gradient-warm-primary text-white">
+                            {{ (empleado.nombre or 'N')[0] }}{{ (empleado.apellido or 'A')[0] }}
+                        </div>
+                        <div>
+                            <div class="font-semibold">{{ empleado.nombre or 'Sin nombre' }} {{ empleado.apellido or 'Sin apellido' }}</div>
+                            <div class="text-sm text-vanilla-600">ID: {{ empleado.id_empleado }}</div>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <span class="badge badge badge-primary">{{ empleado.cargo or 'Sin cargo' }}</span>
+                </td>
+                <td>
+                    <div class="text-sm">
+                        {% if empleado.email %}
+                            <div><i class="fas fa-envelope text-gray-400"></i> {{ empleado.email }}</div>
+                        {% endif %}
+                        {% if empleado.telefono %}
+                            <div><i class="fas fa-phone text-gray-400"></i> {{ empleado.telefono }}</div>
+                        {% endif %}
+                        {% if not empleado.email and not empleado.telefono %}
+                            <span class="text-vanilla-600">Sin contacto</span>
+                        {% endif %}
+                    </div>
+                </td>
+                <td class="text-right">
+                    {% if empleado.salario %}
+                        <strong class="text-xanthous-600">Q{{ "{:,.2f}".format(empleado.salario) }}</strong>
+                    {% else %}
+                        <span class="text-vanilla-600">No definido</span>
+                    {% endif %}
+                </td>
+                <td>{{ empleado.fecha_contratacion.strftime('%d/%m/%Y') if empleado.fecha_contratacion else 'N/A' }}</td>
+                <td>
+                    {% if empleado.estado == 'Activo' %}
+                        <span class="badge badge badge-success">{{ empleado.estado }}</span>
+                    {% elif empleado.estado == 'Inactivo' %}
+                        <span class="badge badge badge-secondary">{{ empleado.estado }}</span>
+                    {% elif empleado.estado == 'Vacaciones' %}
+                        <span class="badge badge badge-primary">{{ empleado.estado }}</span>
+                    {% elif empleado.estado == 'Licencia' %}
+                        <span class="badge badge badge-warning">{{ empleado.estado }}</span>
+                    {% elif empleado.estado == 'Suspendido' %}
+                        <span class="badge badge badge-danger">{{ empleado.estado }}</span>
+                    {% else %}
+                        <span class="badge badge badge-secondary">{{ empleado.estado or 'Sin estado' }}</span>
+                    {% endif %}
+                </td>
+                <td class="actions-cell">
+                    <div class="table-actions">
+                        <a class="btn-action btn-view" href="{{ url_for('ver_empleado', id=empleado.id_empleado) }}" title="Ver Detalles">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a class="btn-action btn-edit" href="{{ url_for('editar_empleado', id=empleado.id_empleado) }}" title="Editar">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <button class="btn-action btn-muted btn-asignar-proyecto" data-empleado-id="{{ empleado.id_empleado }}" title="Asignar a Proyecto">
+                            <i class="fas fa-project-diagram"></i>
+                        </button>
+                        <form action="{{ url_for('eliminar_empleado', id=empleado.id_empleado) }}" method="post" class="inline-form" onsubmit="return confirm('¿Eliminar este empleado?');">
+                            <button class="btn-action btn btn btn-warm-danger" title="Eliminar" type="submit">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="7" class="text-center text-vanilla-600 p-8">
+                    <i class="fas fa-users fa-3x mb-6 text-gray-300"></i>
+                    <p class="text-lg">No hay empleados registrados</p>
+                    <a href="{{ url_for('crear_empleado') }}" class="btn btn btn btn-warm-primary mt-6">
+                        <i class="fas fa-plus"></i> Crear Primer Empleado
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table></div></div></div></div>
+
+<!-- Modal para Ver Detalles del Empleado -->
+<div class="modal-overlay" id="modalDetalleEmpleado">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title">Detalles del Empleado</h3>
+            <button class="btn btn-warm-primary" class="modal-close" onclick="cerrarModal('modalDetalleEmpleado')">×</button>
+        </div>
+        <div class="modal-body" id="contenidoDetalleEmpleado">
+            <!-- Contenido cargado dinámicamente -->
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn btn btn-warm-secondary" onclick="cerrarModal('modalDetalleEmpleado')">Cerrar</button>
+            <button class="btn btn btn btn-warm-primary" onclick="editarEmpleadoModal()">
+                <i class="fas fa-edit"></i> Editar
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+// Variables globales
+let empleadoSeleccionado = null;
+
+// Búsqueda en tiempo real
+document.getElementById('searchEmpleados').addEventListener('input', function(e) {
+    filtrarEmpleados();
+});
+
+// Filtro por cargo
+document.getElementById('filterCargo').addEventListener('change', function(e) {
+    filtrarEmpleados();
+});
+
+// Event listener para botones de asignar proyecto
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.btn-asignar-proyecto').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const empleadoId = this.getAttribute('data-empleado-id');
+            asignarProyecto(empleadoId);
+        });
+    });
+});
+
+function filtrarEmpleados() {
+    const searchTerm = document.getElementById('searchEmpleados').value.toLowerCase();
+    const cargoFilter = document.getElementById('filterCargo').value;
+    const rows = document.querySelectorAll('#tablaEmpleados tbody tr');
+    
+    rows.forEach(row => {
+        const texto = row.textContent.toLowerCase();
+        const cargo = row.getAttribute('data-cargo') || '';
+        
+        const matchesSearch = texto.includes(searchTerm);
+        const matchesCargo = !cargoFilter || cargo === cargoFilter;
+        
+        row.style.display = matchesSearch && matchesCargo ? '' : 'none';
+    });
+}
+
+// Funciones para manejar empleados
+function verEmpleado(id) {
+    empleadoSeleccionado = id;
+    
+    // Simular carga de datos (en producción sería una llamada AJAX)
+    document.getElementById('contenidoDetalleEmpleado').innerHTML = `
+        <div class="text-center p-8">
+            <i class="fas fa-spinner fa-spin fa-2x text-prussian-blue"></i>
+            <p class="mt-6">Cargando datos del empleado...</p>
+        </div>
+    `;
+    
+    document.getElementById('modalDetalleEmpleado').style.display = 'flex';
+    
+    // Simular respuesta del servidor
+    setTimeout(() => {
+        document.getElementById('contenidoDetalleEmpleado').innerHTML = `
+            <div class="space-y-6">
+                <div class="flex items-center gap-4 p-6 bg-gray-50 rounded-lg">
+                    <div class="user-avatar bg-gradient-warm-primary text-white text-white" style="width: 64px; height: 64px; font-size: 24px;">
+                        JD
+                    </div>
+                    <div>
+                        <h4 class="text-xl font-semibold">Juan Pérez</h4>
+                        <p class="text-gray-600">Ingeniero Civil</p>
+                        <span class="badge badge badge-success">Activo</span>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <h5 class="font-semibold mb-2">Información Personal</h5>
+                        <div class="text-sm space-y-1">
+                            <div><strong>Email:</strong> juan.perez@constructora.com</div>
+                            <div><strong>Teléfono:</strong> +52 123 456 7890</div>
+                            <div><strong>RFC:</strong> PEJR850315ABC</div>
+                            <div><strong>NSS:</strong> 12345678901</div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h5 class="font-semibold mb-2">Información Laboral</h5>
+                        <div class="text-sm space-y-1">
+                            <div><strong>Salario:</strong> $45,000.00</div>
+                            <div><strong>Fecha Contratación:</strong> 15/03/2023</div>
+                            <div><strong>Antigüedad:</strong> 1 año 8 meses</div>
+                            <div><strong>Proyectos Asignados:</strong> 3</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h5 class="font-semibold mb-2">Dirección</h5>
+                    <p class="text-sm text-gray-600">Av. Revolución 123, Col. Centro, Ciudad de México, CDMX, 06000</p>
+                </div>
+            </div>
+        `;
+    }, 1000);
+}
+
+function editarEmpleado(id) {
+    window.location.href = `/empleados/${id}/editar`;
+}
+
+function editarEmpleadoModal() {
+    if (empleadoSeleccionado) {
+        editarEmpleado(empleadoSeleccionado);
+    }
+}
+
+function asignarProyecto(id) {
+    // Implementar asignación a proyecto
+    alert(`Asignar empleado ${id} a proyecto`);
+}
+
+function cambiarEstado(id, nuevoEstado) {
+    if (confirm(`¿Estás seguro de cambiar el estado del empleado a ${nuevoEstado}?`)) {
+        // Aquí iría la llamada AJAX
+        alert(`Estado cambiado a ${nuevoEstado}`);
+        location.reload();
+    }
+}
+
+function cerrarModal(modalId) {
+    document.getElementById(modalId).style.display = 'none';
+    empleadoSeleccionado = null;
+}
+
+// Exportar datos
+function exportarEmpleados() {
+    // Implementar exportación a Excel/PDF
+    alert('Exportando lista de empleados...');
+}
+</script>
+
+<style>
+.items-center {
+    align-items: center;
+}
+
+.gap-3 {
+    gap: var(--spacing-3);
+}
+
+.gap-4 {
+    gap: var(--spacing-4);
+}
+
+.flex {
+    display: flex;
+}
+
+.grid {
+    display: grid;
+}
+
+.grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.text-sm {
+    font-size: var(--font-size-sm);
+}
+
+.text-lg {
+    font-size: var(--font-size-lg);
+}
+
+.text-xl {
+    font-size: var(--font-size-xl);
+}
+
+.font-semibold {
+    font-weight: 600;
+}
+
+.space-y-1 > * + * {
+    margin-top: 0.25rem;
+}
+
+.space-y-6 > * + * {
+    margin-top: 1.5rem;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    color: white;
+}
+
+@media (max-width: 768px) {
+    .table-tools {
+        flex-direction: column;
+        gap: var(--spacing-3);
+    }
+    
+    .table-search {
+        max-width: none;
+    }
+    
+    .table-actions {
+        flex-direction: column;
+        gap: var(--spacing-1);
+    }
+    
+    .dashboard-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .grid-cols-2 {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}

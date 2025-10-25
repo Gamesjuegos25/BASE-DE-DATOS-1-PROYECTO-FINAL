@@ -1,0 +1,281 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <!-- CSS específico para páginas de detalle -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/detail-page.css') }}">
+    
+    <!-- CSS para páginas de detalle -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/detail-page.css') }}">{% endblock %}
+
+
+{% block content %}
+<div class="content-wrapper">
+    <div class="page-header">
+        <div class="detail-header-container"><h1 class="detail-title"><i class="fas fa-eye"></i>Área: {{ area.nombre }}</h1></div>
+        <p class="page-subtitle">ID: {{ area.id }} — Gestiona asociaciones y relaciones</p>
+    </div>
+
+    <div class="grid-max-w-7xl mx-auto px-6" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 1.5rem;">
+        
+        <!-- OBRAS -->
+        <div class="detail-card">
+            <div class="module-header" style="background: #f8f9fa; padding: 1rem; border-bottom: 2px solid #dee2e6;">
+                <h3 style="margin: 0; color: #495057;">📋 Obras asignadas</h3>
+            </div>
+            <div class="module-content">
+                <div style="max-height: 200px; overflow-y: auto; border: 1px solid #e9ecef; border-radius: 4px; padding: 0.5rem; margin-bottom: 1rem;">
+                    {% if obras %}
+                        {% for o in obras %}
+                        <div id="obra-{{ o.id }}" style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem; border-bottom: 1px solid #f1f3f5;">
+                            <span><strong>{{ o.nombre }}</strong> <small class="text-vanilla-600">(ID: {{ o.id }})</small></span>
+                            <button class="btn btn-sm btn-outline" data-action="desasignar" data-type="obra" data-target-id="{{ o.id }}" data-area-id="{{ area.id }}" style="font-size: 0.85rem;">✕ Quitar</button>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-vanilla-600" style="text-align: center; padding: 1rem;">Sin obras asignadas</p>
+                    {% endif %}
+                </div>
+
+                <details style="margin-top: 1rem;">
+                    <summary style="cursor: pointer; padding: 0.75rem; background: #e7f3ff; border-radius: 4px; font-weight: 600; color: #0066cc;">+ Asignar nuevas obras</summary>
+                    <div style="padding: 1rem; border: 1px solid #e7f3ff; border-radius: 0 0 4px 4px;">
+                        <input class="form-control form-warm" type="text" id="search-obras" placeholder="🔍 Buscar obra..." style="width: 100%; padding: 0.5rem; margin-bottom: 0.75rem; border: 1px solid #ced4da; border-radius: 4px;">
+                        <div class="checkbox-max-w-7xl mx-auto px-6" style="max-height: 250px; overflow-y: auto; border: 1px solid #e9ecef; padding: 0.5rem; border-radius: 4px;">
+                            {% set seen_obras = [] %}
+                            {% for o in obras_all %}
+                                {% set obra_id = o.get('id_obra') or o.get('id') %}
+                                {% if obra_id and obra_id not in seen_obras %}
+                                    {% set _ = seen_obras.append(obra_id) %}
+                                    <label class="checkbox-item" data-search-text="{{ (o.get('nombre') or o.get('nombre_obra') or '').lower() }}" style="display: block; padding: 0.4rem; cursor: pointer; border-bottom: 1px solid #f8f9fa;">
+                                        <input class="form-control form-warm" type="checkbox" name="obra_id" value="{{ obra_id }}" style="margin-right: 0.5rem;">
+                                        {{ o.get('nombre') or o.get('nombre_obra') or ('Obra #' ~ obra_id) }}
+                                    </label>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <button class="btn btn btn btn-warm-primary" data-assign-type="obra" style="width: 100%; margin-top: 0.75rem;">✓ Asignar seleccionadas</button>
+                    </div>
+                </details>
+            </div>
+        </div>
+
+        <!-- ACTIVIDADES -->
+        <div class="detail-card">
+            <div class="module-header" style="background: #f8f9fa; padding: 1rem; border-bottom: 2px solid #dee2e6;">
+                <h3 style="margin: 0; color: #495057;">⚙️ Actividades asignadas</h3>
+            </div>
+            <div class="module-content">
+                <div style="max-height: 200px; overflow-y: auto; border: 1px solid #e9ecef; border-radius: 4px; padding: 0.5rem; margin-bottom: 1rem;">
+                    {% if actividades %}
+                        {% for a in actividades %}
+                        <div id="actividad-{{ a.id }}" style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem; border-bottom: 1px solid #f1f3f5;">
+                            <span><strong>{{ a.nombre }}</strong> <small class="text-vanilla-600">(ID: {{ a.id }})</small></span>
+                            <button class="btn btn-sm btn-outline" data-action="desasignar" data-type="actividad" data-target-id="{{ a.id }}" data-area-id="{{ area.id }}" style="font-size: 0.85rem;">✕ Quitar</button>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-vanilla-600" style="text-align: center; padding: 1rem;">Sin actividades asignadas</p>
+                    {% endif %}
+                </div>
+
+                <details style="margin-top: 1rem;">
+                    <summary style="cursor: pointer; padding: 0.75rem; background: #e7f3ff; border-radius: 4px; font-weight: 600; color: #0066cc;">+ Asignar nuevas actividades</summary>
+                    <div style="padding: 1rem; border: 1px solid #e7f3ff; border-radius: 0 0 4px 4px;">
+                        <input class="form-control form-warm" type="text" id="search-actividades" placeholder="🔍 Buscar actividad..." style="width: 100%; padding: 0.5rem; margin-bottom: 0.75rem; border: 1px solid #ced4da; border-radius: 4px;">
+                        <div class="checkbox-max-w-7xl mx-auto px-6" style="max-height: 250px; overflow-y: auto; border: 1px solid #e9ecef; padding: 0.5rem; border-radius: 4px;">
+                            {% set seen_actividades = [] %}
+                            {% for a in actividades_all %}
+                                {% set act_id = a.get('id_actividad') or a.get('id') %}
+                                {% if act_id and act_id not in seen_actividades %}
+                                    {% set _ = seen_actividades.append(act_id) %}
+                                    <label class="checkbox-item" data-search-text="{{ (a.get('nombre_actividad') or a.get('nombre') or '').lower() }}" style="display: block; padding: 0.4rem; cursor: pointer; border-bottom: 1px solid #f8f9fa;">
+                                        <input class="form-control form-warm" type="checkbox" name="actividad_id" value="{{ act_id }}" style="margin-right: 0.5rem;">
+                                        {{ a.get('nombre_actividad') or a.get('nombre') or ('Actividad #' ~ act_id) }}
+                                    </label>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <button class="btn btn btn btn-warm-primary" data-assign-type="actividad" style="width: 100%; margin-top: 0.75rem;">✓ Asignar seleccionadas</button>
+                    </div>
+                </details>
+            </div>
+        </div>
+
+        <!-- EMPLEADOS -->
+        <div class="detail-card">
+            <div class="module-header" style="background: #f8f9fa; padding: 1rem; border-bottom: 2px solid #dee2e6;">
+                <h3 style="margin: 0; color: #495057;">👥 Empleados asignados</h3>
+            </div>
+            <div class="module-content">
+                <div style="max-height: 200px; overflow-y: auto; border: 1px solid #e9ecef; border-radius: 4px; padding: 0.5rem; margin-bottom: 1rem;">
+                    {% if empleados %}
+                        {% for e in empleados %}
+                        <div id="empleado-{{ e.id }}" style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem; border-bottom: 1px solid #f1f3f5;">
+                            <span><strong>{{ e.nombre }}</strong> <small class="text-vanilla-600">(ID: {{ e.id }})</small></span>
+                            <button class="btn btn-sm btn-outline" data-action="desasignar" data-type="empleado" data-target-id="{{ e.id }}" data-area-id="{{ area.id }}" style="font-size: 0.85rem;">✕ Quitar</button>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-vanilla-600" style="text-align: center; padding: 1rem;">Sin empleados asignados</p>
+                    {% endif %}
+                </div>
+
+                <details style="margin-top: 1rem;">
+                    <summary style="cursor: pointer; padding: 0.75rem; background: #e7f3ff; border-radius: 4px; font-weight: 600; color: #0066cc;">+ Asignar nuevos empleados</summary>
+                    <div style="padding: 1rem; border: 1px solid #e7f3ff; border-radius: 0 0 4px 4px;">
+                        <input class="form-control form-warm" type="text" id="search-empleados" placeholder="🔍 Buscar empleado..." style="width: 100%; padding: 0.5rem; margin-bottom: 0.75rem; border: 1px solid #ced4da; border-radius: 4px;">
+                        <div class="checkbox-max-w-7xl mx-auto px-6" style="max-height: 250px; overflow-y: auto; border: 1px solid #e9ecef; padding: 0.5rem; border-radius: 4px;">
+                            {% set seen_empleados = [] %}
+                            {% for e in empleados_all %}
+                                {% set emp_id = e.get('id') or e.get('id_empleado') %}
+                                {% if emp_id and emp_id not in seen_empleados %}
+                                    {% set _ = seen_empleados.append(emp_id) %}
+                                    <label class="checkbox-item" data-search-text="{{ (e.get('nombre') or e.get('nombre_empleado') or '').lower() }}" style="display: block; padding: 0.4rem; cursor: pointer; border-bottom: 1px solid #f8f9fa;">
+                                        <input class="form-control form-warm" type="checkbox" name="empleado_id" value="{{ emp_id }}" style="margin-right: 0.5rem;">
+                                        {{ e.get('nombre') or e.get('nombre_empleado') or ('Empleado #' ~ emp_id) }}
+                                    </label>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <button class="btn btn btn btn-warm-primary" data-assign-type="empleado" style="width: 100%; margin-top: 0.75rem;">✓ Asignar seleccionados</button>
+                    </div>
+                </details>
+            </div>
+        </div>
+
+        <!-- REQUISICIONES -->
+        <div class="detail-card">
+            <div class="module-header" style="background: #f8f9fa; padding: 1rem; border-bottom: 2px solid #dee2e6;">
+                <h3 style="margin: 0; color: #495057;">📦 Requisiciones asociadas</h3>
+            </div>
+            <div class="module-content">
+                <div style="max-height: 200px; overflow-y: auto; border: 1px solid #e9ecef; border-radius: 4px; padding: 0.5rem; margin-bottom: 1rem;">
+                    {% if requisiciones %}
+                        {% for r in requisiciones %}
+                        <div id="requisicion-{{ r.id }}" style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem; border-bottom: 1px solid #f1f3f5;">
+                            <span><strong>Req #{{ r.id }}</strong> <small class="text-vanilla-600">{{ r.fecha }}</small></span>
+                            <button class="btn btn-sm btn-outline" data-action="desasignar" data-type="requisicion" data-target-id="{{ r.id }}" data-area-id="{{ area.id }}" style="font-size: 0.85rem;">✕ Quitar</button>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-vanilla-600" style="text-align: center; padding: 1rem;">Sin requisiciones asociadas</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<script>
+// Delegated handler para botones con data-action="desasignar"
+async function postForm(url, data) {
+    const formData = new FormData();
+    for (const k in data) {
+        const v = data[k];
+        if (Array.isArray(v)) {
+            v.forEach(x => formData.append(k, x));
+        } else {
+            formData.append(k, v);
+        }
+    }
+    const res = await fetch(url, { method: 'POST', body: formData });
+    return res.json();
+}
+
+document.addEventListener('click', function (ev) {
+    const btn = ev.target.closest && ev.target.closest('button[data-action="desasignar"]');
+    if (!btn) return;
+    const type = btn.dataset.type;
+    const targetId = btn.dataset.targetId;
+    const areaId = btn.dataset.areaId;
+    if (!type || !targetId || !areaId) return;
+    if (!confirm(`¿Desasignar ${type} #${targetId}?`)) return;
+
+    const mapping = {
+        'obra': { url: `/areas/${areaId}/desasignar/obra`, field: 'obra_id', liId: `obra-${targetId}` },
+        'actividad': { url: `/areas/${areaId}/desasignar/actividad`, field: 'actividad_id', liId: `actividad-${targetId}` },
+        'empleado': { url: `/areas/${areaId}/desasignar/empleado`, field: 'empleado_id', liId: `empleado-${targetId}` },
+        'requisicion': { url: `/areas/${areaId}/desasignar/requisicion`, field: 'requisicion_id', liId: `requisicion-${targetId}` }
+    };
+
+    const m = mapping[type];
+    if (!m) { alert('Tipo desconocido'); return; }
+
+    postForm(m.url, { [m.field]: targetId })
+        .then(r => {
+            if (r && r.success) {
+                const li = document.getElementById(m.liId);
+                if (li) li.remove();
+            } else {
+                alert('Error al desasignar');
+            }
+        })
+        .catch(err => alert('Error: ' + err));
+});
+
+// Handler para botones "Asignar seleccionadas"
+document.addEventListener('click', function (ev) {
+    const btn = ev.target.closest && ev.target.closest('button[data-assign-type]');
+    if (!btn) return;
+    const type = btn.dataset.assignType;
+    const areaId = '{{ area.id }}';
+    const selector = `input[type=checkbox][name="${type}_id"]:checked`;
+    const checked = Array.from(document.querySelectorAll(selector)).map(cb => cb.value).filter(Boolean);
+    if (checked.length === 0) { alert('Selecciona al menos un ítem'); return; }
+    if (!confirm(`¿Asignar ${checked.length} ${type}(s) a esta área?`)) return;
+
+    const urlMap = {
+        'obra': `/areas/${areaId}/asignar/obra`,
+        'actividad': `/areas/${areaId}/asignar/actividad`,
+        'empleado': `/areas/${areaId}/asignar/empleado`
+    };
+    const fieldMap = {
+        'obra': 'obra_id',
+        'actividad': 'actividad_id',
+        'empleado': 'empleado_id'
+    };
+
+    const url = urlMap[type];
+    const field = fieldMap[type];
+    if (!url) { alert('Tipo no soportado'); return; }
+
+    postForm(url, { [field]: checked })
+        .then(r => {
+            if (r && r.success) {
+                alert(`✓ Asignadas: ${r.assigned || checked.length}`);
+                location.reload();
+            } else {
+                alert('Error al asignar');
+            }
+        })
+        .catch(err => alert('Error: ' + err));
+});
+
+// Funcionalidad de búsqueda en checkboxes
+function setupSearch(inputId, containerSelector) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    
+    input.addEventListener('input', function() {
+        const searchText = this.value.toLowerCase().trim();
+        const container = this.parentElement.querySelector(containerSelector);
+        if (!container) return;
+        
+        const items = container.querySelectorAll('.checkbox-item');
+        items.forEach(item => {
+            const itemText = item.dataset.searchText || item.textContent.toLowerCase();
+            if (itemText.includes(searchText)) {
+                item.style.display = 'block';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    });
+}
+
+// Inicializar búsqueda para cada tipo
+setupSearch('search-obras', '.checkbox-container');
+setupSearch('search-actividades', '.checkbox-container');
+setupSearch('search-empleados', '.checkbox-container');
+</script>
+{% endblock %}

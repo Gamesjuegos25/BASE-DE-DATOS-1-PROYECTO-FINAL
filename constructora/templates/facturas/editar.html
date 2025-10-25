@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <!-- CSS para formularios -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/form-pages.css') }}">{% endblock %}
+
+{% block title %}Editar Factura{% endblock %}
+{% block content %}
+<div class="page-header">
+  <nav class="breadcrumb">
+    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+    <span class="breadcrumb-separator">/</span>
+    <a href="{{ url_for('listar_facturas') }}">Facturas</a>
+    <span class="breadcrumb-separator">/</span>
+    <span>Editar</span>
+  </nav>
+  <div class="form-header"><div class="form-header-content"><h1 class="form-title"><i class="fas fa-edit"></i>✏️ Editar Factura</h1></div></div>
+</div>
+
+<div class="form-card">
+  <form action="{{ url_for('editar_factura', id=(factura.id or factura.factura_id or factura.id_factura)) }}" method="post">
+    <div class="stat-module-content">
+      <div class="form-group">
+        <label for="numero_factura">Número de Factura *</label>
+        <input class="form-input" 
+               id="numero_factura" 
+               name="numero_factura" 
+               value="{{ factura.numero_factura }}" 
+               required>
+      </div>
+      
+      <div class="form-group">
+        <label for="id_contrato">Contrato *</label>
+        <select class="form-select" id="id_contrato" name="id_contrato" required>
+          <option value="">Seleccione un contrato</option>
+          {% for contrato in contratos %}
+          <option value="{{ contrato.id_contrato }}" 
+                  {% if contrato.id_contrato == factura.id_contrato %}selected{% endif %}>
+            {{ contrato.tipo_contrato }} - {{ contrato.empleado_nombre }} {{ contrato.empleado_apellido }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label for="fecha_vencimiento">Fecha de Vencimiento</label>
+        <input class="form-input" 
+               id="fecha_vencimiento" 
+               name="fecha_vencimiento" 
+               value="{% if factura.fecha_vencimiento %}{{ factura.fecha_vencimiento.strftime('%Y-%m-%d') if factura.fecha_vencimiento.strftime else factura.fecha_vencimiento }}{% endif %}">
+      </div>
+      
+      <div class="form-group">
+        <label for="metodo_pago">Método de Pago</label>
+        <select class="form-select" id="metodo_pago" name="metodo_pago">
+          <option value="Transferencia" {% if factura.metodo_pago == 'Transferencia' %}selected{% endif %}>Transferencia</option>
+          <option value="Efectivo" {% if factura.metodo_pago == 'Efectivo' %}selected{% endif %}>Efectivo</option>
+          <option value="Cheque" {% if factura.metodo_pago == 'Cheque' %}selected{% endif %}>Cheque</option>
+          <option value="Tarjeta" {% if factura.metodo_pago == 'Tarjeta' %}selected{% endif %}>Tarjeta</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label for="estado">Estado</label>
+        <select class="form-select" id="estado" name="estado">
+          <option value="PENDIENTE" {% if factura.estado == 'PENDIENTE' %}selected{% endif %}>Pendiente</option>
+          <option value="PAGADA" {% if factura.estado == 'PAGADA' %}selected{% endif %}>Pagada</option>
+          <option value="VENCIDA" {% if factura.estado == 'VENCIDA' %}selected{% endif %}>Vencida</option>
+          <option value="ANULADA" {% if factura.estado == 'ANULADA' %}selected{% endif %}>Anulada</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label for="observaciones">Observaciones</label>
+        <textarea class="form-textarea" 
+                  id="observaciones" 
+                  name="observaciones" 
+                  rows="3">{{ factura.observaciones or '' }}</textarea>
+      </div>
+    </div>
+    <div class="stat-module-actions">
+      <button type="submit" class="btn-form primary">Actualizar Factura</button>
+      <a href="{{ url_for('ver_factura', id=(factura.id or factura.factura_id or factura.id_factura)) }}" class="btn btn btn btn-warm-secondary">Cancelar</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

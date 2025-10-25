@@ -1,110 +1,659 @@
 {% extends "base.html" %}
 
-{% block title %}Empleados - Sistema Constructora{% endblock %}
+{% block head %}
+    <!-- CSS para páginas de listado -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/list-pages.css') }}">{% endblock %}
+
+
+{% block title %}Gestión de Empleados - Sistema ERP
+<script>
+// Mejoras JavaScript automáticas para tablas
+document.addEventListener('DOMContentLoaded', function() {
+    // Aplicar efectos de hover a filas de tabla
+    const tableRows = document.querySelectorAll('.data-table-enhanced tbody tr, table tbody tr');
+    tableRows.forEach((row, index) => {
+        row.style.animationDelay = `${index * 0.1}s`;
+        row.classList.add('fade-in-up');
+        
+        row.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+            this.style.boxShadow = '0 4px 15px rgba(247, 127, 0, 0.2)';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = 'none';
+        });
+    });
+    
+    // Mejorar botones de acción con tooltips
+    const actionButtons = document.querySelectorAll('.btn-action-enhanced, .action-buttons a, .action-buttons button');
+    actionButtons.forEach(button => {
+        if (!button.querySelector('.custom-tooltip')) {
+            button.addEventListener('mouseenter', function() {
+                const title = this.getAttribute('title');
+                if (title) {
+                    const tooltip = document.createElement('div');
+                    tooltip.className = 'custom-tooltip';
+                    tooltip.textContent = title;
+                    tooltip.style.cssText = `
+                        position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+                        background: var(--prussian-blue-700); color: var(--vanilla);
+                        padding: 4px 8px; border-radius: 4px; font-size: 0.7rem;
+                        white-space: nowrap; z-index: 1000; margin-bottom: 5px;
+                    `;
+                    this.style.position = 'relative';
+                    this.appendChild(tooltip);
+                }
+            });
+            
+            button.addEventListener('mouseleave', function() {
+                const tooltip = this.querySelector('.custom-tooltip');
+                if (tooltip) tooltip.remove();
+            });
+        }
+    });
+    
+    // Contador animado para números
+    const statNumbers = document.querySelectorAll('.stat-number-enhanced, .stat-number');
+    statNumbers.forEach(stat => {
+        const finalNumber = parseInt(stat.textContent) || 0;
+        if (finalNumber > 0) {
+            let currentNumber = 0;
+            const increment = Math.max(1, Math.ceil(finalNumber / 20));
+            const timer = setInterval(() => {
+                currentNumber += increment;
+                if (currentNumber >= finalNumber) {
+                    currentNumber = finalNumber;
+                    clearInterval(timer);
+                }
+                stat.textContent = currentNumber;
+            }, 100);
+        }
+    });
+});
+</script>
+{% endblock %}
 
 {% block content %}
-<div class="container">
-    <div class="header-section">
-        <h1>👷‍♂️ Gestión de Empleados</h1>
-        <a href="{{ url_for('crear_empleado') }}" class="btn-primary">
-            ➕ Nuevo Empleado
-        </a>
-    </div>
-    
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="alert alert-{{ category }}">
-                    {{ message }}
-                </div>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-    
-    <div class="stats-cards">
-        <div class="stat-card">
-            <h3>{{ empleados|length }}</h3>
-            <p>Total Empleados</p>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/enhanced-tables.css') }}">
+
+<div class="page-container"><div class="page-header fade-in-up">
+    <div class="header-content">
+        <div class="header-left">
+            <h1 class="page-title">
+                <i class="fas fa-users text-orange-wheel"></i>
+                Gestión de Empleados
+            </h1>
+            <p class="page-subtitle">Control y administración del equipo de trabajo</p>
         </div>
-        <div class="stat-card">
-            <h3>{{ empleados|selectattr('tipo', 'equalto', 'Operario')|list|length }}</h3>
-            <p>Operarios</p>
-        </div>
-        <div class="stat-card">
-            <h3>{{ empleados|selectattr('tipo', 'equalto', 'Supervisor')|list|length }}</h3>
-            <p>Supervisores</p>
-        </div>
-        <div class="stat-card">
-            <h3>{{ empleados|selectattr('tipo', 'equalto', 'Ingeniero')|list|length }}</h3>
-            <p>Ingenieros</p>
-        </div>
-    </div>
-    
-    {% if empleados %}
-        <div class="table-container">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Nombre</th>
-                        <th>Tipo/Cargo</th>
-                        <th>Salario</th>
-                        <th>Estado</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for empleado in empleados %}
-                    <tr>
-                        <td>{{ empleado.id or empleado.empleado_id or 'N/A' }}</td>
-                        <td>
-                            <strong>{{ empleado.nombre or 'Sin nombre' }}</strong>
-                        </td>
-                        <td>
-                            <span class="badge badge-info">{{ empleado.tipo or 'General' }}</span>
-                        </td>
-                        <td>
-                            {% if empleado.salario %}
-                                Q{{ "{:,.2f}".format(empleado.salario) }}
-                            {% else %}
-                                No especificado
-                            {% endif %}
-                        </td>
-                        <td>
-                            <span class="badge badge-success">Activo</span>
-                        </td>
-                        <td>
-                            <button class="btn-sm btn-secondary" onclick="verEmpleado({{ empleado.id or empleado.empleado_id }})">
-                                👁️ Ver
-                            </button>
-                            <button class="btn-sm btn-primary" onclick="editarEmpleado({{ empleado.id or empleado.empleado_id }})">
-                                ✏️ Editar
-                            </button>
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    {% else %}
-        <div class="empty-state">
-            <div class="empty-icon">👷‍♂️</div>
-            <h3>No hay empleados registrados</h3>
-            <p>Comienza agregando el primer empleado a tu equipo de trabajo.</p>
-            <a href="{{ url_for('crear_empleado') }}" class="btn-primary">
-                ➕ Agregar Primer Empleado
+        <div class="header-actions">
+            <a href="{{ url_for('crear_empleado') }}" class="btn btn btn btn-warm-primary">
+                <i class="fas fa-plus"></i>
+                Nuevo Empleado
             </a>
         </div>
-    {% endif %}
+    </div>
 </div>
 
+<!-- Estadísticas Rápidas -->
+<div class="stats-grid">
+    <div class="stat-stat-card fade-in-up">
+        <div class="stat-icon bg-blue">
+            <i class="fas fa-users text-orange-wheel"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ empleados|length }}</div>
+            <div class="stat-label">Total Empleados</div>
+        </div>
+    </div>
+    
+    <div class="stat-stat-card fade-in-up">
+        <div class="stat-icon bg-green">
+            <i class="fas fa-hard-hat"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ empleados|selectattr('tipo_empleado', 'equalto', 'OPERARIO')|list|length }}</div>
+            <div class="stat-label">Operarios</div>
+        </div>
+    </div>
+    
+    <div class="stat-stat-card fade-in-up">
+        <div class="stat-icon bg-orange">
+            <i class="fas fa-user-tie"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ empleados|selectattr('tipo_empleado', 'in', ['SUPERVISOR', 'ADMINISTRADOR'])|list|length }}</div>
+            <div class="stat-label">Supervisión</div>
+        </div>
+    </div>
+    
+    <div class="stat-stat-card fade-in-up">
+        <div class="stat-icon bg-purple">
+            <i class="fas fa-user-graduate"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ empleados|selectattr('tipo_empleado', 'in', ['INGENIERO', 'ARQUITECTO'])|list|length }}</div>
+            <div class="stat-label">Profesionales</div>
+        </div>
+    </div>
+</div>
+
+<!-- Filtros -->
+<div class="filters-max-w-7xl mx-auto px-6">
+    <div class="filter-group">
+        <select class="form-control form-warm" id="filtroTipo" class="filter-select" onchange="filtrarEmpleados()">
+            <option value="">Todos los tipos</option>
+            <option value="Operario">Operarios</option>
+            <option value="Supervisor">Supervisores</option>
+            <option value="Ingeniero">Ingenieros</option>
+            <option value="Administrador">Administradores</option>
+        </select>
+    </div>
+    
+    <div class="search-group">
+        <input class="form-control form-warm" type="text" 
+               id="buscarEmpleado" 
+               class="search-input" 
+               placeholder="Buscar empleado..."
+               onkeyup="filtrarEmpleados()">
+        <i class="fas fa-search search-icon"></i>
+    </div>
+</div>
+
+<!-- Lista de Empleados -->
+<div class="list-table-container">
+    <div class="list-table-container">
+        <div class="list-table-container">
+            <h3>Lista de Empleados</h3>
+            <span class="record-count">{{ empleados|length }} registros</span>
+        </div>
+    </div>
+    
+    <div class="list-table-container">
+        <table class="data-table" id="tablaEmpleados">
+            <thead><tr>
+                    <th class="hidden-lg text-center" style="width: 60px;">ID</th>
+                    <th style="min-width: 200px;">Empleado</th>
+                    <th class="hidden-sm text-center" style="width: 120px;">Cargo</th>
+                    <th class="hidden-md" style="min-width: 150px;">Contacto</th>
+                    <th class="hidden-lg text-center" style="width: 110px;">Salario</th>
+                    <th class="hidden-lg text-center" style="width: 100px;">Fecha</th>
+                    <th class="hidden-md text-center" style="width: 80px;">Estado</th>
+                    <th class="text-center" style="width: 140px;">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for empleado in empleados %}
+                <tr data-tipo="{{ empleado.tipo_empleado or 'General' }}" data-nombre="{{ empleado.nombre_empleado or '' }}">
+                    <td class="hidden-lg text-center">{{ empleado.id_empleado or 'N/A' }}</td>
+                    <td>
+                        <div class="employee-info">
+                            <div class="employee-avatar">
+                                {% if empleado.tipo_empleado == 'ARQUITECTO' %}
+                                    <i class="fas fa-drafting-compass text-prussian-blue"></i>
+                                {% elif empleado.tipo_empleado == 'INGENIERO' %}
+                                    <i class="fas fa-user-graduate text-xanthous-600"></i>
+                                {% elif empleado.tipo_empleado in ['SUPERVISOR', 'ADMINISTRADOR'] %}
+                                    <i class="fas fa-user-tie text-orange-wheel"></i>
+                                {% elif empleado.tipo_empleado == 'OPERARIO' %}
+                                    <i class="fas fa-hard-hat text-prussian-blue-700"></i>
+                                {% else %}
+                                    <i class="fas fa-user text-orange-wheel"></i>
+                                {% endif %}
+                            </div>
+                            <div class="employee-details">
+                                <strong>{{ empleado.nombre_empleado or 'Sin nombre' }} {{ empleado.apellido_empleado or '' }}</strong>
+                                {% if empleado.email %}
+                                <div class="employee-email">{{ empleado.email }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </td>
+                    <td class="hidden-sm">
+                        {% if empleado.tipo_empleado == 'ARQUITECTO' %}
+                        <span class="status-badge">
+                            <i class="fas fa-drafting-compass"></i>
+                        {% elif empleado.tipo_empleado == 'INGENIERO' %}
+                        <span class="status-badge">
+                            <i class="fas fa-user-graduate"></i>
+                        {% elif empleado.tipo_empleado in ['SUPERVISOR', 'ADMINISTRADOR'] %}
+                        <span class="status-badge">
+                            <i class="fas fa-user-tie"></i>
+                        {% elif empleado.tipo_empleado == 'OPERARIO' %}
+                        <span class="status-badge">
+                            <i class="fas fa-hard-hat"></i>
+                        {% elif empleado.tipo_empleado == 'CONDUCTOR' %}
+                        <span class="status-badge">
+                            <i class="fas fa-truck"></i>
+                        {% elif empleado.tipo_empleado == 'SEGURIDAD' %}
+                        <span class="status-badge">
+                            <i class="fas fa-shield-alt"></i>
+                        {% else %}
+                        <span class="status-badge">
+                            <i class="fas fa-user"></i>
+                        {% endif %}
+                            {{ empleado.tipo_empleado.replace('_', ' ').title() if empleado.tipo_empleado else 'General' }}
+                        </span>
+                    </td>
+                    <td class="hidden-md">
+                        {% if empleado.telefono or empleado.email %}
+                            <div class="contact-info">
+                                {% if empleado.telefono %}
+                                <div class="phone-contact">
+                                    <i class="fas fa-phone text-prussian-blue"></i>
+                                    {{ empleado.telefono }}
+                                </div>
+                                {% endif %}
+                                {% if empleado.email %}
+                                <div class="email-contact">
+                                    <i class="fas fa-envelope text-prussian-blue-700"></i>
+                                    {{ empleado.email }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            <span class="text-vanilla-600">
+                                <i class="fas fa-exclamation-circle"></i>
+                                Sin contacto
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td class="hidden-lg text-center">
+                        {% if empleado.salario_fijo_empleado %}
+                            <div class="salary-compact">
+                                <strong style="color: #28a745; font-size: 13px;">
+                                    Q{{ "{:,.0f}".format(empleado.salario_fijo_empleado) }}
+                                </strong>
+                                <small class="block text-xanthous-600" style="font-size: 10px;">
+                                    <i class="fas fa-lock"></i> Fijo
+                                </small>
+                            </div>
+                        {% else %}
+                            <span class="text-vanilla-600 small">N/A</span>
+                        {% endif %}
+                    </td>
+                    <td class="hidden-lg text-center">
+                        {% if empleado.fecha_ingreso %}
+                            <div class="date-compact" style="font-size: 12px;">
+                                {{ empleado.fecha_ingreso.strftime('%d/%m/%Y') if empleado.fecha_ingreso else 'N/A' }}
+                            </div>
+                        {% else %}
+                            <span class="text-vanilla-600 small">N/A</span>
+                        {% endif %}
+                    </td>
+                    <td class="hidden-md text-center">
+                        <span class="status-badge">
+                            <i class="fas fa-circle" style="font-size: 6px;"></i> Activo
+                        </span>
+                    </td>
+                    <td class="text-center">
+                        <!-- Botones de acción unificados -->
+                        <div class="action-buttons-enhanced">
+                            <button class="btn-action btn-view" 
+                                    title="Ver detalles"
+                                    onclick="verEmpleado({{ empleado.id_empleado }})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn-action btn-edit" 
+                                    title="Editar"
+                                    onclick="editarEmpleado({{ empleado.id_empleado }})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <form action="{{ url_for('eliminar_empleado', id=empleado.id_empleado) }}" 
+                                  method="post" 
+                                  style="display: inline;"
+                                  onsubmit="return confirm('¿Está seguro de eliminar este empleado?');">
+                                <button class="btn-action btn btn btn-warm-danger" title="Eliminar" type="submit">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="8" class="empty-state">
+                        <div class="empty-content">
+                            <i class="fas fa-users text-orange-wheel"></i>
+                            <h3>No hay empleados registrados</h3>
+                            <p>Comienza agregando el primer empleado a tu equipo de trabajo</p>
+                            <a href="{{ url_for('crear_empleado') }}" class="btn btn btn btn-warm-primary">
+                                <i class="fas fa-plus"></i>
+                                Agregar Primer Empleado
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table></div></div></div></div>
+</div>
+
+<style>
+/* Información del empleado compacta */
+.employee-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.employee-avatar {
+    font-size: 16px;
+    width: 24px;
+    text-align: center;
+}
+
+.employee-details strong {
+    font-size: 14px;
+    color: #2d3748;
+    line-height: 1.2;
+}
+
+.employee-email {
+    font-size: 11px;
+    color: #718096;
+    margin-top: 2px;
+}
+
+/* Estilos para la información de contacto */
+.contact-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.phone-contact, .email-contact {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+}
+
+.phone-contact i, .email-contact i {
+    width: 10px;
+    text-align: center;
+    font-size: 9px;
+}
+
+/* Estilos para la información de salario */
+.salary-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+}
+
+.salary-amount {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #28a745;
+}
+
+.salary-type .badge-sm {
+    font-size: 0.7rem;
+    padding: 2px 6px;
+}
+
+/* Estilos para la información de fecha */
+.date-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+}
+
+.date-value {
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.date-label {
+    font-size: 0.7rem;
+}
+
+/* Estilos responsivos mejorados */
+@media (max-width: 768px) {
+    .contact-info {
+        display: none;
+    }
+    
+    .salary-info .salary-type {
+        display: none;
+    }
+    
+    .date-info .date-label {
+        display: none;
+    }
+}
+
+@media (max-width: 576px) {
+    .phone-contact {
+        font-size: 0.75rem;
+    }
+    
+    .email-contact {
+        font-size: 0.75rem;
+    }
+    
+    .salary-amount {
+        font-size: 0.9rem;
+    }
+}
+
+/* Animación para información nueva */
+.contact-info, .salary-info, .date-info {
+    animation: fadeInUp 0.3s ease-in-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Mejorar badges */
+.badge-success {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    border: none;
+    box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
+}
+
+/* Badges para cargos compactos */
+.badge {
+    font-size: 10px;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge i {
+    font-size: 8px;
+    margin-right: 2px;
+}
+
+/* Información compacta de salario y fecha */
+.salary-compact,
+.date-compact {
+    line-height: 1.2;
+}
+
+/* Iconos con color mejorado */
+.text-primary { color: #007bff !important; }
+.text-info { color: #17a2b8 !important; }
+.text-success { color: #28a745 !important; }
+
+/* Tabla responsiva mejorada */
+.data-table {
+    white-space: nowrap;
+}
+
+.data-table td {
+    vertical-align: middle;
+}
+
+/* Botones de acción más compactos */
+.btn-action {
+    padding: 6px 8px;
+    font-size: 11px;
+    min-width: 32px;
+    height: 28px;
+    border-radius: 4px;
+    margin: 1px;
+}
+
+/* Responsivo para botones */
+@media (max-width: 576px) {
+    .action-buttons {
+        flex-direction: column !important;
+        gap: 2px;
+    }
+    
+    .action-buttons .btn-action {
+        width: 80px;
+        font-size: 10px;
+        padding: 4px 6px;
+        height: 24px;
+    }
+    
+    .action-buttons form {
+        width: 80px;
+    }
+    
+    .action-buttons form .btn-action {
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .employee-info {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+    
+    .employee-avatar {
+        display: none;
+    }
+    
+    .contact-info {
+        gap: 2px;
+    }
+    
+    .phone-contact,
+    .email-contact {
+        font-size: 10px;
+    }
+}
+</style>
+
 <script>
+function filtrarEmpleados() {
+    const filtroTipo = document.getElementById('filtroTipo').value.toLowerCase();
+    const busqueda = document.getElementById('buscarEmpleado').value.toLowerCase();
+    const filas = document.querySelectorAll('#tablaEmpleados tbody tr');
+    
+    filas.forEach(fila => {
+        const tipo = fila.getAttribute('data-tipo').toLowerCase();
+        const nombre = fila.getAttribute('data-nombre').toLowerCase();
+        
+        const cumpleFiltroTipo = !filtroTipo || tipo.includes(filtroTipo);
+        const cumpleBusqueda = !busqueda || nombre.includes(busqueda);
+        
+        if (cumpleFiltroTipo && cumpleBusqueda) {
+            fila.style.display = '';
+        } else {
+            fila.style.display = 'none';
+        }
+    });
+}
+
 function verEmpleado(id) {
-    alert('Función ver empleado #' + id + ' (por implementar)');
+    // Redirigir a la página de detalles del empleado
+    window.location.href = `/empleados/${id}`;
 }
 
 function editarEmpleado(id) {
-    alert('Función editar empleado #' + id + ' (por implementar)');
+    // Redirigir a la página de edición del empleado
+    window.location.href = `/empleados/${id}/editar`;
 }
+</script>
+
+<script>
+// Mejoras JavaScript automáticas para tablas
+document.addEventListener('DOMContentLoaded', function() {
+    // Aplicar efectos de hover a filas de tabla
+    const tableRows = document.querySelectorAll('.data-table-enhanced tbody tr, table tbody tr');
+    tableRows.forEach((row, index) => {
+        row.style.animationDelay = `${index * 0.1}s`;
+        row.classList.add('fade-in-up');
+        
+        row.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+            this.style.boxShadow = '0 4px 15px rgba(247, 127, 0, 0.2)';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = 'none';
+        });
+    });
+    
+    // Mejorar botones de acción con tooltips
+    const actionButtons = document.querySelectorAll('.btn-action-enhanced, .action-buttons a, .action-buttons button');
+    actionButtons.forEach(button => {
+        if (!button.querySelector('.custom-tooltip')) {
+            button.addEventListener('mouseenter', function() {
+                const title = this.getAttribute('title');
+                if (title) {
+                    const tooltip = document.createElement('div');
+                    tooltip.className = 'custom-tooltip';
+                    tooltip.textContent = title;
+                    tooltip.style.cssText = `
+                        position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+                        background: var(--prussian-blue-700); color: var(--vanilla);
+                        padding: 4px 8px; border-radius: 4px; font-size: 0.7rem;
+                        white-space: nowrap; z-index: 1000; margin-bottom: 5px;
+                    `;
+                    this.style.position = 'relative';
+                    this.appendChild(tooltip);
+                }
+            });
+            
+            button.addEventListener('mouseleave', function() {
+                const tooltip = this.querySelector('.custom-tooltip');
+                if (tooltip) tooltip.remove();
+            });
+        }
+    });
+    
+    // Contador animado para números
+    const statNumbers = document.querySelectorAll('.stat-number-enhanced, .stat-number');
+    statNumbers.forEach(stat => {
+        const finalNumber = parseInt(stat.textContent) || 0;
+        if (finalNumber > 0) {
+            let currentNumber = 0;
+            const increment = Math.max(1, Math.ceil(finalNumber / 20));
+            const timer = setInterval(() => {
+                currentNumber += increment;
+                if (currentNumber >= finalNumber) {
+                    currentNumber = finalNumber;
+                    clearInterval(timer);
+                }
+                stat.textContent = currentNumber;
+            }, 100);
+        }
+    });
+});
 </script>
 {% endblock %}

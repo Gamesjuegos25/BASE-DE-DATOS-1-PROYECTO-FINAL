@@ -1,19 +1,176 @@
 <!-- templates/actividades/listar.html -->
 {% extends "base.html" %}
 
-{% block title %}Gestión de Actividades{% endblock %}
+{% block head %}
+    <!-- CSS para páginas de listado -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/list-pages.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/calendar-styles.css') }}">
+    <style>
+        .calendar-info {
+            font-size: 0.85rem;
+            line-height: 1.3;
+        }
+        .calendar-date, .calendar-time, .calendar-frequency {
+            margin-bottom: 2px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .calendar-date i { color: var(--prussian-blue-600); }
+        .calendar-time i { color: var(--xanthous-600); }
+        .calendar-frequency i { color: var(--fire-engine-red-600); }
+        .badge {
+            padding: 2px 6px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .badge-success { background: var(--green-600); color: white; }
+        .badge-info { background: var(--prussian-blue-600); color: white; }
+        .badge-warning { background: var(--xanthous-600); color: var(--prussian-blue-900); }
+        .badge-danger { background: var(--fire-engine-red-600); color: white; }
+        .badge-secondary { background: var(--vanilla-600); color: var(--prussian-blue-700); }
+    </style>
+{% endblock %}
+
+
+{% block title %}Gestión de Actividades
+<script>
+// Mejoras JavaScript automáticas para tablas
+document.addEventListener('DOMContentLoaded', function() {
+    // Aplicar efectos de hover a filas de tabla
+    const tableRows = document.querySelectorAll('.data-table-enhanced tbody tr, table tbody tr');
+    tableRows.forEach((row, index) => {
+        row.style.animationDelay = `${index * 0.1}s`;
+        row.classList.add('fade-in-up');
+        
+        row.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+            this.style.boxShadow = '0 4px 15px rgba(247, 127, 0, 0.2)';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = 'none';
+        });
+    });
+    
+    // Mejorar botones de acción con tooltips
+    const actionButtons = document.querySelectorAll('.btn-action-enhanced, .action-buttons a, .action-buttons button');
+    actionButtons.forEach(button => {
+        if (!button.querySelector('.custom-tooltip')) {
+            button.addEventListener('mouseenter', function() {
+                const title = this.getAttribute('title');
+                if (title) {
+                    const tooltip = document.createElement('div');
+                    tooltip.className = 'custom-tooltip';
+                    tooltip.textContent = title;
+                    tooltip.style.cssText = `
+                        position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+                        background: var(--prussian-blue-700); color: var(--vanilla);
+                        padding: 4px 8px; border-radius: 4px; font-size: 0.7rem;
+                        white-space: nowrap; z-index: 1000; margin-bottom: 5px;
+                    `;
+                    this.style.position = 'relative';
+                    this.appendChild(tooltip);
+                }
+            });
+            
+            button.addEventListener('mouseleave', function() {
+                const tooltip = this.querySelector('.custom-tooltip');
+                if (tooltip) tooltip.remove();
+            });
+        }
+    });
+    
+    // Contador animado para números
+    const statNumbers = document.querySelectorAll('.stat-number-enhanced, .stat-number');
+    statNumbers.forEach(stat => {
+        const finalNumber = parseInt(stat.textContent) || 0;
+        if (finalNumber > 0) {
+            let currentNumber = 0;
+            const increment = Math.max(1, Math.ceil(finalNumber / 20));
+            const timer = setInterval(() => {
+                currentNumber += increment;
+                if (currentNumber >= finalNumber) {
+                    currentNumber = finalNumber;
+                    clearInterval(timer);
+                }
+                stat.textContent = currentNumber;
+            }, 100);
+        }
+    });
+});
+</script>
+{% endblock %}
 
 {% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/enhanced-tables.css') }}">
+
+<div class="page-container"><div class="page-header fade-in-up">
+    <div class="header-content">
+        <div class="header-left">
+            <h1 class="page-title">
+                <i class="fas fa-list"></i>
+                Gestión de Actividades
+            </h1>
+            <p class="page-subtitle">Control y administración de actividades</p>
+        </div>
+        <div class="header-actions">
+            <a href="{{ url_for('crear_actividad') }}" class="btn btn btn btn-warm-primary">
+                <i class="fas fa-plus"></i>
+                Nueva Actividad
+            </a>
+        </div>
+</div>
+
+<!-- Estadísticas del Módulo -->
+<div class="stats-grid">
+    <div class="stat-stat-card fade-in-up">
+        <div class="stat-icon bg-blue">
+            <i class="fas fa-list"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ datos|length or 0 }}</div>
+            <div class="stat-label">Total Registros</div>
+        </div>
+    </div>
+    
+    <div class="stat-stat-card fade-in-up">
+        <div class="stat-icon bg-green">
+            <i class="fas fa-check-circle text-xanthous-600"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">{{ datos|length or 0 }}</div>
+            <div class="stat-label">Activos</div>
+        </div>
+    </div>
+    
+    <div class="stat-stat-card fade-in-up">
+        <div class="stat-icon bg-orange">
+            <i class="fas fa-clock"></i>
+        </div>
+        <div class="stat-content">
+            <div class="stat-number">0</div>
+            <div class="stat-label">Pendientes</div>
+        </div>
+    </div>
+</div>
+
+</div>
+
+
 <div class="dashboard-header">
     <h1><i class="fas fa-tasks"></i> Gestión de Actividades</h1>
-    <a href="{{ url_for('crear_actividad') }}" class="btn btn-primary">
+    <a href="{{ url_for('crear_actividad') }}" class="btn btn btn btn-warm-primary">
         <i class="fas fa-plus"></i> Nueva Actividad
     </a>
 </div>
 
 <div class="content-grid">
-    <div class="stats-cards">
-        <div class="stat-card">
+    <div class="stats-cards fade-in-up">
+        <div class="stat-stat-card fade-in-up">
             <div class="stat-icon">
                 <i class="fas fa-tasks"></i>
             </div>
@@ -22,7 +179,7 @@
                 <p>Total Actividades</p>
             </div>
         </div>
-        <div class="stat-card">
+        <div class="stat-stat-card fade-in-up">
             <div class="stat-icon">
                 <i class="fas fa-calendar-check"></i>
             </div>
@@ -33,49 +190,118 @@
         </div>
     </div>
 
-    <div class="table-container">
+    <div class="list-table-container">
         <table class="data-table">
-            <thead>
-                <tr>
+            <thead><tr>
                     <th>ID</th>
                     <th>Nombre Actividad</th>
-                    <th>Descripción</th>
-                    <th>Fecha Programada</th>
-                    <th>Acciones</th>
+                    <th>Área</th>
+                    <th><i class="fas fa-calendar-alt"></i> Fecha/Hora</th>
+                    <th>Estado</th>
+                    <th>Prioridad</th>
+                    <th class="text-center"><i class="fas fa-cogs"></i> Acciones</th>
                 </tr>
             </thead>
             <tbody>
                 {% for actividad in actividades %}
                 <tr>
                     <td>{{ actividad.id_actividad }}</td>
-                    <td><strong>{{ actividad.nombre_actividad }}</strong></td>
-                    <td>{{ actividad.descripcion_actividad or 'Sin descripción' }}</td>
+                    <td>
+                        <strong>{{ actividad.nombre_actividad }}</strong>
+                        <br><small class="text-vanilla-600">{{ (actividad.descripcion_actividad or 'Sin descripción')[:50] }}{% if actividad.descripcion_actividad and actividad.descripcion_actividad|length > 50 %}...{% endif %}</small>
+                    </td>
+                    <td>
+                        {% if actividad.nombre_area %}
+                            <span class="badge badge-info">{{ actividad.nombre_area }}</span>
+                        {% else %}
+                            <span class="text-vanilla-500">Sin área</span>
+                        {% endif %}
+                    </td>
                     <td>
                         {% if actividad.fecha_programada_actividad %}
-                            {{ actividad.fecha_programada_actividad.strftime('%d/%m/%Y') if actividad.fecha_programada_actividad.strftime else actividad.fecha_programada_actividad }}
+                            <div class="calendar-info">
+                                <div class="calendar-date">
+                                    <i class="fas fa-calendar"></i>
+                                    {{ actividad.fecha_programada_actividad.strftime('%d/%m/%Y') if actividad.fecha_programada_actividad.strftime else actividad.fecha_programada_actividad }}
+                                </div>
+                                {% if actividad.hora_inicio %}
+                                <div class="calendar-time">
+                                    <i class="fas fa-clock"></i>
+                                    {{ actividad.hora_inicio }} - {{ actividad.hora_fin or 'N/D' }}
+                                </div>
+                                {% endif %}
+                                {% if actividad.frecuencia and actividad.frecuencia != 'unica' %}
+                                <div class="calendar-frequency">
+                                    <i class="fas fa-repeat"></i>
+                                    {{ actividad.frecuencia.title() }}
+                                </div>
+                                {% endif %}
+                            </div>
                         {% else %}
-                            <span class="text-muted">No programada</span>
+                            <span class="text-vanilla-600">No programada</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if actividad.estado %}
+                            {% set estado_class = {
+                                'pendiente': 'badge-warning',
+                                'en_progreso': 'badge-info',
+                                'completada': 'badge-success',
+                                'cancelada': 'badge-danger'
+                            } %}
+                            <span class="badge {{ estado_class.get(actividad.estado, 'badge-secondary') }}">
+                                {{ actividad.estado.replace('_', ' ').title() }}
+                            </span>
+                        {% else %}
+                            <span class="badge badge-secondary">N/D</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if actividad.prioridad %}
+                            {% set prioridad_class = {
+                                'baja': 'badge-success',
+                                'media': 'badge-info', 
+                                'alta': 'badge-warning',
+                                'crítica': 'badge-danger'
+                            } %}
+                            <span class="badge {{ prioridad_class.get(actividad.prioridad, 'badge-secondary') }}">
+                                {{ actividad.prioridad.title() }}
+                            </span>
+                        {% else %}
+                            <span class="badge badge-secondary">N/D</span>
                         {% endif %}
                     </td>
                     <td>
                         <div class="action-buttons">
-                            <button class="btn btn-sm btn-info" title="Ver Detalles">
+                            <a class="btn-action btn-view" 
+                               href="{{ url_for('ver_actividad', id=(actividad.id or actividad.actividad_id or actividad.id_actividad)) }}" 
+                               title="Ver Detalles">
                                 <i class="fas fa-eye"></i>
-                            </button>
-                            <button class="btn btn-sm btn-warning" title="Editar">
+                            </a>
+                            <a class="btn-action btn-edit" 
+                               href="{{ url_for('editar_actividad', id=(actividad.id or actividad.actividad_id or actividad.id_actividad)) }}" 
+                               title="Editar">
                                 <i class="fas fa-edit"></i>
-                            </button>
+                            </a>
+                            <form action="{{ url_for('eliminar_actividad', id=(actividad.id or actividad.actividad_id or actividad.id_actividad)) }}" 
+                                  method="post" 
+                                  class="inline-form" 
+                                  onsubmit="return confirm('¿Estás seguro de eliminar esta actividad?');">
+                                <button class="btn-action btn-danger" title="Eliminar" type="submit">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
                         </div>
                     </td>
                 </tr>
                 {% else %}
                 <tr>
-                    <td colspan="5" class="text-center">
+                    <td colspan="7" class="text-center">
                         <div class="empty-state">
                             <i class="fas fa-tasks fa-3x"></i>
                             <h3>No hay actividades registradas</h3>
                             <p>Comienza creando la primera actividad del proyecto</p>
-                            <a href="{{ url_for('crear_actividad') }}" class="btn btn-primary">
+                            <a href="{{ url_for('crear_actividad') }}" class="btn btn btn btn-warm-primary">
                                 <i class="fas fa-plus"></i> Crear Primera Actividad
                             </a>
                         </div>
@@ -83,7 +309,74 @@
                 </tr>
                 {% endfor %}
             </tbody>
-        </table>
-    </div>
+        </table></div></div></div></div>
 </div>
+
+<script>
+// Mejoras JavaScript automáticas para tablas
+document.addEventListener('DOMContentLoaded', function() {
+    // Aplicar efectos de hover a filas de tabla
+    const tableRows = document.querySelectorAll('.data-table-enhanced tbody tr, table tbody tr');
+    tableRows.forEach((row, index) => {
+        row.style.animationDelay = `${index * 0.1}s`;
+        row.classList.add('fade-in-up');
+        
+        row.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+            this.style.boxShadow = '0 4px 15px rgba(247, 127, 0, 0.2)';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = 'none';
+        });
+    });
+    
+    // Mejorar botones de acción con tooltips
+    const actionButtons = document.querySelectorAll('.btn-action-enhanced, .action-buttons a, .action-buttons button');
+    actionButtons.forEach(button => {
+        if (!button.querySelector('.custom-tooltip')) {
+            button.addEventListener('mouseenter', function() {
+                const title = this.getAttribute('title');
+                if (title) {
+                    const tooltip = document.createElement('div');
+                    tooltip.className = 'custom-tooltip';
+                    tooltip.textContent = title;
+                    tooltip.style.cssText = `
+                        position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+                        background: var(--prussian-blue-700); color: var(--vanilla);
+                        padding: 4px 8px; border-radius: 4px; font-size: 0.7rem;
+                        white-space: nowrap; z-index: 1000; margin-bottom: 5px;
+                    `;
+                    this.style.position = 'relative';
+                    this.appendChild(tooltip);
+                }
+            });
+            
+            button.addEventListener('mouseleave', function() {
+                const tooltip = this.querySelector('.custom-tooltip');
+                if (tooltip) tooltip.remove();
+            });
+        }
+    });
+    
+    // Contador animado para números
+    const statNumbers = document.querySelectorAll('.stat-number-enhanced, .stat-number');
+    statNumbers.forEach(stat => {
+        const finalNumber = parseInt(stat.textContent) || 0;
+        if (finalNumber > 0) {
+            let currentNumber = 0;
+            const increment = Math.max(1, Math.ceil(finalNumber / 20));
+            const timer = setInterval(() => {
+                currentNumber += increment;
+                if (currentNumber >= finalNumber) {
+                    currentNumber = finalNumber;
+                    clearInterval(timer);
+                }
+                stat.textContent = currentNumber;
+            }, 100);
+        }
+    });
+});
+</script>
 {% endblock %}

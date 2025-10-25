@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Editar Equipo{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/create-forms.css') }}">
+
+
+<div class="page-header">
+  <nav class="breadcrumb">
+    <a href="{{ url_for('dashboard') }}">Dashboard</a>
+    <span class="breadcrumb-separator">/</span>
+    <a href="{{ url_for('listar_equipos') }}">Equipos</a>
+    <span class="breadcrumb-separator">/</span>
+    <span>Editar</span>
+  </nav>
+  <h1 class="page-title">✏️ Editar Equipo</h1>
+</div>
+
+<div class="create-form-container">
+<form action="{{ url_for('editar_equipo', id=equipo.id_equipo) }}" method="post" class="form">
+  <div class="form-group">
+    <label>Nombre</label>
+    <input type="text" name="nombre" class="form-control" value="{{ equipo.nombre or '' }}" required>
+  </div>
+  <div class="form-group">
+    <label>Tipo</label>
+    <input type="text" name="tipo" class="form-control" value="{{ equipo.tipo or '' }}">
+  </div>
+  <div class="form-group">
+    <label>Marca</label>
+    <input type="text" name="marca" class="form-control" value="{{ equipo.marca or '' }}">
+  </div>
+  <div class="form-group">
+    <label>Estado</label>
+    <select name="estado" class="form-control">
+      <option value="Disponible" {{ 'selected' if equipo.estado == 'Disponible' else '' }}>Disponible</option>
+      <option value="En Uso" {{ 'selected' if equipo.estado == 'En Uso' else '' }}>En Uso</option>
+      <option value="Mantenimiento" {{ 'selected' if equipo.estado == 'Mantenimiento' else '' }}>Mantenimiento</option>
+      <option value="Fuera de Servicio" {{ 'selected' if equipo.estado == 'Fuera de Servicio' else '' }}>Fuera de Servicio</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label>Ubicación</label>
+    <input type="text" name="ubicacion" class="form-control" value="{{ equipo.ubicacion or '' }}">
+  </div>
+  <div class="form-actions">
+    <a class="btn btn-secondary" href="{{ url_for('listar_equipos') }}">Cancelar</a>
+    <button class="btn btn-primary" type="submit">Guardar</button>
+  </div>
+</form>
+</div>
+
+{% endblock %}

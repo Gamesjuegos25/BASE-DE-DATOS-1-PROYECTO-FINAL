@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block title %}Nuevo Material - Sistema Constructora{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/create-forms.css') }}">
+
+<div class="create-form-container">
+    <!-- Header de página estilo detalle -->
+    <div class="create-page-header">
+        <nav class="breadcrumb">
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <span class="breadcrumb-separator">/</span>
+            <a href="{{ url_for('listar_materiales') }}">Materiales</a>
+            <span class="breadcrumb-separator">/</span>
+            <span>Nuevo</span>
+        </nav>
+        <h1 class="create-page-title">
+            <i class="fas fa-cubes"></i>
+            Crear Nuevo Material
+        </h1>
+    </div>
+
+    <div class="container-fluid">
+        <form method="POST" action="{{ url_for('crear_material') }}" id="create-material-form" class="needs-validation" novalidate>
+            <div class="create-form-row">
+                <!-- Información del Material -->
+                <div class="create-form-card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-cube"></i> Información del Material</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="create-form-group">
+                            <label for="nombre_material" class="create-form-label">
+                                <i class="fas fa-tag"></i>Nombre del Material<span class="required">*</span>
+                            </label>
+                            <input type="text" class="create-form-control" id="nombre_material" name="nombre_material" 
+                                   placeholder="Ej: Cemento Portland" 
+                                   value="{{ request.form.nombre_material if request.form else '' }}" required>
+                            <div class="invalid-feedback">
+                                Por favor, ingrese el nombre del material.
+                            </div>
+                        </div>
+
+                        <div class="create-form-group">
+                            <label for="tipo_material" class="create-form-label">
+                                <i class="fas fa-list"></i>Tipo de Material<span class="required">*</span>
+                            </label>
+                            <select class="create-form-control" id="tipo_material" name="tipo_material" required>
+                                <option value="">Seleccionar tipo...</option>
+                                <option value="CEMENTO" {{ 'selected' if request.form and request.form.tipo_material == 'CEMENTO' else '' }}>🏗️ Cemento</option>
+                                <option value="ARENA" {{ 'selected' if request.form and request.form.tipo_material == 'ARENA' else '' }}>🏖️ Arena</option>
+                                <option value="GRAVA" {{ 'selected' if request.form and request.form.tipo_material == 'GRAVA' else '' }}>🪨 Grava</option>
+                                <option value="HIERRO" {{ 'selected' if request.form and request.form.tipo_material == 'HIERRO' else '' }}>🔩 Hierro</option>
+                                <option value="LADRILLO" {{ 'selected' if request.form and request.form.tipo_material == 'LADRILLO' else '' }}>🧱 Ladrillo</option>
+                                <option value="TUBERIA" {{ 'selected' if request.form and request.form.tipo_material == 'TUBERIA' else '' }}>🚿 Tubería</option>
+                                <option value="ELECTRICO" {{ 'selected' if request.form and request.form.tipo_material == 'ELECTRICO' else '' }}>⚡ Eléctrico</option>
+                                <option value="OTRO" {{ 'selected' if request.form and request.form.tipo_material == 'OTRO' else '' }}>❓ Otro</option>
+                            </select>
+                            <div class="invalid-feedback">
+                                Por favor, seleccione el tipo de material.
+                            </div>
+                        </div>
+
+                        <div class="create-form-group">
+                            <label for="unidad_medida" class="create-form-label">
+                                <i class="fas fa-ruler"></i>Unidad de Medida<span class="required">*</span>
+                            </label>
+                            <select class="create-form-control" id="unidad_medida" name="unidad_medida" required>
+                                <option value="">Seleccionar unidad...</option>
+                                <option value="KG" {{ 'selected' if request.form and request.form.unidad_medida == 'KG' else '' }}>⚖️ Kilogramos (KG)</option>
+                                <option value="TONELADAS" {{ 'selected' if request.form and request.form.unidad_medida == 'TONELADAS' else '' }}>🏗️ Toneladas</option>
+                                <option value="M3" {{ 'selected' if request.form and request.form.unidad_medida == 'M3' else '' }}>📦 Metros Cúbicos (M³)</option>
+                                <option value="M2" {{ 'selected' if request.form and request.form.unidad_medida == 'M2' else '' }}>📐 Metros Cuadrados (M²)</option>
+                                <option value="ML" {{ 'selected' if request.form and request.form.unidad_medida == 'ML' else '' }}>📏 Metros Lineales (ML)</option>
+                                <option value="UNIDADES" {{ 'selected' if request.form and request.form.unidad_medida == 'UNIDADES' else '' }}>🔢 Unidades</option>
+                            </select>
+                            <div class="invalid-feedback">
+                                Por favor, seleccione la unidad de medida.
+                            </div>
+                        </div>
+
+                        <div class="create-form-group">
+                            <label for="stock_actual" class="create-form-label">
+                                <i class="fas fa-warehouse"></i>Stock Inicial
+                            </label>
+                            <input type="number" class="create-form-control" id="stock_actual" name="stock_actual" 
+                                   placeholder="0" step="0.01" min="0"
+                                   value="{{ request.form.stock_actual if request.form else '' }}">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Información Adicional -->
+                <div class="create-form-card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-info-circle"></i> Información Adicional</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="create-form-group">
+                            <label for="precio_unitario" class="create-form-label">
+                                <i class="fas fa-dollar-sign"></i>Precio Unitario
+                            </label>
+                            <input type="number" class="create-form-control" id="precio_unitario" name="precio_unitario" 
+                                   placeholder="0.00" step="0.01" min="0"
+                                   value="{{ request.form.precio_unitario if request.form else '' }}">
+                            <div class="create-form-text">
+                                <i class="fas fa-info-circle"></i>Precio por unidad de medida en pesos colombianos
+                            </div>
+                        </div>
+
+                        <div class="create-form-group">
+                            <label for="stock_minimo" class="create-form-label">
+                                <i class="fas fa-exclamation-triangle"></i>Stock Mínimo
+                            </label>
+                            <input type="number" class="create-form-control" id="stock_minimo" name="stock_minimo" 
+                                   placeholder="0" step="0.01" min="0"
+                                   value="{{ request.form.stock_minimo if request.form else '' }}">
+                            <div class="create-form-text">
+                                <i class="fas fa-info-circle"></i>Cantidad mínima antes de alertar por reabastecimiento
+                            </div>
+                        </div>
+
+                        <div class="create-form-group">
+                            <label for="descripcion" class="create-form-label">
+                                <i class="fas fa-sticky-note"></i>Descripción
+                            </label>
+                            <textarea class="create-form-control" id="descripcion" name="descripcion" rows="3"
+                                      placeholder="Descripción detallada del material">{{ request.form.descripcion if request.form else '' }}</textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="container-fluid">
+        <div class="create-form-card">
+            <div class="create-form-actions">
+                <a href="{{ url_for('listar_materiales') }}" class="create-btn create-btn-secondary">
+                    <i class="fas fa-times"></i>Cancelar
+                </a>
+                <button type="submit" form="create-material-form" class="create-btn create-btn-primary">
+                    <i class="fas fa-cubes"></i>Crear Material
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Validación del formulario
+(function() {
+    'use strict';
+    window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        var validation = Array.prototype.filter.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+})();
+</script>
+{% endblock %}

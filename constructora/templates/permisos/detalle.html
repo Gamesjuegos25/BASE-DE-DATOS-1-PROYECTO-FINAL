@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block head %}
+    <!-- CSS específico para páginas de detalle -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/detail-page.css') }}">
+    
+    <!-- CSS para páginas de detalle -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/detail-page.css') }}">{% endblock %}
+
+
+{% block title %}Detalle de Permiso{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-6-fluid">
+    <div class="flex flex-wrap -mx-2 mb-6">
+        <div class="flex-1 px-2-md-12">
+            <h2><i class="bi bi-shield-check"></i> Detalle del Permiso</h2>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}">Inicio</a></li>
+                    <li class="breadcrumb-item"><a href="{{ url_for('listar_permisos') }}">Permisos</a></li>
+                    <li class="breadcrumb-item active">Permiso #{{ permiso.id_permiso }}</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="flex flex-wrap -mx-2">
+        <div class="flex-1 px-2-md-8">
+            <div class="detail-card">
+                <div class="stat-stat-header bg-gradient-warm-primary text-white text-white flex justify-between items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-shield-lock"></i> {{ permiso.modulo_permiso }}
+                    </h5>
+                    <span class="status-badge-detail">
+                        {{ permiso.nivel_acceso_permiso or 'Sin nivel' }}
+                    </span>
+                </div>
+                <div class="stat-module-content">
+                    <div class="flex flex-wrap -mx-2">
+                        <div class="flex-1 px-2-md-6">
+                            <div class="mb-3">
+                                <label class="text-vanilla-600 small">ID del Permiso</label>
+                                <p class="h5">#{{ permiso.id_permiso }}</p>
+                            </div>
+                        </div>
+                        <div class="flex-1 px-2-md-6">
+                            <div class="mb-3">
+                                <label class="text-vanilla-600 small">Usuarios con este Permiso</label>
+                                <p class="h5">
+                                    <span class="status-badge-detail">{{ permiso.usuarios_asignados }}</span> usuario(s)
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-wrap -mx-2 mt-3">
+                        <div class="flex-1 px-2-md-12">
+                            <div class="mb-3">
+                                <label class="text-vanilla-600 small">Módulo del Sistema</label>
+                                <p class="lead"><span class="status-badge-detail">{{ permiso.modulo_permiso }}</span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-6">
+                        <a href="{{ url_for('listar_permisos') }}" class="btn btn btn btn-warm-secondary">
+                            <i class="bi bi-arrow-left"></i> Volver
+                        </a>
+                        <a href="{{ url_for('asignar_permiso', id=permiso.id_permiso) }}" class="btn btn btn-accent">
+                            <i class="bi bi-person-plus"></i> Asignar Usuarios
+                        </a>
+                        <a href="{{ url_for('editar_permiso', id=permiso.id_permiso) }}" class="btn btn btn btn-warm-secondary">
+                            <i class="bi bi-pencil"></i> Editar
+                        </a>
+                        <button type="button" class="btn btn btn btn-warm-danger" data-bs-toggle="modal" data-bs-target="#modalEliminar">
+                            <i class="bi bi-trash"></i> Eliminar
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            {% if usuarios_asignados %}
+            <div class="detail-card">
+                <div class="stat-stat-header bg-vanilla-800">
+                    <h6 class="mb-0"><i class="bi bi-people"></i> Usuarios con este Permiso</h6>
+                </div>
+                <div class="stat-module-content">
+                    <div class="table-max-w-7xl mx-auto px-6">
+                        <table class="assignment-table">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Usuario</th>
+                                    <th>Correo</th>
+                                    <th>Rol</th>
+                                    <th>Fecha Asignación</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for usuario in usuarios_asignados %}
+                                <tr>
+                                    <td><strong>{{ usuario.nombre_usuario }}</strong></td>
+                                    <td><small>{{ usuario.correo_usuario }}</small></td>
+                                    <td><span class="status-badge-detail">{{ usuario.rol_usuario }}</span></td>
+                                    <td>
+                                        <small class="text-vanilla-600">
+                                            {{ usuario.fecha_asignacion_usuario_permiso.strftime('%d/%m/%Y %H:%M') if usuario.fecha_asignacion_usuario_permiso else 'N/A' }}
+                                        </small>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="flex-1 px-2-md-4">
+            <div class="detail-card">
+                <div class="stat-module-content">
+                    <h6 class="stat-card-title"><i class="bi bi-info-circle"></i> Información del Permiso</h6>
+                    <ul class="small mb-0">
+                        <li><strong>Módulo:</strong> {{ permiso.modulo_permiso }}</li>
+                        <li><strong>Nivel:</strong> {{ permiso.nivel_acceso_permiso or 'Sin nivel específico' }}</li>
+                        <li><strong>Usuarios Asignados:</strong> {{ permiso.usuarios_asignados }}</li>
+                        <li class="mt-2">Los permisos controlan el acceso a diferentes áreas del sistema</li>
+                        <li>Puedes asignar este permiso a múltiples usuarios</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="detail-card">
+                <div class="stat-module-content">
+                    <h6 class="stat-card-title text-orange-wheel"><i class="bi bi-exclamation-triangle"></i> Advertencia</h6>
+                    <p class="small mb-0">
+                        Al eliminar este permiso, se revocarán automáticamente todas las asignaciones 
+                        a usuarios. Esta acción no se puede deshacer.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmación de eliminación -->
+<div class="modal fade" id="modalEliminar" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-gradient-warm-danger text-white text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-exclamation-triangle"></i> Confirmar Eliminación
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Está seguro que desea eliminar el permiso <strong>"{{ permiso.modulo_permiso }}"</strong>?</p>
+                <p class="text-fire-engine-red">
+                    <strong>Advertencia:</strong> Se revocarán las asignaciones de {{ permiso.usuarios_asignados }} usuario(s).
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn btn btn-warm-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form method="POST" action="{{ url_for('eliminar_permiso', id=permiso.id_permiso) }}">
+                    <button type="submit" class="btn btn btn btn-warm-danger">
+                        <i class="bi bi-trash"></i> Eliminar Permiso
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

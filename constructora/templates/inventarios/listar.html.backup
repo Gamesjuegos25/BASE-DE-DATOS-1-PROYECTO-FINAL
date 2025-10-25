@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block title %}Gestión de Inventarios{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="{{ url_for('dashboard') }}">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                <i class="fas fa-boxes"></i> Inventarios
+            </li>
+        </ol>
+    </nav>
+    
+    <div class="title-section">
+        <h1 class="page-title">
+            <i class="fas fa-boxes"></i>
+            Gestión de Inventarios
+        </h1>
+        <p class="page-subtitle">Control de stock y materiales por bodega</p>
+    </div>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon primary">
+            <i class="fas fa-boxes"></i>
+        </div>
+        <div class="stat-info">
+            <h3>{{ inventarios|length }}</h3>
+            <p>Total Inventarios</p>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon success">
+            <i class="fas fa-warehouse"></i>
+        </div>
+        <div class="stat-info">
+            <h3>{{ inventarios|sum(attribute='bodegas_asignadas') or 0 }}</h3>
+            <p>Bodegas Activas</p>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon info">
+            <i class="fas fa-cubes"></i>
+        </div>
+        <div class="stat-info">
+            <h3>{{ inventarios|sum(attribute='materiales_incluidos') or 0 }}</h3>
+            <p>Materiales en Stock</p>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon warning">
+            <i class="fas fa-dollar-sign"></i>
+        </div>
+        <div class="stat-info">
+            <h3>Q{{ "%.0f"|format(inventarios|sum(attribute='valor_estimado') or 0) }}</h3>
+            <p>Valor Total Estimado</p>
+        </div>
+    </div>
+</div>
+
+<div class="table-container">
+    <div class="table-header">
+        <h2>
+            <i class="fas fa-list"></i>
+            Lista de Inventarios
+        </h2>
+        <div class="table-actions">
+            <a href="{{ url_for('crear_inventario') }}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Nuevo Inventario
+            </a>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Cantidad</th>
+                    <th>Bodegas</th>
+                    <th>Materiales</th>
+                    <th>Valor Estimado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if inventarios %}
+                    {% for inventario in inventarios %}
+                    <tr>
+                        <td>{{ inventario.id_inventario }}</td>
+                        <td>
+                            <span class="badge badge-primary">{{ inventario.cantidad_inventario or 0 }}</span>
+                        </td>
+                        <td>
+                            {% if inventario.bodegas_asignadas > 0 %}
+                                <span class="badge badge-success">{{ inventario.bodegas_asignadas }} bodegas</span>
+                            {% else %}
+                                <span class="badge badge-warning">Sin asignar</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if inventario.materiales_incluidos > 0 %}
+                                <span class="badge badge-info">{{ inventario.materiales_incluidos }} materiales</span>
+                            {% else %}
+                                <span class="badge badge-secondary">Vacío</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <strong class="text-success">Q{{ "%.2f"|format(inventario.valor_estimado or 0) }}</strong>
+                        </td>
+                        <td class="actions-cell">
+                            <div class="table-actions">
+                                <a class="btn-action btn-view" 
+                                   title="Ver detalles"
+                                   href="{{ url_for('ver_inventario', id=inventario.id_inventario) }}">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a class="btn-action btn-edit" 
+                                   title="Editar"
+                                   href="{{ url_for('editar_inventario', id=inventario.id_inventario) }}">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <form action="{{ url_for('eliminar_inventario', id=inventario.id_inventario) }}" 
+                                      method="post" 
+                                      onsubmit="return confirm('¿Eliminar este inventario? Se perderán todas las asignaciones.');"
+                                      style="display: inline;">
+                                    <button class="btn-action btn-danger" title="Eliminar" type="submit">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                                <a class="btn-action btn-secondary" 
+                                   title="Asignar materiales"
+                                   href="{{ url_for('asignar_materiales_inventario', id=inventario.id_inventario) }}">
+                                    <i class="fas fa-cubes"></i>
+                                </a>
+                                <a class="btn-action btn-info" 
+                                   title="Asignar bodegas"
+                                   href="{{ url_for('asignar_bodegas_inventario', id=inventario.id_inventario) }}">
+                                    <i class="fas fa-warehouse"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted">
+                            <div class="empty-state">
+                                <i class="fas fa-boxes fa-3x mb-3"></i>
+                                <h4>No hay inventarios registrados</h4>
+                                <p>Comience creando su primer inventario</p>
+                                <a href="{{ url_for('crear_inventario') }}" class="btn btn-primary">
+                                    <i class="fas fa-plus"></i> Crear Inventario
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

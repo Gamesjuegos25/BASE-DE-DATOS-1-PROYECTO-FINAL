@@ -25,7 +25,7 @@ from database import (
     get_clientes_safe, get_cliente_by_id_safe, update_cliente_safe, delete_cliente_safe, get_obras_safe, insert_obra_safe, insert_cliente_safe,
     get_empleados_safe, insert_empleado_safe,
     get_proveedores_safe, insert_proveedor_safe,
-    get_materiales_safe, insert_material_safe,
+    get_materiales_safe, insert_material_safe, insert_material_completo_safe,
     get_vehiculos_safe, insert_vehiculo_safe,
     get_equipos_safe, insert_equipo_safe,
     get_proyectos_safe, insert_proyecto_safe,
@@ -1289,14 +1289,31 @@ def crear_proveedor():
         return render_template('proveedores/crear.html')
     
     try:
-        nombre = request.form.get('nombre', '').strip()
-        contacto = request.form.get('contacto', '').strip()
+        # Obtener datos del formulario con nombres correctos del template
+        nombre = request.form.get('nombre_proveedor', '').strip()
+        nit = request.form.get('nit_proveedor', '').strip()
+        tipo = request.form.get('tipo_proveedor', '').strip()
+        telefono = request.form.get('telefono_proveedor', '').strip()
+        email = request.form.get('email_proveedor', '').strip()
+        direccion = request.form.get('direccion_proveedor', '').strip()
         
+        # VALIDACIONES OBLIGATORIAS
         if not nombre:
-            flash('El nombre del proveedor es obligatorio', 'error')
+            flash('El nombre del proveedor es OBLIGATORIO', 'error')
             return render_template('proveedores/crear.html')
         
-        proveedor_id = insert_proveedor_safe(nombre=nombre, contacto=contacto)
+        if not tipo:
+            flash('El tipo de proveedor es OBLIGATORIO', 'error')
+            return render_template('proveedores/crear.html')
+        
+        # Crear contacto combinando varios campos disponibles
+        contacto_info = []
+        if telefono: contacto_info.append(f"Tel: {telefono}")
+        if email: contacto_info.append(f"Email: {email}")
+        if direccion: contacto_info.append(f"Dir: {direccion}")
+        contacto_combined = " | ".join(contacto_info) if contacto_info else None
+        
+        proveedor_id = insert_proveedor_safe(nombre=nombre, contacto=contacto_combined)
         
         if proveedor_id:
             flash(f'Proveedor "{nombre}" creado exitosamente', 'success')
@@ -1487,33 +1504,66 @@ def listar_materiales():
 
 @app.route('/materiales/nuevo', methods=['GET', 'POST'])
 def crear_material():
-    """Crear nuevo material"""
+    """Crear nuevo material completo con inventario"""
     if request.method == 'GET':
         proveedores = get_proveedores_safe()
         return render_template('materiales/crear_modern.html', proveedores=proveedores)
     
     try:
+        # Obtener todos los campos del formulario
         nombre = request.form.get('nombre', '').strip()
         unidad = request.form.get('unidad_medida', '').strip()
-        precio = request.form.get('precio_unitario')
+        precio_raw = request.form.get('precio_unitario', '').strip()
+        descripcion = request.form.get('descripcion', '').strip()
         categoria = request.form.get('categoria', '').strip()
+        stock_raw = request.form.get('stock', '').strip()
+        proveedor_id = request.form.get('proveedor_id', '').strip()
         
+        # Validaciones obligatorias
         if not nombre:
-            flash('El nombre del material es obligatorio', 'error')
+            flash('El nombre del material es OBLIGATORIO', 'error')
             proveedores = get_proveedores_safe()
             return render_template('materiales/crear_modern.html', proveedores=proveedores)
         
+        # Conversiones numéricas
         precio_numerico = None
-        if precio:
+        if precio_raw:
             try:
-                precio_numerico = float(precio)
+                precio_numerico = float(precio_raw)
             except ValueError:
-                precio_numerico = None
+                flash('El precio debe ser un número válido', 'error')
+                proveedores = get_proveedores_safe()
+                return render_template('materiales/crear_modern.html', proveedores=proveedores)
         
-        material_id = insert_material_safe(nombre=nombre, unidad=unidad, precio=precio_numerico)
+        stock_numerico = 0
+        if stock_raw:
+            try:
+                stock_numerico = int(stock_raw)
+            except ValueError:
+                flash('El stock debe ser un número entero válido', 'error')
+                proveedores = get_proveedores_safe()
+                return render_template('materiales/crear_modern.html', proveedores=proveedores)
+        
+        proveedor_id_numerico = None
+        if proveedor_id:
+            try:
+                proveedor_id_numerico = int(proveedor_id)
+            except ValueError:
+                proveedor_id_numerico = None
+        
+        # Crear material completo
+        material_id = insert_material_completo_safe(
+            nombre=nombre, 
+            unidad=unidad, 
+            precio=precio_numerico,
+            descripcion=descripcion,
+            categoria=categoria,
+            stock=stock_numerico,
+            proveedor_id=proveedor_id_numerico
+        )
         
         if material_id:
-            flash(f'Material "{nombre}" creado exitosamente', 'success')
+            flash(f'Material "{nombre}" creado exitosamente con stock inicial: {stock_numerico}', 'success')
             return redirect(url_for('listar_materiales'))
         else:
             flash('Error al crear material', 'error')
@@ -1611,12 +1661,38 @@ def crear_vehiculo():
         return render_template('vehiculos/crear.html')
     
     try:
-        placa = request.form.get('placa', '').strip()
-        estado = request.form.get('estado', '').strip()
-        tipo = request.form.get('tipo', '').strip()
+        # Obtener datos del formulario con los nombres correctos
+        placa = request.form.get('placa_vehiculo', '').strip().upper()
+        estado = request.form.get('estado_vehiculo', 'DISPONIBLE').strip()
+        tipo = request.form.get('tipo_vehiculo', '').strip()
         
+        # Campos adicionales del formulario
+        modelo = request.form.get('modelo', '').strip()
+        capacidad = request.form.get('capacidad', '').strip()
+        observaciones = request.form.get('observaciones', '').strip()
+        
+        # VALIDACIONES OBLIGATORIAS
         if not placa:
-            flash('La placa del vehículo es obligatoria', 'error')
+            flash('La placa del vehículo es OBLIGATORIA', 'error')
+            return render_template('vehiculos/crear.html')
+        
+        if not tipo:
+            flash('El tipo de vehículo es OBLIGATORIO', 'error')
+            return render_template('vehiculos/crear.html')
+            
+        if not estado:
+            flash('El estado del vehículo es OBLIGATORIO', 'error')
+            return render_template('vehiculos/crear.html')
+            
+        # Validar formato de placa (letras, números y guiones solamente)
+        import re
+        if not re.match(r'^[A-Z0-9\-]+$', placa):
+            flash('Formato de placa inválido. Solo letras, números y guiones permitidos', 'error')
+            return render_template('vehiculos/crear.html')
+        
+        # Validar longitud mínima de placa
+        if len(placa) < 3:
+            flash('La placa debe tener al menos 3 caracteres', 'error')
             return render_template('vehiculos/crear.html')
         
         vehiculo_id = insert_vehiculo_safe(placa=placa, estado=estado, tipo=tipo)
@@ -3050,6 +3126,12 @@ def listar_bodegas():
 @app.route('/bodegas/nueva', methods=['GET', 'POST'])
 def crear_bodega():
     """Crear nueva bodega con información completa"""
+    # Obtener empleados supervisores para el dropdown
+    try:
+        empleados_supervisores = get_empleados_supervisores_safe()
+    except Exception as e:
+        empleados_supervisores = []
+        
     if request.method == 'POST':
         try:
             # Obtener todos los campos del formulario
@@ -3063,7 +3145,7 @@ def crear_bodega():
             # Validación básica
             if not responsable:
                 flash('El responsable es requerido', 'error')
-                return render_template('bodegas/crear.html')
+                return render_template('bodegas/crear.html', empleados_supervisores=empleados_supervisores)
             
             # Crear bodega con todos los campos
             bodega_id = insert_bodega_safe(
@@ -3083,7 +3165,7 @@ def crear_bodega():
         except Exception as e:
             flash(f'Error: {str(e)}', 'error')
     
-    return render_template('bodegas/crear.html')
+    return render_template('bodegas/crear.html', empleados_supervisores=empleados_supervisores)
 
 @app.route('/bodegas/<int:id>')
 def ver_bodega(id):

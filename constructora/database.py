@@ -972,6 +972,41 @@ def get_empleados_safe():
         logger.error(f"Error obteniendo empleados: {e}")
         return []
 
+def get_empleados_supervisores_safe():
+    """Obtener empleados que pueden ser supervisores/responsables de bodegas"""
+    try:
+        with get_connection() as conn:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
+                cursor.execute("""
+                    SELECT 
+                        id_empleado,
+                        nombre_empleado,
+                        apellido_empleado,
+                        tipo_empleado
+                    FROM empleados 
+                    WHERE tipo_empleado IN ('Supervisor', 'Gerente', 'Coordinador', 'Jefe', 'Administrador', 'Encargado')
+                       OR tipo_empleado IS NULL
+                    ORDER BY nombre_empleado
+                    LIMIT 50
+                """)
+                
+                results = cursor.fetchall()
+                clean_results = []
+                for row in results:
+                    clean_row = {}
+                    for key, value in row.items():
+                        if isinstance(value, str):
+                            clean_row[key] = str(value).replace('ñ', 'n').replace('Ñ', 'N')
+                        else:
+                            clean_row[key] = value
+                    clean_results.append(clean_row)
+                
+                return clean_results
+                
+    except Exception as e:
+        logger.error(f"Error obteniendo empleados supervisores: {e}")
+        return []
+
 def insert_empleado_safe(nombre, apellido=None, tipo=None, salario=None, telefono=None, email=None, fecha_ingreso=None):
     """Insertar empleado de forma segura"""
     try:
@@ -1065,10 +1100,13 @@ def get_proveedores_safe():
                 cursor.execute("""
                     SELECT 
                         id_proveedor,
+                        id_proveedor as proveedor_id,
+                        nombre_proveedor,
                         CASE 
                             WHEN nombre_proveedor IS NULL THEN 'Sin nombre'
                             ELSE REPLACE(REPLACE(REPLACE(TRIM(nombre_proveedor), 'ó', 'o'), 'á', 'a'), 'é', 'e')
                         END as nombre,
+                        contacto_proveedor,
                         contacto_proveedor as contacto
                     FROM PROVEEDORES 
                     ORDER BY nombre_proveedor
@@ -1228,7 +1266,7 @@ def get_materiales_safe():
         return []
 
 def insert_material_safe(nombre, unidad=None, precio=None):
-    """Insertar material de forma segura"""
+    """Insertar material de forma segura (básico)"""
     try:
         nombre_clean = str(nombre).replace('ó', 'o').replace('á', 'a').replace('é', 'e').replace('ñ', 'n')
         
@@ -1247,6 +1285,53 @@ def insert_material_safe(nombre, unidad=None, precio=None):
                 
     except Exception as e:
         logger.error(f"Error insertando material: {e}")
+        return None
+
+def insert_material_completo_safe(nombre, unidad=None, precio=None, descripcion=None, categoria=None, stock=0, proveedor_id=None):
+    """Insertar material completo con inventario y proveedor"""
+    try:
+        nombre_clean = str(nombre).replace('ó', 'o').replace('á', 'a').replace('é', 'e').replace('ñ', 'n')
+        
+        with get_connection() as conn:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
+                # 1. Crear el material
+                cursor.execute("""
+                    INSERT INTO MATERIALES (nombre_material, unidad_material, precio_unitario_material, 
+                                          descripcion_material, categoria_material)
+                    VALUES (%s, %s, %s, %s, %s) RETURNING id_material
+                """, (nombre_clean, unidad, precio, descripcion, categoria))
+                
+                material_id = cursor.fetchone()['id_material']
+                
+                # 2. Crear el inventario con stock inicial
+                cursor.execute("""
+                    INSERT INTO INVENTARIOS (cantidad_inventario) 
+                    VALUES (%s) RETURNING id_inventario
+                """, (stock,))
+                
+                inventario_id = cursor.fetchone()['id_inventario']
+                
+                # 3. Relacionar material con inventario
+                cursor.execute("""
+                    INSERT INTO INVENTARIO_MATERIAL (id_inventario, id_material)
+                    VALUES (%s, %s)
+                """, (inventario_id, material_id))
+                
+                # 4. Si hay proveedor, relacionarlo con el material
+                if proveedor_id:
+                    cursor.execute("""
+                        INSERT INTO PROVEEDOR_MATERIAL (id_proveedor, id_material)
+                        VALUES (%s, %s)
+                    """, (proveedor_id, material_id))
+                    logger.info(f"Material asociado con proveedor ID: {proveedor_id}")
+                
+                conn.commit()
+                
+                logger.info(f"Material completo creado: ID {material_id}, Inventario ID: {inventario_id}, Stock: {stock}")
+                return material_id
+                
+    except Exception as e:
+        logger.error(f"Error insertando material completo: {e}")
         return None
 
 # ===== CRUD Materiales adicionales =====
@@ -1383,23 +1468,39 @@ def delete_material_safe(material_id: int):
 # CONSULTAS SEGURAS PARA VEHÍCULOS
 # ===============================
 def get_vehiculos_safe():
-    """Obtener vehículos de forma segura"""
+    """Obtener vehículos de forma segura con alias para compatibilidad"""
     try:
         with get_connection() as conn:
             with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
                 cursor.execute("""
                     SELECT 
                         id_vehiculo,
+                        id_vehiculo as id,
                         placa_vehiculo,
+                        placa_vehiculo as placa,
                         estado_vehiculo,
-                        tipo_vehiculo
+                        estado_vehiculo as estado,
+                        tipo_vehiculo,
+                        tipo_vehiculo as tipo
                     FROM VEHICULOS 
                     ORDER BY placa_vehiculo
-                    LIMIT 100
                 """)
                 
                 results = cursor.fetchall()
-                return [dict(row) for row in results]
+                vehiculos = []
+                for row in results:
+                    vehiculo = dict(row)
+                    # Asegurar que tenga todos los alias necesarios
+                    vehiculo.update({
+                        'id': vehiculo.get('id_vehiculo'),
+                        'placa': vehiculo.get('placa_vehiculo'),
+                        'estado': vehiculo.get('estado_vehiculo'),
+                        'tipo': vehiculo.get('tipo_vehiculo')
+                    })
+                    vehiculos.append(vehiculo)
+                
+                logger.info(f"Obtenidos {len(vehiculos)} vehículos")
+                return vehiculos
                 
     except Exception as e:
         logger.error(f"Error obteniendo vehículos: {e}")
@@ -5386,21 +5487,7 @@ def get_bodegas_inventarios_safe():
         logger.error(f'Error obteniendo bodegas: {e}')
         return []
 
-def insert_bodega_safe(nombre, ubicacion, responsable=None):
-    """Insertar nueva bodega de forma segura"""
-    try:
-        with get_connection() as conn:
-            with conn.cursor() as cursor:
-                query = """
-                INSERT INTO BODEGAS (nombre, ubicacion, responsable)
-                VALUES (%s, %s, %s)
-                """
-                cursor.execute(query, (nombre, ubicacion, responsable))
-                conn.commit()
-                return True
-    except Exception as e:
-        logger.error(f'Error insertando bodega: {e}')
-        return False
+# Función duplicada eliminada - usar la función correcta en línea 2988
 
 def get_inventarios_por_bodega_safe(id_bodega):
     """Obtener inventarios de una bodega específica"""

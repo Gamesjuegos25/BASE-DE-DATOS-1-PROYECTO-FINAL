@@ -46,9 +46,22 @@
                         <label class="form-label">
                             <i class="fas fa-user"></i> Responsable de la Bodega <span class="required">*</span>
                         </label>
+                        {% if empleados_supervisores %}
+                        <select class="form-select" id="responsable_bodega" name="responsable_bodega" required>
+                            <option value="">Seleccionar responsable...</option>
+                            {% for empleado in empleados_supervisores %}
+                            <option value="{{ empleado.id_empleado }}">
+                                {{ empleado.nombre_empleado }} {{ empleado.apellido_empleado or '' }} 
+                                {% if empleado.tipo_empleado %}({{ empleado.tipo_empleado }}){% endif %}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        {% else %}
                         <input class="form-input" id="responsable_bodega" name="responsable_bodega" required placeholder="Ingrese nombre del responsable">
+                        <small class="form-text text-muted">No hay empleados supervisores disponibles. Puede ingresar el nombre manualmente.</small>
+                        {% endif %}
                         <div class="invalid-feedback">
-                            Por favor ingrese el responsable de la bodega.
+                            Por favor seleccione el responsable de la bodega.
                         </div>
                     </div>
                 </div>
